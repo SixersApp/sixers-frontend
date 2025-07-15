@@ -1,0 +1,31 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in the system.
+labels: ["bug"]
+title: "[Bug]: "
+body:
+    - type: textarea
+      id: bugDescription
+      attributes:
+          label: Bug Description
+          placeholder: Describe the bug in detail.
+      validations:
+          required: true
+    - type: textarea
+      id: stepsToReproduce
+      attributes:
+          label: Steps to Reproduce
+          placeholder: List the steps to reproduce the bug.
+      validations:
+          required: true
+    - type: textarea
+      id: behavior
+      attributes:
+          label: Behavior
+          placeholder: What did you expect to happen vs what actually happened?
+      validations:
+          required: true
+    - type: textarea
+      id: devNotes
+      attributes:
+          label: Dev Notes
+          placeholder: Optional notes for developers

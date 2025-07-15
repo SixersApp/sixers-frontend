@@ -1,0 +1,24 @@
+name: User Story
+description: A default user story with developer notes and user story.
+labels: ["User Story"]
+title: "[Story]: "
+body:
+    - type: textarea
+      id: why
+      attributes:
+          label: User Story
+          placeholder: As [user], I want [feature] because [reason]
+      validations:
+          required: true
+    - type: textarea
+      id: acceptanceCritera
+      attributes:
+          label: Acceptance Critera
+          placeholder: N/A
+      validations:
+          required: true
+    - type: textarea
+      id: devNotes
+      attributes:
+          label: Dev Notes
+          placeholder: N/A
