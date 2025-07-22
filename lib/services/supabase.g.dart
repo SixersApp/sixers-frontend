@@ -6,7 +6,7 @@ part of 'supabase.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$playersFutureHash() => r'0e9b648429134e9eb12da5b01ef09810ac0ac359';
+String _$playersFutureHash() => r'1651340e288f61b5d7170465810321d825699703';
 
 /// See also [playersFuture].
 @ProviderFor(playersFuture)

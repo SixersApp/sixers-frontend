@@ -40,7 +40,10 @@ class PlayersScreen extends ConsumerWidget {
           itemCount: players.length,
           itemBuilder: (context, index) {
             final player = players[index];
-            return ListTile(title: Text(player.name), subtitle: Text('ID: \\${player.id}'));
+            return ListTile(
+              title: Text(player.name),
+              subtitle: Text('ID: ${player.id}\nTournament: ${player.tournaments.name}\nReal Team: ${player.real_teams.name}'),
+            );
           },
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
