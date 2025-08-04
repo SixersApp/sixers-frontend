@@ -5,35 +5,47 @@ import 'fantasy_team_model.dart';
 class FantasyTeamService {
   final client = Supabase.instance.client;
 
-  /// Get all fantasy teams for a specific user
-  Future<List<FantasyTeam>> getUserFantasyTeams(String userId) async {
-    final res = await client
+  /* ---------- reads ---------- */
+
+  Future<List<FantasyTeam>> fetchTeamsForUser(String userId) async {
+    final rows = await client
         .from('fantasy_teams')
         .select()
         .eq('user_id', userId);
 
-    return (res as List).map((json) => FantasyTeam.fromJson(json)).toList();
+    return (rows as List)
+        .map((row) => FantasyTeam.fromJson(row as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<List<FantasyTeam>> fetchTeamsForLeague(String leagueId) async {
+    final rows = await client
+        .from('fantasy_teams')
+        .select()
+        .eq('league_id', leagueId);
+
+    return (rows as List)
+        .map((row) => FantasyTeam.fromJson(row as Map<String, dynamic>))
+        .toList();
   }
 
   Future<FantasyTeam?> getTeamById(String id) async {
-    final res = await client
+    final row = await client
         .from('fantasy_teams')
         .select()
         .eq('id', id)
         .maybeSingle();
-
-    return res == null ? null : FantasyTeam.fromJson(res);
+    return row == null ? null : FantasyTeam.fromJson(row);
   }
 
-  Future<void> createTeam(FantasyTeam team) async {
-    await client.from('fantasy_teams').insert(team.toJson());
-  }
+  /* ---------- mutations ---------- */
 
-  Future<void> updateTeam(FantasyTeam team) async {
-    await client.from('fantasy_teams').update(team.toJson()).eq('id', team.id);
-  }
+  Future<void> createTeam(FantasyTeam team) =>
+      client.from('fantasy_teams').insert(team.toJson());
 
-  Future<void> deleteTeam(String id) async {
-    await client.from('fantasy_teams').delete().eq('id', id);
-  }
+  Future<void> updateTeam(FantasyTeam team) =>
+      client.from('fantasy_teams').update(team.toJson()).eq('id', team.id);
+
+  Future<void> deleteTeam(String id) =>
+      client.from('fantasy_teams').delete().eq('id', id);
 }

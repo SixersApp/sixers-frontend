@@ -2,6 +2,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/leagues/league_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'league_provider.g.dart';
 
@@ -11,32 +12,40 @@ class Leagues extends _$Leagues {
 
   @override
   Future<List<League>> build() async {
-    return [];
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid == null) return [];
+    return _service.fetchLeaguesForUser(uid);
   }
 
-  Future<void> loadLeaguesForUser(String userId) async {
+  /* ---------- CRUD helpers ---------- */
+
+  Future<void> refresh() async {
+    // AsyncLoading(previous) keeps old list while refetching → no blank frame
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      return await _service.fetchLeaguesForUser(userId);
-    });
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid == null) {
+      state = const AsyncData([]);
+      return;
+    }
+    state = await AsyncValue.guard(() => _service.fetchLeaguesForUser(uid));
   }
 
-  Future<void> createLeague(League league, String userId) async {
-    await _service.createLeague(league, userId);
-    await loadLeaguesForUser(userId);
+  Future<void> createLeague(League league) async {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid == null) return;
+    await _service.createLeague(league, uid);
+    await refresh();
   }
 
-  Future<void> updateLeague(League league, String userId) async {
+  Future<void> updateLeague(League league) async {
     await _service.updateLeague(league);
-    await loadLeaguesForUser(userId);
+    await refresh();
   }
 
-  Future<void> deleteLeague(String leagueId, String userId) async {
+  Future<void> deleteLeague(String leagueId) async {
     await _service.deleteLeague(leagueId);
-    await loadLeaguesForUser(userId);
+    await refresh();
   }
 
-  Future<League?> getLeagueById(String id) async {
-    return await _service.getLeagueById(id);
-  }
+  Future<League?> getLeagueById(String id) => _service.getLeagueById(id);
 }

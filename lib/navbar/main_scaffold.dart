@@ -1,6 +1,6 @@
 // lib/navigation/main_scaffold.dart
 import 'package:flutter/material.dart';
-import 'package:sixers/views/drafts_screen.dart';
+import 'package:sixers/views/draft_screen.dart';
 import 'package:sixers/views/home_screen.dart';
 import 'package:sixers/views/players_screen.dart';
 import 'navbar.dart';
@@ -17,7 +17,7 @@ class _MainScaffoldState extends State<MainScaffold> {
 
   final List<Widget> _pages = const [
     HomeScreen(),
-    DraftsScreen(),
+    DraftScreen(),
     PlayersScreen(),
   ];
 

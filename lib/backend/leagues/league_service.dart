@@ -7,13 +7,36 @@ class LeagueService {
 
   /// Get all leagues where the user owns a fantasy team
   Future<List<League>> fetchLeaguesForUser(String userId) async {
-    final rows = await client
+    print('[fetchLeaguesForUser] userId = $userId');
+
+    // 1️⃣ get league_ids where the user owns a fantasy team
+    final teamRows = await client
         .from('fantasy_teams')
-        .select('leagues(*)')
+        .select('league_id') // only the FK column
         .eq('user_id', userId);
 
-    return (rows as List)
-        .map((row) => League.fromJson(row['leagues']))
+    print('[fetchLeaguesForUser] teamRows: $teamRows');
+
+    final ids = (teamRows as List)
+        .map((row) => row['league_id'] as String)
+        .toSet() // remove duplicates
+        .toList();
+
+    if (ids.isEmpty) {
+      print('[fetchLeaguesForUser] no league_ids found');
+      return [];
+    }
+
+    // 2️⃣ fetch those leagues
+    final leagueRows = await client
+        .from('leagues')
+        .select()
+        .inFilter('id', ids);
+
+    print('[fetchLeaguesForUser] leagueRows: $leagueRows');
+
+    return (leagueRows as List)
+        .map((json) => League.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 

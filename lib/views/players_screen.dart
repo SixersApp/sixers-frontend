@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:sixers/backend/auth/auth_gate.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/services/supabase.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PlayersScreen extends ConsumerWidget {
   const PlayersScreen({super.key});
