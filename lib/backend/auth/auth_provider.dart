@@ -1,7 +1,6 @@
-
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sixers/backend/auth/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../services/auth_service.dart';
 
 part 'auth_provider.g.dart';
 
