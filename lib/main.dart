@@ -7,9 +7,12 @@ import 'services/supabase.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: '.env');
 
-  await Supabase.initialize(url: dotenv.env['SUPABASE_URL']!, anonKey: dotenv.env['SUPABASE_ANON_KEY']!);
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+  );
 
   runApp(ProviderScope(child: const SixersApp()));
 }
@@ -21,7 +24,9 @@ class SixersApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Sixers',
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      ),
       home: const PlayersScreen(),
     );
   }
@@ -42,7 +47,9 @@ class PlayersScreen extends ConsumerWidget {
             final player = players[index];
             return ListTile(
               title: Text(player.name),
-              subtitle: Text('ID: ${player.id}\nTournament: ${player.tournaments.name}\nReal Team: ${player.real_teams.name}'),
+              subtitle: Text(
+                'ID: ${player.id}\nTournament: ${player.tournaments.name}\nReal Team: ${player.real_teams.name}',
+              ),
             );
           },
         ),
