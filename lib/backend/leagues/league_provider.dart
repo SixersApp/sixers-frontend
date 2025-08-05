@@ -47,5 +47,24 @@ class Leagues extends _$Leagues {
     await refresh();
   }
 
+  Future<void> startDraft(String leagueId) async {
+    await _service.startDraft(leagueId);
+    await refresh(); // refresh provider state
+  }
+
   Future<League?> getLeagueById(String id) => _service.getLeagueById(id);
+}
+
+@riverpod
+class LeagueActions extends _$LeagueActions {
+  final _svc = LeagueService();
+
+  @override
+  void build() {} // stateless
+
+  Future<void> startDraft(String leagueId) async {
+    await _svc.startDraft(leagueId);
+    // refresh leagues list everywhere
+    ref.invalidate(leaguesProvider);
+  }
 }

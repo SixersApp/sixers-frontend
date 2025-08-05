@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:sixers/views/draft_screen.dart';
 import 'package:sixers/views/home_screen.dart';
-import 'package:sixers/views/players_screen.dart';
 import 'navbar.dart';
 
 class MainScaffold extends StatefulWidget {
@@ -15,11 +14,7 @@ class MainScaffold extends StatefulWidget {
 class _MainScaffoldState extends State<MainScaffold> {
   int _index = 0;
 
-  final List<Widget> _pages = const [
-    HomeScreen(),
-    DraftScreen(),
-    PlayersScreen(),
-  ];
+  final List<Widget> _pages = const [HomeScreen(), DraftScreen(), HomeScreen()];
 
   void _onTabTapped(int newIndex) {
     setState(() => _index = newIndex);

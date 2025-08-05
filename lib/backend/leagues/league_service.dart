@@ -73,4 +73,11 @@ class LeagueService {
         .maybeSingle();
     return res == null ? null : League.fromJson(res);
   }
+
+  Future<void> startDraft(String leagueId) async {
+    await client
+        .from('leagues')
+        .update({'status': 'draft_in_progress'})
+        .eq('id', leagueId);
+  }
 }

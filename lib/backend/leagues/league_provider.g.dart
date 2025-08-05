@@ -6,7 +6,7 @@ part of 'league_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$leaguesHash() => r'daf375c0ccdbf81d9260842969b524b66a91b438';
+String _$leaguesHash() => r'0eff00259ad6fbcffd52ae9166ad91b96207a194';
 
 /// See also [Leagues].
 @ProviderFor(Leagues)
@@ -22,5 +22,21 @@ final leaguesProvider =
     );
 
 typedef _$Leagues = AutoDisposeAsyncNotifier<List<League>>;
+String _$leagueActionsHash() => r'cbbd7ff108ebef2af4a0966d1bbf794f654cc1fc';
+
+/// See also [LeagueActions].
+@ProviderFor(LeagueActions)
+final leagueActionsProvider =
+    AutoDisposeNotifierProvider<LeagueActions, void>.internal(
+      LeagueActions.new,
+      name: r'leagueActionsProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$leagueActionsHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$LeagueActions = AutoDisposeNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
