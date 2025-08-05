@@ -20,7 +20,7 @@ class DraftStateService {
     Timer? pollTimer;
 
     // Helper to poll for the initial row in case realtime insert is missed
-    Future<void> _pollInitial() async {
+    Future<void> pollInitial() async {
       final initial = await fetch(leagueId);
       if (initial != null) {
         controller.add(initial);
@@ -49,10 +49,12 @@ class DraftStateService {
 
     controller
       ..onListen = () async {
-        await _pollInitial();
+        await pollInitial();
         // if still no state, periodically poll until row exists
-        pollTimer ??=
-            Timer.periodic(const Duration(seconds: 2), (_) => _pollInitial());
+        pollTimer ??= Timer.periodic(
+          const Duration(seconds: 2),
+          (_) => pollInitial(),
+        );
       }
       ..onCancel = () {
         pollTimer?.cancel();

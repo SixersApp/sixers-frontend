@@ -1,6 +1,5 @@
 // lib/draft_settings/draft_settings_provider.dart
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'draft_settings_model.dart' as model; // alias to avoid name clash
 import 'draft_settings_service.dart';
 

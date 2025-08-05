@@ -33,7 +33,9 @@ class DraftPickService {
     controller
       ..onListen = () async {
         final initial = await fetch(leagueId);
-        for (final p in initial) controller.add(p);
+        for (final p in initial) {
+          controller.add(p);
+        }
       }
       ..onCancel = () => _client.removeChannel(channel);
 
