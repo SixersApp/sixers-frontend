@@ -1,4 +1,3 @@
-// lib/screens/draft_lobby.dart
 import 'dart:async';
 
 import 'package:collection/collection.dart';
