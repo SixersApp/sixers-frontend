@@ -20,14 +20,16 @@ class DraftStateService {
 
     final channel = _client
         .channel('public:league_draft_state:league_id=eq.$leagueId')
+        // 🔹 INSERT to catch the first row
         .onPostgresChanges(
-          event: PostgresChangeEvent.all,
-          callback: (payload) {
-            final newRecord = payload.newRecord;
-            if (newRecord != null) {
-              controller.add(DraftState.fromJson(newRecord));
-            }
-          },
+          event: PostgresChangeEvent.insert,
+          callback: (payload) =>
+              controller.add(DraftState.fromJson(payload.newRecord)),
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
+          callback: (payload) =>
+              controller.add(DraftState.fromJson(payload.newRecord)),
         )
         .subscribe();
 

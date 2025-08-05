@@ -31,38 +31,30 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
 
   @override
   Widget build(BuildContext context) {
-    final league = widget.league;
     final uid = Supabase.instance.client.auth.currentUser!.id;
 
-    /* ─── Providers ─────────────────────────────────────────── */
-    final stateA = ref.watch(draftStateStreamProvider(league.id));
-    final picksA = ref.watch(draftPicksStreamProvider(league.id));
-    final settingsA = ref.watch(draftSettingsProvider(league.id));
+    /* ─── Static providers ────────────────────────────────── */
+    final leaguesA = ref.watch(leaguesProvider); // latest league row
+    final settingsA = ref.watch(draftSettingsProvider(widget.league.id));
     final teamsA = ref.watch(fantasyTeamsProvider);
-    final playersA = ref.watch(allPlayersProvider(league.tournamentId));
+    final playersA = ref.watch(allPlayersProvider(widget.league.tournamentId));
 
-    /* ─── Loading logic  ────────────────────────────────────── */
-    final waitingForState = league.status == LeagueStatus.draft_in_progress
-        ? stateA.isLoading
-        : false;
-    final waitingForPicks = league.status == LeagueStatus.draft_in_progress
-        ? picksA.isLoading
-        : false;
-
-    if (waitingForState ||
-        waitingForPicks ||
-        settingsA.isLoading ||
-        teamsA.isLoading ||
-        playersA.isLoading) {
+    // wait for static providers
+    if ([leaguesA, settingsA, teamsA, playersA].any((a) => a.isLoading)) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
-    /* ─── Error handling ────────────────────────────────────── */
-    for (final a in [stateA, picksA, settingsA, teamsA, playersA]) {
+    for (final a in [leaguesA, settingsA, teamsA, playersA]) {
       if (a.hasError) return _err(a.error);
     }
 
-    /* ─── Draft pending screen ─────────────────────────────── */
+    // freshest league row
+    final leagues = leaguesA.requireValue;
+    final league = leagues.firstWhere(
+      (l) => l.id == widget.league.id,
+      orElse: () => widget.league,
+    );
+
+    /* ─── Draft pending view ─────────────────────────────── */
     if (league.status == LeagueStatus.draft_pending) {
       return Scaffold(
         appBar: AppBar(title: Text('Draft • ${league.name}')),
@@ -81,12 +73,30 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
       );
     }
 
-    /* ─── Draft in progress  — all providers now have data ─── */
+    /* ─── Dynamic providers (only relevant once draft begins) ─ */
+    final stateA = ref.watch(draftStateStreamProvider(league.id));
+    final picksA = ref.watch(draftPicksStreamProvider(league.id));
+
+    final waitingForState = stateA.isLoading;
+    final waitingForPicks = picksA.isLoading;
+
+    if (waitingForState || waitingForPicks) {
+      return Scaffold(
+        appBar: AppBar(title: Text('Draft • ${league.name}')),
+        body: const Center(child: Text('Preparing draft room…')),
+      );
+    }
+
+    if (stateA.hasError) return _err(stateA.error);
+    if (picksA.hasError) return _err(picksA.error);
+
+    /* ─── Draft in progress ───────────────────────────────── */
     final state = stateA.requireValue;
     final picks = picksA.requireValue;
     final teams = teamsA.requireValue;
     final players = playersA.requireValue;
 
+    // per-second rebuild for countdown
     _ticker ??= Timer.periodic(
       const Duration(seconds: 1),
       (_) => setState(() {}),
@@ -100,10 +110,10 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
     final myTeam = teams.firstWhereOrNull(
       (t) => t.leagueId == league.id && t.userId == uid,
     );
-    final currentTeamOwnerUid = teams
+    final currentOwnerUid = teams
         .firstWhereOrNull((t) => t.id == state.currentTeamId)
         ?.userId;
-    final myTurn = currentTeamOwnerUid == uid;
+    final myTurn = currentOwnerUid == uid;
 
     final availablePlayers = players
         .where((pl) => picks.every((p) => p.playerId != pl.id))
@@ -152,7 +162,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
     );
   }
 
-  /* ─── Helpers ─────────────────────────────────────────────── */
+  /* ─── Helpers ─────────────────────────────────────────── */
 
   Widget _header(state, int secs) => Container(
     width: double.infinity,
@@ -175,14 +185,26 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
   );
 
   Future<void> _pickPlayer(String playerId, String? myTeamId) async {
-    if (myTeamId == null) return;
-    await ref
-        .read(draftPickActionsProvider.notifier)
-        .makePick(
-          leagueId: widget.league.id,
-          teamId: myTeamId,
-          playerId: playerId,
-        );
+    if (myTeamId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Your team not found for this league')),
+      );
+      return;
+    }
+
+    try {
+      await ref
+          .read(draftPickActionsProvider.notifier)
+          .makePick(
+            leagueId: widget.league.id,
+            teamId: myTeamId,
+            playerId: playerId,
+          );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Pick failed: $e')));
+    }
   }
 
   Scaffold _err(Object? e) => Scaffold(body: Center(child: Text('Error: $e')));

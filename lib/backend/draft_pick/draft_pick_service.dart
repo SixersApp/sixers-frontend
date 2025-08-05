@@ -48,7 +48,11 @@ class DraftPickService {
   }) {
     return _client.rpc(
       'make_draft_pick_full',
-      params: {'_league': leagueId, '_team': teamId, '_player': playerId},
+      params: {
+        'p_fantasy_team_id': teamId,
+        'p_league_id': leagueId,
+        'p_player_id': playerId,
+      },
     );
   }
 }
