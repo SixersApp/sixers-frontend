@@ -1,27 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'supabase.dart';
+part of 'auth_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$playersFutureHash() => r'1651340e288f61b5d7170465810321d825699703';
+String _$authHash() => r'e462e8302530ad92b07355d0a83fb769249a8cee';
 
-/// See also [playersFuture].
-@ProviderFor(playersFuture)
-final playersFutureProvider = AutoDisposeFutureProvider<List<Player>>.internal(
-  playersFuture,
-  name: r'playersFutureProvider',
+/// See also [Auth].
+@ProviderFor(Auth)
+final authProvider = AutoDisposeNotifierProvider<Auth, User?>.internal(
+  Auth.new,
+  name: r'authProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$playersFutureHash,
+      : _$authHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PlayersFutureRef = AutoDisposeFutureProviderRef<List<Player>>;
+typedef _$Auth = AutoDisposeNotifier<User?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
