@@ -54,8 +54,17 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
       orElse: () => widget.league,
     );
 
-    /* ─── Draft pending view ─────────────────────────────── */
-    if (league.status == LeagueStatus.draft_pending) {
+    /* ─── Dynamic providers ──────────────────────────────── */
+    final stateA = ref.watch(draftStateStreamProvider(league.id));
+    final picksA = ref.watch(draftPicksStreamProvider(league.id));
+
+    if (stateA.hasError) return _err(stateA.error);
+    if (picksA.hasError) return _err(picksA.error);
+
+    final state = stateA.valueOrNull;
+
+    // If no draft state yet, show waiting/pending view
+    if (state == null) {
       return Scaffold(
         appBar: AppBar(title: Text('Draft • ${league.name}')),
         body: Center(
@@ -73,26 +82,15 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
       );
     }
 
-    /* ─── Dynamic providers (only relevant once draft begins) ─ */
-    final stateA = ref.watch(draftStateStreamProvider(league.id));
-    final picksA = ref.watch(draftPicksStreamProvider(league.id));
-
-    final waitingForState = stateA.isLoading;
-    final waitingForPicks = picksA.isLoading;
-
-    if (waitingForState || waitingForPicks) {
+    final picks = picksA.valueOrNull;
+    if (picks == null) {
       return Scaffold(
         appBar: AppBar(title: Text('Draft • ${league.name}')),
         body: const Center(child: Text('Preparing draft room…')),
       );
     }
 
-    if (stateA.hasError) return _err(stateA.error);
-    if (picksA.hasError) return _err(picksA.error);
-
     /* ─── Draft in progress ───────────────────────────────── */
-    final state = stateA.requireValue;
-    final picks = picksA.requireValue;
     final teams = teamsA.requireValue;
     final players = playersA.requireValue;
 
@@ -102,10 +100,15 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
       (_) => setState(() {}),
     );
 
-    final secsLeft = state.pickDeadline
-        .difference(DateTime.now())
-        .inSeconds
-        .clamp(0, 9999);
+    // Calculate remaining seconds using server update time to reduce skew
+    final now = DateTime.now();
+    final updatedAt = state.updatedAt;
+    final secsLeft = updatedAt == null
+        ? state.pickDeadline.difference(now).inSeconds
+        : (state.pickDeadline.difference(updatedAt) -
+                now.difference(updatedAt))
+            .inSeconds
+            .clamp(0, 9999);
 
     final myTeam = teams.firstWhereOrNull(
       (t) => t.leagueId == league.id && t.userId == uid,
