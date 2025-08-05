@@ -16,7 +16,7 @@ class DraftPickService {
         .toList();
   }
 
-  /// realtime insert stream
+  /// realtime stream of inserts/updates
   Stream<DraftPick> stream(String leagueId) {
     final controller = StreamController<DraftPick>();
 
@@ -24,6 +24,12 @@ class DraftPickService {
         .channel('public:draft_picks:league_id=eq.$leagueId')
         .onPostgresChanges(
           event: PostgresChangeEvent.insert,
+          callback: (payload) {
+            controller.add(DraftPick.fromJson(payload.newRecord));
+          },
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
           callback: (payload) {
             controller.add(DraftPick.fromJson(payload.newRecord));
           },
