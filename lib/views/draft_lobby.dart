@@ -36,57 +36,44 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
     final uid = Supabase.instance.client.auth.currentUser!.id;
 
     /* ─── Providers ─────────────────────────────────────────── */
-    final leaguesA = ref.watch(leaguesProvider); // NEW
     final stateA = ref.watch(draftStateStreamProvider(league.id));
     final picksA = ref.watch(draftPicksStreamProvider(league.id));
     final settingsA = ref.watch(draftSettingsProvider(league.id));
     final teamsA = ref.watch(fantasyTeamsProvider);
     final playersA = ref.watch(allPlayersProvider(league.tournamentId));
 
-    /* ─── Loading ───────────────────────────────────────────── */
-    if ([leaguesA, settingsA, teamsA, playersA].any((a) => a.isLoading)) {
+    /* ─── Loading logic  ────────────────────────────────────── */
+    final waitingForState = league.status == LeagueStatus.draft_in_progress
+        ? stateA.isLoading
+        : false;
+    final waitingForPicks = league.status == LeagueStatus.draft_in_progress
+        ? picksA.isLoading
+        : false;
+
+    if (waitingForState ||
+        waitingForPicks ||
+        settingsA.isLoading ||
+        teamsA.isLoading ||
+        playersA.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    /* ─── Error (static providers first) ────────────────────── */
-    for (final a in [leaguesA, settingsA, teamsA, playersA]) {
+    /* ─── Error handling ────────────────────────────────────── */
+    for (final a in [stateA, picksA, settingsA, teamsA, playersA]) {
       if (a.hasError) return _err(a.error);
     }
 
-    /* ─── Get fresh League each build ───────────────────────── */
-    final leagues = leaguesA.requireValue;
-    final freshLeague = leagues.firstWhere(
-      (l) => l.id == league.id,
-      orElse: () => league,
-    );
-
-    /* dynamic wait: if draft has started, also wait on streams */
-    final bool waitState =
-        freshLeague.status == LeagueStatus.draft_in_progress &&
-        stateA.isLoading;
-    final bool waitPicks =
-        freshLeague.status == LeagueStatus.draft_in_progress &&
-        picksA.isLoading;
-
-    if (waitState || waitPicks) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
-    /* Err on dynamic streams */
-    if (stateA.hasError) return _err(stateA.error);
-    if (picksA.hasError) return _err(picksA.error);
-
     /* ─── Draft pending screen ─────────────────────────────── */
-    if (freshLeague.status == LeagueStatus.draft_pending) {
+    if (league.status == LeagueStatus.draft_pending) {
       return Scaffold(
-        appBar: AppBar(title: Text('Draft • ${freshLeague.name}')),
+        appBar: AppBar(title: Text('Draft • ${league.name}')),
         body: Center(
-          child: freshLeague.creatorId == uid
+          child: league.creatorId == uid
               ? ElevatedButton(
                   onPressed: () async {
                     await ref
                         .read(leagueActionsProvider.notifier)
-                        .startDraft(freshLeague.id);
+                        .startDraft(league.id);
                   },
                   child: const Text('Start Draft'),
                 )
@@ -95,7 +82,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
       );
     }
 
-    /* ─── Draft in progress ─────────────────────────────────── */
+    /* ─── Draft in progress  — all providers now have data ─── */
     final state = stateA.requireValue;
     final picks = picksA.requireValue;
     final teams = teamsA.requireValue;
@@ -189,28 +176,14 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
   );
 
   Future<void> _pickPlayer(String playerId, String? myTeamId) async {
-    final uid = Supabase.instance.client.auth.currentUser!.id;
-
-    if (myTeamId == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Team not found')));
-      return;
-    }
-
-    try {
-      await ref
-          .read(draftPickActionsProvider.notifier)
-          .makePick(
-            leagueId: widget.league.id,
-            teamId: myTeamId,
-            playerId: playerId,
-          );
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Pick failed: $e')));
-    }
+    if (myTeamId == null) return;
+    await ref
+        .read(draftPickActionsProvider.notifier)
+        .makePick(
+          leagueId: widget.league.id,
+          teamId: myTeamId,
+          playerId: playerId,
+        );
   }
 
   Scaffold _err(Object? e) => Scaffold(body: Center(child: Text('Error: $e')));
