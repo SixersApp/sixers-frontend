@@ -6,7 +6,7 @@ part of 'draft_pick_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$draftPicksStreamHash() => r'9cf87ccbb22e89c480b8e61ed328ab96b59547c3';
+String _$draftPicksStreamHash() => r'7048f18b6d16bab36ee598d0d551263252980317';
 
 /// Copied from Dart SDK
 class _SystemHash {
