@@ -30,7 +30,7 @@ class DraftStateService {
           filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'league_id', value: leagueId),
           callback: (payload) {
             debugPrint('RT ► ${payload.eventType}'
-                ' pick# ${payload.newRecord?['current_pick_number']}');
+                ' pick# ${payload.newRecord['current_pick_number']}');
             ctrl.add(DraftState.fromJson(payload.newRecord));
           },
         )
