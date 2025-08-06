@@ -22,7 +22,7 @@ final leaguesProvider =
     );
 
 typedef _$Leagues = AutoDisposeAsyncNotifier<List<League>>;
-String _$leagueActionsHash() => r'cbbd7ff108ebef2af4a0966d1bbf794f654cc1fc';
+String _$leagueActionsHash() => r'df225bb98f1cfc5cadf552cc4285a8be5bb93daa';
 
 /// See also [LeagueActions].
 @ProviderFor(LeagueActions)

@@ -6,7 +6,7 @@ part of 'draft_pick_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$draftPicksStreamHash() => r'7048f18b6d16bab36ee598d0d551263252980317';
+String _$draftPicksHash() => r'3e005469476bb05e50b38100ceaebbc55b4a3fe7';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,23 +29,23 @@ class _SystemHash {
   }
 }
 
-/// See also [draftPicksStream].
-@ProviderFor(draftPicksStream)
-const draftPicksStreamProvider = DraftPicksStreamFamily();
+/// See also [draftPicks].
+@ProviderFor(draftPicks)
+const draftPicksProvider = DraftPicksFamily();
 
-/// See also [draftPicksStream].
-class DraftPicksStreamFamily extends Family<AsyncValue<List<DraftPick>>> {
-  /// See also [draftPicksStream].
-  const DraftPicksStreamFamily();
+/// See also [draftPicks].
+class DraftPicksFamily extends Family<AsyncValue<List<DraftPick>>> {
+  /// See also [draftPicks].
+  const DraftPicksFamily();
 
-  /// See also [draftPicksStream].
-  DraftPicksStreamProvider call(String leagueId) {
-    return DraftPicksStreamProvider(leagueId);
+  /// See also [draftPicks].
+  DraftPicksProvider call(String leagueId) {
+    return DraftPicksProvider(leagueId);
   }
 
   @override
-  DraftPicksStreamProvider getProviderOverride(
-    covariant DraftPicksStreamProvider provider,
+  DraftPicksProvider getProviderOverride(
+    covariant DraftPicksProvider provider,
   ) {
     return call(provider.leagueId);
   }
@@ -62,28 +62,26 @@ class DraftPicksStreamFamily extends Family<AsyncValue<List<DraftPick>>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'draftPicksStreamProvider';
+  String? get name => r'draftPicksProvider';
 }
 
-/// See also [draftPicksStream].
-class DraftPicksStreamProvider
-    extends AutoDisposeStreamProvider<List<DraftPick>> {
-  /// See also [draftPicksStream].
-  DraftPicksStreamProvider(String leagueId)
+/// See also [draftPicks].
+class DraftPicksProvider extends AutoDisposeFutureProvider<List<DraftPick>> {
+  /// See also [draftPicks].
+  DraftPicksProvider(String leagueId)
     : this._internal(
-        (ref) => draftPicksStream(ref as DraftPicksStreamRef, leagueId),
-        from: draftPicksStreamProvider,
-        name: r'draftPicksStreamProvider',
+        (ref) => draftPicks(ref as DraftPicksRef, leagueId),
+        from: draftPicksProvider,
+        name: r'draftPicksProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
             ? null
-            : _$draftPicksStreamHash,
-        dependencies: DraftPicksStreamFamily._dependencies,
-        allTransitiveDependencies:
-            DraftPicksStreamFamily._allTransitiveDependencies,
+            : _$draftPicksHash,
+        dependencies: DraftPicksFamily._dependencies,
+        allTransitiveDependencies: DraftPicksFamily._allTransitiveDependencies,
         leagueId: leagueId,
       );
 
-  DraftPicksStreamProvider._internal(
+  DraftPicksProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -97,12 +95,12 @@ class DraftPicksStreamProvider
 
   @override
   Override overrideWith(
-    Stream<List<DraftPick>> Function(DraftPicksStreamRef provider) create,
+    FutureOr<List<DraftPick>> Function(DraftPicksRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: DraftPicksStreamProvider._internal(
-        (ref) => create(ref as DraftPicksStreamRef),
+      override: DraftPicksProvider._internal(
+        (ref) => create(ref as DraftPicksRef),
         from: from,
         name: null,
         dependencies: null,
@@ -114,13 +112,13 @@ class DraftPicksStreamProvider
   }
 
   @override
-  AutoDisposeStreamProviderElement<List<DraftPick>> createElement() {
-    return _DraftPicksStreamProviderElement(this);
+  AutoDisposeFutureProviderElement<List<DraftPick>> createElement() {
+    return _DraftPicksProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is DraftPicksStreamProvider && other.leagueId == leagueId;
+    return other is DraftPicksProvider && other.leagueId == leagueId;
   }
 
   @override
@@ -134,21 +132,21 @@ class DraftPicksStreamProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin DraftPicksStreamRef on AutoDisposeStreamProviderRef<List<DraftPick>> {
+mixin DraftPicksRef on AutoDisposeFutureProviderRef<List<DraftPick>> {
   /// The parameter `leagueId` of this provider.
   String get leagueId;
 }
 
-class _DraftPicksStreamProviderElement
-    extends AutoDisposeStreamProviderElement<List<DraftPick>>
-    with DraftPicksStreamRef {
-  _DraftPicksStreamProviderElement(super.provider);
+class _DraftPicksProviderElement
+    extends AutoDisposeFutureProviderElement<List<DraftPick>>
+    with DraftPicksRef {
+  _DraftPicksProviderElement(super.provider);
 
   @override
-  String get leagueId => (origin as DraftPicksStreamProvider).leagueId;
+  String get leagueId => (origin as DraftPicksProvider).leagueId;
 }
 
-String _$draftPickActionsHash() => r'2af3a837a7ea512db914f7732f844c9b132f29b4';
+String _$draftPickActionsHash() => r'6b864dd54e71d4085ea2cf11632b7d560b47ac41';
 
 /// expose mutations
 ///

@@ -65,6 +65,5 @@ class LeagueActions extends _$LeagueActions {
   Future<void> startDraft(String leagueId) async {
     await _svc.startDraft(leagueId);
     // refresh leagues list everywhere
-    ref.invalidate(leaguesProvider);
   }
 }
