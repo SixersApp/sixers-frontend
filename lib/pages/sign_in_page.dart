@@ -1,4 +1,4 @@
-// lib/pages/sign_in_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';

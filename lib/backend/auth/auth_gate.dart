@@ -1,4 +1,4 @@
-// lib/auth/auth_gate.dart
+
 import 'package:flutter/material.dart';
 import 'package:sixers/navbar/main_scaffold.dart';
 import 'package:sixers/views/sign_in_screen.dart';
@@ -20,9 +20,9 @@ class AuthGate extends StatelessWidget {
         }
 
         if (session == null) {
-          return const SignInScreen(); // custom sign-in page
+          return const SignInScreen();
         } else {
-          return const MainScaffold(); // nav shell
+          return const MainScaffold();
         }
       },
     );

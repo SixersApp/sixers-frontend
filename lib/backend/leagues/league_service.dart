@@ -1,25 +1,24 @@
-// lib/services/league_service.dart
+
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LeagueService {
   final client = Supabase.instance.client;
 
-  /// Get all leagues where the user owns a fantasy team
   Future<List<League>> fetchLeaguesForUser(String userId) async {
     print('[fetchLeaguesForUser] userId = $userId');
 
-    // 1️⃣ get league_ids where the user owns a fantasy team
+   
     final teamRows = await client
         .from('fantasy_teams')
-        .select('league_id') // only the FK column
+        .select('league_id') 
         .eq('user_id', userId);
 
     print('[fetchLeaguesForUser] teamRows: $teamRows');
 
     final ids = (teamRows as List)
         .map((row) => row['league_id'] as String)
-        .toSet() // remove duplicates
+        .toSet()
         .toList();
 
     if (ids.isEmpty) {
@@ -27,7 +26,6 @@ class LeagueService {
       return [];
     }
 
-    // 2️⃣ fetch those leagues
     final leagueRows = await client
         .from('leagues')
         .select()
@@ -40,7 +38,6 @@ class LeagueService {
         .toList();
   }
 
-  /// Create a league and add the creator as a fantasy team
   Future<void> createLeague(League league, String userId) async {
     final inserted = await client
         .from('leagues')

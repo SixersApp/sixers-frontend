@@ -1,4 +1,4 @@
-// lib/main.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -28,7 +28,7 @@ class SixersApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const AuthGate(), // 👈 Replaces PlayersScreen
+      home: const AuthGate(), 
     );
   }
 }

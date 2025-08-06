@@ -10,7 +10,7 @@ class Auth extends _$Auth {
 
   @override
   User? build() {
-    // Initial state: current user
+
     _service.authStateChanges.listen((event) {
       state = event.session?.user;
     });

@@ -1,11 +1,10 @@
-// lib/fantasy_teams/fantasy_team_service.dart
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'fantasy_team_model.dart';
 
 class FantasyTeamService {
   final client = Supabase.instance.client;
 
-  /* ---------- reads ---------- */
 
   Future<List<FantasyTeam>> fetchTeamsForUser(String userId) async {
     final rows = await client
@@ -38,7 +37,7 @@ class FantasyTeamService {
     return row == null ? null : FantasyTeam.fromJson(row);
   }
 
-  /* ---------- mutations ---------- */
+
 
   Future<void> createTeam(FantasyTeam team) =>
       client.from('fantasy_teams').insert(team.toJson());

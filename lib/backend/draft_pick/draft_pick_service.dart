@@ -16,7 +16,7 @@ class DraftPickService {
         .toList();
   }
 
-  /// realtime insert stream
+
   Stream<DraftPick> stream(String leagueId) {
     final controller = StreamController<DraftPick>();
 
@@ -33,14 +33,16 @@ class DraftPickService {
     controller
       ..onListen = () async {
         final initial = await fetch(leagueId);
-        for (final p in initial) controller.add(p);
+        for (final p in initial) {
+          controller.add(p);
+        }
       }
       ..onCancel = () => _client.removeChannel(channel);
 
     return controller.stream;
   }
 
-  /// call the make_pick RPC (see SQL in roadmap)
+
   Future<void> makePick({
     required String leagueId,
     required String teamId,

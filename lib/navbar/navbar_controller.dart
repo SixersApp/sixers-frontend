@@ -1,4 +1,4 @@
-// lib/navbar/navbar_controller.dart
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'navbar_controller.g.dart';

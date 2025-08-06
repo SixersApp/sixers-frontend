@@ -1,4 +1,4 @@
-// lib/fantasy_teams/fantasy_team_provider.dart
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'fantasy_team_model.dart';
@@ -10,7 +10,6 @@ part 'fantasy_team_provider.g.dart';
 class FantasyTeams extends _$FantasyTeams {
   final _service = FantasyTeamService();
 
-  /* ---------- auto-load for the signed-in user ---------- */
   @override
   Future<List<FantasyTeam>> build() async {
     final uid = Supabase.instance.client.auth.currentUser?.id;
@@ -18,7 +17,7 @@ class FantasyTeams extends _$FantasyTeams {
     return _service.fetchTeamsForUser(uid);
   }
 
-  /* ---------- helpers ---------- */
+  
 
   Future<void> refresh() async {
     state = const AsyncLoading();
