@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../backend/auth/auth_provider.dart'; // adjust path if different
+import '../backend/auth/auth_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -17,7 +17,7 @@ class HomeScreen extends ConsumerWidget {
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await ref.read(authProvider.notifier).signOut();
-              // Optionally show a snack-bar or navigate to login page here
+           
             },
           ),
         ],

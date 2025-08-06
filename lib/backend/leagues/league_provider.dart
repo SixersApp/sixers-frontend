@@ -60,10 +60,10 @@ class LeagueActions extends _$LeagueActions {
   final _svc = LeagueService();
 
   @override
-  void build() {} // stateless
+  void build() {}
 
   Future<void> startDraft(String leagueId) async {
     await _svc.startDraft(leagueId);
-    // refresh leagues list everywhere
+    
   }
 }

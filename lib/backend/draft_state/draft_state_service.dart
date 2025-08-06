@@ -1,4 +1,4 @@
-// lib/draft_state/draft_state_service.dart
+
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -10,7 +10,7 @@ class DraftStateService {
   Stream<DraftState> stream(String leagueId) {
     final ctrl = StreamController<DraftState>.broadcast();
 
-    // cold-start query (row might already exist)
+   
     _c
         .from('league_draft_state')
         .select()
@@ -20,11 +20,11 @@ class DraftStateService {
       if (row != null) ctrl.add(DraftState.fromJson(row));
     });
 
-    // realtime subscription
+  
     final channel = _c
-        .channel('public:league_draft_state')          // channel name
+        .channel('public:league_draft_state')          
         .onPostgresChanges(
-          event: PostgresChangeEvent.all,              // INSERT + UPDATE
+          event: PostgresChangeEvent.all,              
           schema: 'public',
           table: 'league_draft_state',
           filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'league_id', value: leagueId),

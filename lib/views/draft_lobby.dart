@@ -1,4 +1,4 @@
-// lib/screens/draft_lobby.dart
+
 import 'dart:async';
 
 import 'package:collection/collection.dart';
@@ -36,7 +36,6 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
   Widget build(BuildContext context) {
     final uid = Supabase.instance.client.auth.currentUser!.id;
 
-    /* ── static providers (never realtime) ───────────────── */
     final settingsA = ref.watch(draftSettingsProvider(widget.league.id));
     final teamsA    = ref.watch(fantasyTeamsProvider);
     final playersA  = ref.watch(allPlayersProvider(widget.league.tournamentId));
@@ -48,17 +47,16 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
       if (a.hasError) return _err(a.error);
     }
 
-    /* ── realtime state  & picks ─────────────────────────── */
+
     final stateA = ref.watch(draftStateStreamProvider(widget.league.id));
     final picksA = ref.watch(draftPicksProvider(widget.league.id));
 
-    // stream errors
+  
     if (stateA.hasError) return _err(stateA.error);
     if (picksA.hasError) return _err(picksA.error);
 
     final state = stateA.valueOrNull;
 
-    /* ── draft not started yet ───────────────────────────── */
     if (state == null) {
       return Scaffold(
         appBar: AppBar(title: Text('Draft • ${widget.league.name}')),
@@ -77,7 +75,6 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
       );
     }
 
-    /* ── waiting for picks list on first start ───────────── */
     final picks = picksA.valueOrNull;
     if (picks == null) {
       return Scaffold(
@@ -86,14 +83,13 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
       );
     }
 
-    /* ── live draft lobby ───────────────────────────────── */
     final teams   = teamsA.requireValue;
     final players = playersA.requireValue;
 
     _ticker ??=
         Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
 
-    // countdown
+  
     final now       = DateTime.now();
     final secsLeft  = state.pickDeadline.difference(now).inSeconds.clamp(0, 9999);
 
@@ -152,7 +148,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
     );
   }
 
-  /* ── helpers ──────────────────────────────────────────── */
+  
 
   Widget _header(state, int secs) => Container(
         width: double.infinity,

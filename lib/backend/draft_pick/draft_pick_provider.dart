@@ -23,7 +23,7 @@ Future<List<DraftPick>> draftPicks(
 }
 
 
-/// expose mutations
+
 @riverpod
 class DraftPickActions extends _$DraftPickActions {
   @override
@@ -39,7 +39,7 @@ class DraftPickActions extends _$DraftPickActions {
       teamId: teamId,
       playerId: playerId,
     );
-    // force refresh for this league’s list (immediate feedback)
+
     ref.invalidate(draftPicksProvider(leagueId));
   }
 }

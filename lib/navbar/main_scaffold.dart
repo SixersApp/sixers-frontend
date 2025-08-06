@@ -1,4 +1,4 @@
-// lib/navigation/main_scaffold.dart
+
 import 'package:flutter/material.dart';
 import 'package:sixers/views/draft_screen.dart';
 import 'package:sixers/views/home_screen.dart';

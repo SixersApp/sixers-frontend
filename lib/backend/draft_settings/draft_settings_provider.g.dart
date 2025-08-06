@@ -36,28 +36,16 @@ abstract class _$DraftSettings
   FutureOr<model.DraftSettings?> build(String leagueId);
 }
 
-/// One provider instance per league →
-///     ref.watch(draftSettingsProvider(leagueId))
-///
-/// Copied from [DraftSettings].
+/// See also [DraftSettings].
 @ProviderFor(DraftSettings)
 const draftSettingsProvider = DraftSettingsFamily();
 
-/// One provider instance per league →
-///     ref.watch(draftSettingsProvider(leagueId))
-///
-/// Copied from [DraftSettings].
+/// See also [DraftSettings].
 class DraftSettingsFamily extends Family<AsyncValue<model.DraftSettings?>> {
-  /// One provider instance per league →
-  ///     ref.watch(draftSettingsProvider(leagueId))
-  ///
-  /// Copied from [DraftSettings].
+  /// See also [DraftSettings].
   const DraftSettingsFamily();
 
-  /// One provider instance per league →
-  ///     ref.watch(draftSettingsProvider(leagueId))
-  ///
-  /// Copied from [DraftSettings].
+  /// See also [DraftSettings].
   DraftSettingsProvider call(String leagueId) {
     return DraftSettingsProvider(leagueId);
   }
@@ -84,20 +72,14 @@ class DraftSettingsFamily extends Family<AsyncValue<model.DraftSettings?>> {
   String? get name => r'draftSettingsProvider';
 }
 
-/// One provider instance per league →
-///     ref.watch(draftSettingsProvider(leagueId))
-///
-/// Copied from [DraftSettings].
+/// See also [DraftSettings].
 class DraftSettingsProvider
     extends
         AutoDisposeAsyncNotifierProviderImpl<
           DraftSettings,
           model.DraftSettings?
         > {
-  /// One provider instance per league →
-  ///     ref.watch(draftSettingsProvider(leagueId))
-  ///
-  /// Copied from [DraftSettings].
+  /// See also [DraftSettings].
   DraftSettingsProvider(String leagueId)
     : this._internal(
         () => DraftSettings()..leagueId = leagueId,

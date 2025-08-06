@@ -1,11 +1,11 @@
-// lib/screens/drafts_screen.dart
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../backend/leagues/league_provider.dart';
 import '../backend/fantasy_team/fantasy_team_provider.dart';
-import 'draft_lobby.dart'; // ← NEW import
+import 'draft_lobby.dart'; 
 
 class DraftScreen extends ConsumerWidget {
   const DraftScreen({super.key});
@@ -15,12 +15,10 @@ class DraftScreen extends ConsumerWidget {
     final leaguesAsync = ref.watch(leaguesProvider);
     final teamsAsync = ref.watch(fantasyTeamsProvider);
 
-    // unified loading
     if (leaguesAsync.isLoading || teamsAsync.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // unified error
     if (leaguesAsync.hasError) {
       return _err('Leagues', leaguesAsync.error);
     }

@@ -16,7 +16,7 @@ class DraftPickService {
         .toList();
   }
 
-  /// realtime insert stream
+
   Stream<DraftPick> stream(String leagueId) {
     final controller = StreamController<DraftPick>();
 
@@ -42,7 +42,7 @@ class DraftPickService {
     return controller.stream;
   }
 
-  /// call the make_pick RPC (see SQL in roadmap)
+
   Future<void> makePick({
     required String leagueId,
     required String teamId,

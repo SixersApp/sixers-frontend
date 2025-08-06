@@ -148,9 +148,7 @@ class _DraftPicksProviderElement
 
 String _$draftPickActionsHash() => r'6b864dd54e71d4085ea2cf11632b7d560b47ac41';
 
-/// expose mutations
-///
-/// Copied from [DraftPickActions].
+/// See also [DraftPickActions].
 @ProviderFor(DraftPickActions)
 final draftPickActionsProvider =
     AutoDisposeNotifierProvider<DraftPickActions, void>.internal(
