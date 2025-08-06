@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:collection/collection.dart';
@@ -11,7 +10,6 @@ import 'package:sixers/backend/fantasy_team/fantasy_team_provider.dart';
 import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/backend/players/player_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 
 import '../backend/leagues/league_model.dart';
 
@@ -37,8 +35,8 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
     final uid = Supabase.instance.client.auth.currentUser!.id;
 
     final settingsA = ref.watch(draftSettingsProvider(widget.league.id));
-    final teamsA    = ref.watch(fantasyTeamsProvider);
-    final playersA  = ref.watch(allPlayersProvider(widget.league.tournamentId));
+    final teamsA = ref.watch(fantasyTeamsProvider);
+    final playersA = ref.watch(allPlayersProvider(widget.league.tournamentId));
 
     if ([settingsA, teamsA, playersA].any((a) => a.isLoading)) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -47,11 +45,9 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
       if (a.hasError) return _err(a.error);
     }
 
-
     final stateA = ref.watch(draftStateStreamProvider(widget.league.id));
     final picksA = ref.watch(draftPicksProvider(widget.league.id));
 
-  
     if (stateA.hasError) return _err(stateA.error);
     if (picksA.hasError) return _err(picksA.error);
 
@@ -83,15 +79,19 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
       );
     }
 
-    final teams   = teamsA.requireValue;
+    final teams = teamsA.requireValue;
     final players = playersA.requireValue;
 
-    _ticker ??=
-        Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
+    _ticker ??= Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => setState(() {}),
+    );
 
-  
-    final now       = DateTime.now();
-    final secsLeft  = state.pickDeadline.difference(now).inSeconds.clamp(0, 9999);
+    final now = DateTime.now();
+    final secsLeft = state.pickDeadline
+        .difference(now)
+        .inSeconds
+        .clamp(0, 9999);
 
     final myTeam = teams.firstWhereOrNull(
       (t) => t.leagueId == widget.league.id && t.userId == uid,
@@ -148,24 +148,25 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
     );
   }
 
-  
-
   Widget _header(state, int secs) => Container(
-        width: double.infinity,
-        color: Colors.black12,
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Round ${state.roundNumber} • Pick #${state.pickNumber}',
-                style: const TextStyle(fontSize: 16)),
-            Text('On the clock: ${state.currentTeamId}',
-                style: const TextStyle(fontSize: 14)),
-            Text('Time left: $secs s',
-                style: const TextStyle(fontSize: 14)),
-          ],
+    width: double.infinity,
+    color: Colors.black12,
+    padding: const EdgeInsets.all(12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Round ${state.roundNumber} • Pick #${state.pickNumber}',
+          style: const TextStyle(fontSize: 16),
         ),
-      );
+        Text(
+          'On the clock: ${state.currentTeamId}',
+          style: const TextStyle(fontSize: 14),
+        ),
+        Text('Time left: $secs s', style: const TextStyle(fontSize: 14)),
+      ],
+    ),
+  );
 
   Future<void> _pickPlayer(String playerId, String? myTeamId) async {
     if (myTeamId == null) {
@@ -184,9 +185,9 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
             playerId: playerId,
           );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pick failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Pick failed: $e')));
     }
   }
 
