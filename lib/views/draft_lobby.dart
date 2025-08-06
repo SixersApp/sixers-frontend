@@ -94,6 +94,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
     final teams = teamsA.requireValue;
     final players = playersA.requireValue;
 
+
     // per-second rebuild for countdown
     _ticker ??= Timer.periodic(
       const Duration(seconds: 1),
