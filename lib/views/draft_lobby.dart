@@ -9,6 +9,7 @@ import 'package:sixers/backend/draft_state/draft_state_provider.dart';
 import 'package:sixers/backend/fantasy_team/fantasy_team_provider.dart';
 import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/backend/players/player_provider.dart';
+import 'package:sixers/widgets/draft_app_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../backend/leagues/league_model.dart';
@@ -106,10 +107,10 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
         .toList();
 
     return Scaffold(
-      appBar: AppBar(title: Text('Draft • ${widget.league.name}')),
+      appBar: DraftAppBar(secsLeft: secsLeft, roundNumber: state.roundNumber, pickNumber: state.pickNumber),
       body: Column(
         children: [
-          _header(state, secsLeft),
+          //_header(state, secsLeft),
           const Divider(height: 0),
           Expanded(
             child: ListView(

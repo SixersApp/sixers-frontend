@@ -65,7 +65,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
-      scaffoldBackgroundColor: surfaces.background,
+      scaffoldBackgroundColor: AppColors.black100,
       textTheme: buildTextTheme(brightness),
 
       // Cards & list tiles (your tiles)
