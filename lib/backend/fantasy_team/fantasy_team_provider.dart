@@ -9,9 +9,14 @@ part 'fantasy_team_provider.g.dart';
 @riverpod
 class FantasyTeams extends _$FantasyTeams {
   final _service = FantasyTeamService();
+  String? _leagueId; // remember current scope for refresh()
 
   @override
-  Future<List<FantasyTeam>> build() async {
+  Future<List<FantasyTeam>> build({String? leagueId}) async {
+    _leagueId = leagueId;
+    if (leagueId != null) {
+      return _service.fetchTeamsForLeague(leagueId);
+    }
     final uid = Supabase.instance.client.auth.currentUser?.id;
     if (uid == null) return [];
     return _service.fetchTeamsForUser(uid);

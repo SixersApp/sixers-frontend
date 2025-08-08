@@ -13,7 +13,7 @@ class DraftScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final leaguesAsync = ref.watch(leaguesProvider);
-    final teamsAsync = ref.watch(fantasyTeamsProvider);
+    final teamsAsync = ref.watch(fantasyTeamsProvider(leagueId: null));
 
     if (leaguesAsync.isLoading || teamsAsync.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));

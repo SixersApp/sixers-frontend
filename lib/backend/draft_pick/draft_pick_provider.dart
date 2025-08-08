@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sixers/backend/draft_pick/draft_pick_service.dart';
+import 'package:sixers/backend/fantasy_team/fantasy_team_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'draft_pick_model.dart';
 
