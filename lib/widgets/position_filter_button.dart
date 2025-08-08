@@ -16,31 +16,42 @@ class PositionFilterButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
+    final text = Theme.of(context).textTheme;
 
     return PopupMenuButton<PositionFilter>(
       initialValue: selected,
       onSelected: onChanged,
       itemBuilder: (ctx) => [
-        PopupMenuItem(value: PositionFilter.all,          child: const Text('All')),
-        PopupMenuItem(value: PositionFilter.batsman,      child: const Text('Batsman')),
-        PopupMenuItem(value: PositionFilter.bowler,       child: const Text('Bowler')),
-        PopupMenuItem(value: PositionFilter.wicketKeeper, child: const Text('Wicket Keeper')),
-        PopupMenuItem(value: PositionFilter.allRounder,   child: const Text('All Rounder')),
+        PopupMenuItem(value: PositionFilter.all, child: const Text('All')),
+        PopupMenuItem(
+          value: PositionFilter.batsman,
+          child: const Text('Batsman'),
+        ),
+        PopupMenuItem(
+          value: PositionFilter.bowler,
+          child: const Text('Bowler'),
+        ),
+        PopupMenuItem(
+          value: PositionFilter.wicketKeeper,
+          child: const Text('Wicket Keeper'),
+        ),
+        PopupMenuItem(
+          value: PositionFilter.allRounder,
+          child: const Text('All Rounder'),
+        ),
       ],
       // Make it look like your pill
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: AppColors.black300,           // black300
+          color: AppColors.black300, // black300
           borderRadius: BorderRadius.circular(5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             // (icon placeholder removed per your note)
-            Text(labelForFilter(selected),
-                style: text.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+            Text(labelForFilter(selected), style: text.bodyMedium),
             const SizedBox(width: 8),
             const Icon(Icons.expand_more, size: 18),
           ],

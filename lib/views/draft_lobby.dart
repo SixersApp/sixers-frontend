@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/draft_pick/draft_pick_provider.dart';
@@ -11,7 +12,11 @@ import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/backend/players/player_model.dart';
 import 'package:sixers/backend/players/player_provider.dart';
 import 'package:sixers/theme/colors.dart';
+import 'package:sixers/theme/brand_tokens.dart';
 import 'package:sixers/widgets/draft_app_bar.dart';
+import 'package:sixers/widgets/draft_tab_board.dart';
+import 'package:sixers/widgets/draft_tab_dart.dart';
+import 'package:sixers/widgets/draft_tab_roster.dart';
 import 'package:sixers/widgets/drafted_pick_card.dart';
 import 'package:sixers/widgets/player_draft_tile.dart';
 import 'package:sixers/widgets/position_filter_button.dart';
@@ -27,9 +32,21 @@ class DraftLobby extends ConsumerStatefulWidget {
   ConsumerState<DraftLobby> createState() => _DraftLobbyState();
 }
 
-// -------- Riverpod position filter state --------
-final posFilterProvider =
-    StateProvider<PositionFilter>((_) => PositionFilter.all);
+/* ───────────────────────────────────────────────
+   RIVERPOD GLOBAL STATE
+─────────────────────────────────────────────── */
+
+// position filter (existing)
+final posFilterProvider = StateProvider<PositionFilter>(
+  (_) => PositionFilter.all,
+);
+
+// new tab enum + provider
+enum DraftTab { draft, board, roster }
+
+final draftTabProvider = StateProvider<DraftTab>((_) => DraftTab.draft);
+
+/* ───────────────────────────────────────────── */
 
 String labelForFilter(PositionFilter f) {
   switch (f) {
@@ -47,7 +64,6 @@ String labelForFilter(PositionFilter f) {
 }
 
 String? roleValue(PositionFilter f) {
-  // DB roles per your schema
   switch (f) {
     case PositionFilter.batsman:
       return 'Batsman';
@@ -62,12 +78,31 @@ String? roleValue(PositionFilter f) {
   }
 }
 
-class _DraftLobbyState extends ConsumerState<DraftLobby> {
+class _DraftLobbyState extends ConsumerState<DraftLobby>
+    with SingleTickerProviderStateMixin {
   Timer? _ticker;
+
+  // slider TabController (custom duration to feel snappy)
+  late final TabController _segController;
+
+  // helper so we don’t hard-code black100 everywhere
+  Color _black100(BuildContext c) =>
+      Theme.of(c).extension<SurfaceColors>()!.background;
+
+  @override
+  void initState() {
+    super.initState();
+    _segController = TabController(
+      length: 3,
+      vsync: this,
+      animationDuration: const Duration(milliseconds: 120),
+    );
+  }
 
   @override
   void dispose() {
     _ticker?.cancel();
+    _segController.dispose();
     super.dispose();
   }
 
@@ -93,7 +128,6 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
     if (picksA.hasError) return _err(picksA.error);
 
     final state = stateA.valueOrNull;
-
     if (state == null) {
       return Scaffold(
         appBar: AppBar(title: Text('Draft • ${widget.league.name}')),
@@ -129,30 +163,43 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
     );
 
     final now = DateTime.now();
-    final secsLeft =
-        state.pickDeadline.difference(now).inSeconds.clamp(0, 9999);
+    final secsLeft = state.pickDeadline
+        .difference(now)
+        .inSeconds
+        .clamp(0, 9999);
 
     final myTeam = teams.firstWhereOrNull(
       (t) => t.leagueId == widget.league.id && t.userId == uid,
     );
-    final currentOwnerUid =
-        teams.firstWhereOrNull((t) => t.id == state.currentTeamId)?.userId;
+    final currentOwnerUid = teams
+        .firstWhereOrNull((t) => t.id == state.currentTeamId)
+        ?.userId;
     final myTurn = currentOwnerUid == uid;
 
     final availablePlayers = players
         .where((pl) => picks.every((p) => p.playerId != pl.id))
         .toList();
 
-    final leagueTeams =
-        teams.where((t) => t.leagueId == widget.league.id).toList();
+    final leagueTeams = teams
+        .where((t) => t.leagueId == widget.league.id)
+        .toList();
     final teamCount = leagueTeams.isEmpty ? 1 : leagueTeams.length;
 
-    // -------- use Riverpod filter state --------
+    // position filtering
     final pos = ref.watch(posFilterProvider);
     final role = roleValue(pos);
     final filteredPlayers = role == null
         ? availablePlayers
         : availablePlayers.where((pl) => pl.role == role).toList();
+
+    // tab switching
+    final currentTab = ref.watch(draftTabProvider);
+
+    // keep controller in sync with provider without extra animation delay
+    final targetIndex = DraftTab.values.indexOf(currentTab);
+    if (_segController.index != targetIndex) {
+      _segController.index = targetIndex; // immediate
+    }
 
     return Scaffold(
       appBar: DraftAppBar(
@@ -163,7 +210,8 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
       body: Column(
         children: [
           const SizedBox(height: 32),
-          // -------- Drafted picks carousel (fixed height) --------
+
+          // ─── Drafted picks carousel ──────────────────────────
           SizedBox(
             height: 114,
             child: ListView.separated(
@@ -173,11 +221,11 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
               separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemBuilder: (_, i) {
                 final p = picks[i];
-                final player =
-                    players.firstWhereOrNull((pl) => pl.id == p.playerId);
+                final player = players.firstWhereOrNull(
+                  (pl) => pl.id == p.playerId,
+                );
                 final team = teams.firstWhereOrNull((t) => t.id == p.teamId);
 
-                // Correct round/pick-in-round calculation with safe teamCount
                 final round = ((p.pickNumber - 1) ~/ teamCount) + 1;
                 final pickInRound = ((p.pickNumber - 1) % teamCount) + 1;
 
@@ -186,101 +234,84 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
                   fantasyTeamName: team?.teamName ?? 'Team',
                   roundNumber: round,
                   pickNumber: pickInRound,
-                  // avatarUrl: null, // placeholder
                 );
               },
             ),
           ),
-          const SizedBox(height: 20),
-          // -------- Available Players section (fills rest, black200) --------
+
+          const SizedBox(height: 12),
+
+          // ─── Light-gray container with slider + tab body ──────
           Expanded(
             child: Container(
               color: Theme.of(context).colorScheme.surface, // black200
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Section title
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
-                    child: Text(
-                      'Your Pick',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                            color: AppColors.black700,
-                          ),
-                    ),
-                  ),
-                  // Filter (uses Riverpod state)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
-                    child: PositionFilterButton(
-                      selected: pos,
-                      onChanged: (v) =>
-                          ref.read(posFilterProvider.notifier).state = v,
-                    ),
-                  ),
-
-                  // Header row
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Rank',
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelMedium
-                                ?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                          ),
+                  // ─── Slider (pill) — 46px tall, snappy, black400 selected ──
+                  SizedBox(
+                    height: 46,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: _black100(context), // dark track
+                          borderRadius: BorderRadius.circular(90), // 46/2
                         ),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              'Stats',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelMedium
-                                  ?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
+                        child: TabBar(
+                          controller: _segController,
+                          onTap: (i) {
+                            // update provider immediately (no lag)
+                            ref.read(draftTabProvider.notifier).state =
+                                DraftTab.values[i];
+                          },
+                          isScrollable: false,
+                          dividerColor: Colors.transparent,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          labelPadding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                          ),
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                          ),
+                          labelColor: Colors.white,
+                          unselectedLabelColor: Theme.of(
+                            context,
+                          ).colorScheme.onSurfaceVariant,
+                          indicator: const ShapeDecoration(
+                            color: AppColors.black400, // selected bg
+                            shape: StadiumBorder(
+                              side: BorderSide(color: Colors.white, width: 2),
                             ),
                           ),
+                          tabs: const [
+                            Tab(text: 'Draft'),
+                            Tab(text: 'Board'),
+                            Tab(text: 'Roster'),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 10),
 
-                  // Scrollable list of available players (tiles = black300)
+                  // Active tab body
+                  // Active tab body
                   Expanded(
-                    child: ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                      itemCount: filteredPlayers.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (_, i) {
-                        final pl = filteredPlayers[i];
-                        final rank = i + 1; // placeholder
-
-                        return PlayerDraftTile(
-                          rank: rank,
-                          playerName: pl.name,
-                          realTeamName: 'Team', // TODO: wire real team name
-                          stat1Label: 'Avg',
-                          stat1Value: '—', // TODO
-                          stat2Label: 'SR',
-                          stat2Value: '—', // TODO
-                          enabled: myTurn,
-                          onAdd: () => _pickPlayer(pl.id, myTeam?.id),
-                        );
-                      },
-                    ),
+                    child: switch (currentTab) {
+                      DraftTab.draft => DraftTabDraft(
+                        availablePlayers: availablePlayers,
+                        myTurn: myTurn,
+                        myTeamId: (myTeam as dynamic)?.id,
+                        selectedFilter: ref.watch(posFilterProvider),
+                        onFilterChanged: (v) =>
+                            ref.read(posFilterProvider.notifier).state = v,
+                        onPick: (playerId, teamId) =>
+                            _pickPlayer(playerId, teamId),
+                      ),
+                      DraftTab.board => const DraftTabBoard(),
+                      DraftTab.roster => const DraftTabRoster(),
+                    },
                   ),
                 ],
               ),
@@ -298,7 +329,6 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
       );
       return;
     }
-
     try {
       await ref
           .read(draftPickActionsProvider.notifier)
