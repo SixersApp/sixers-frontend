@@ -52,6 +52,8 @@ TextTheme buildTextTheme(Brightness b) {
       fontWeight: FontWeight.w500,
       fontSize: 20
     ),
+
+
     titleMedium: base.titleMedium?.copyWith(
       fontFamily: heading,
       fontWeight: FontWeight.w600,
@@ -61,6 +63,7 @@ TextTheme buildTextTheme(Brightness b) {
     titleSmall: base.titleSmall?.copyWith(
       fontFamily: heading,
       fontWeight: FontWeight.w600,
+      fontSize: 12
     ),
 
     //standard body (text field)
@@ -76,16 +79,19 @@ TextTheme buildTextTheme(Brightness b) {
       fontWeight: FontWeight.w700,
       fontSize: 16
     ),
+
+    //Fantasy team name in draft pick block
     bodySmall: base.bodySmall?.copyWith(
-      fontFamily: body,
-      fontWeight: FontWeight.w500,
-      height: 1.35,
+      fontFamily: heading,
+      fontWeight: FontWeight.w300,
+      fontSize: 12
     ),
 
     //(Bold Caption) Team's name in head-to-head/
     labelLarge: base.labelLarge?.copyWith(
-      fontFamily: body,
+      fontFamily: heading,
       fontWeight: FontWeight.w600,
+      fontSize: 12
     ),
 
     //(Large Caption) Round and Pick in completed draft pick/info field in player draft block/info in player block in head-to-head

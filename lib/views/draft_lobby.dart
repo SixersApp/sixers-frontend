@@ -10,6 +10,8 @@ import 'package:sixers/backend/fantasy_team/fantasy_team_provider.dart';
 import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/backend/players/player_provider.dart';
 import 'package:sixers/widgets/draft_app_bar.dart';
+import 'package:sixers/widgets/drafted_pick_card.dart';
+import 'package:sixers/widgets/player_draft_tile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../backend/leagues/league_model.dart';
@@ -36,7 +38,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
     final uid = Supabase.instance.client.auth.currentUser!.id;
 
     final settingsA = ref.watch(draftSettingsProvider(widget.league.id));
-    final teamsA = ref.watch(fantasyTeamsProvider);
+    final teamsA = ref.watch(fantasyTeamsProvider(leagueId: widget.league.id));
     final playersA = ref.watch(allPlayersProvider(widget.league.tournamentId));
 
     if ([settingsA, teamsA, playersA].any((a) => a.isLoading)) {
@@ -89,85 +91,148 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
     );
 
     final now = DateTime.now();
-    final secsLeft = state.pickDeadline
-        .difference(now)
-        .inSeconds
-        .clamp(0, 9999);
+    final secsLeft =
+        state.pickDeadline.difference(now).inSeconds.clamp(0, 9999);
 
     final myTeam = teams.firstWhereOrNull(
       (t) => t.leagueId == widget.league.id && t.userId == uid,
     );
-    final currentOwnerUid = teams
-        .firstWhereOrNull((t) => t.id == state.currentTeamId)
-        ?.userId;
+    final currentOwnerUid =
+        teams.firstWhereOrNull((t) => t.id == state.currentTeamId)?.userId;
     final myTurn = currentOwnerUid == uid;
 
     final availablePlayers = players
         .where((pl) => picks.every((p) => p.playerId != pl.id))
         .toList();
 
+    final leagueTeams =
+        teams.where((t) => t.leagueId == widget.league.id).toList();
+    final teamCount = leagueTeams.isEmpty ? 1 : leagueTeams.length;
+
     return Scaffold(
-      appBar: DraftAppBar(secsLeft: secsLeft, roundNumber: state.roundNumber, pickNumber: state.pickNumber),
+      appBar: DraftAppBar(
+        secsLeft: secsLeft,
+        roundNumber: state.roundNumber,
+        pickNumber: state.pickNumber,
+      ),
       body: Column(
         children: [
-          //_header(state, secsLeft),
-          const Divider(height: 0),
+          const SizedBox(height: 32),
+          // -------- Drafted picks carousel (fixed height) --------
+          SizedBox(
+            height: 140,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              itemCount: picks.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (_, i) {
+                final p = picks[i];
+                final player =
+                    players.firstWhereOrNull((pl) => pl.id == p.playerId);
+                final team = teams.firstWhereOrNull((t) => t.id == p.teamId);
+
+                // Correct round/pick-in-round calculation with safe teamCount
+                final round = ((p.pickNumber - 1) ~/ teamCount) + 1;
+                final pickInRound = ((p.pickNumber - 1) % teamCount) + 1;
+
+                return DraftedPickCard(
+                  playerName: player?.name ?? 'Player',
+                  fantasyTeamName: team?.teamName ?? 'Team',
+                  roundNumber: round,
+                  pickNumber: pickInRound,
+                  // avatarUrl: null, // placeholder
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 20),
+          // -------- Available Players section (fills rest, black200) --------
           Expanded(
-            child: ListView(
-              children: [
-                ...picks.map(
-                  (p) => ListTile(
-                    leading: Text('#${p.pickNumber}'),
-                    title: Text('Player ${p.playerId}'),
-                    subtitle: Text('Team ${p.teamId}'),
+            child: Container(
+              color: Theme.of(context).colorScheme.surface, // black200
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Section title
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+                    child: Text('Your Pick',
+                        style: Theme.of(context).textTheme.titleLarge),
                   ),
-                ),
-                const Divider(),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(
-                    'Available Players',
-                    style: Theme.of(context).textTheme.titleMedium,
+
+                  // Header row
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Rank',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelMedium
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              'Stats',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                ...availablePlayers.map(
-                  (pl) => ListTile(
-                    title: Text(pl.name),
-                    trailing: myTurn
-                        ? IconButton(
-                            icon: const Icon(Icons.add),
-                            onPressed: () => _pickPlayer(pl.id, myTeam?.id),
-                          )
-                        : null,
+                  const SizedBox(height: 6),
+
+                  // Scrollable list of available players (tiles = black300)
+                  Expanded(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                      itemCount: availablePlayers.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (_, i) {
+                        final pl = availablePlayers[i];
+                        final rank = i + 1; // placeholder
+
+                        return PlayerDraftTile(
+                          rank: rank,
+                          playerName: pl.name,
+                          realTeamName: 'Team', // TODO: wire real team name
+                          stat1Label: 'Avg',
+                          stat1Value: '—', // TODO
+                          stat2Label: 'SR',
+                          stat2Value: '—', // TODO
+                          enabled: myTurn,
+                          onAdd: () => _pickPlayer(pl.id, myTeam?.id),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
       ),
     );
   }
-
-  Widget _header(state, int secs) => Container(
-    width: double.infinity,
-    color: Colors.black12,
-    padding: const EdgeInsets.all(12),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Round ${state.roundNumber} • Pick #${state.pickNumber}',
-          style: const TextStyle(fontSize: 16),
-        ),
-        Text(
-          'On the clock: ${state.currentTeamId}',
-          style: const TextStyle(fontSize: 14),
-        ),
-        Text('Time left: $secs s', style: const TextStyle(fontSize: 14)),
-      ],
-    ),
-  );
 
   Future<void> _pickPlayer(String playerId, String? myTeamId) async {
     if (myTeamId == null) {
@@ -178,17 +243,14 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
     }
 
     try {
-      await ref
-          .read(draftPickActionsProvider.notifier)
-          .makePick(
+      await ref.read(draftPickActionsProvider.notifier).makePick(
             leagueId: widget.league.id,
             teamId: myTeamId,
             playerId: playerId,
           );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Pick failed: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Pick failed: $e')));
     }
   }
 
