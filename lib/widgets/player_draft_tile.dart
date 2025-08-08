@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sixers/theme/colors.dart';
 
 /// Visual-only tile for an available player row.
 /// Real team name + stats are placeholders for now.
@@ -107,13 +108,13 @@ class PlayerDraftTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
                   // use outline for now; swap to a "success" token later
-                  color: enabled ? scheme.outline : scheme.onSurfaceVariant,
+                  color: enabled ? AppColors.green300 : scheme.onSurfaceVariant,
                   width: 2,
                 ),
               ),
               child: Icon(Icons.add,
                   size: 20,
-                  color: enabled ? scheme.onSurface : scheme.onSurfaceVariant),
+                  color: enabled ? AppColors.green300 : scheme.onSurfaceVariant),
             ),
           ),
         ],

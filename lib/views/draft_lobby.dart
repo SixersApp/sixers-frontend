@@ -8,10 +8,13 @@ import 'package:sixers/backend/draft_settings/draft_settings_provider.dart';
 import 'package:sixers/backend/draft_state/draft_state_provider.dart';
 import 'package:sixers/backend/fantasy_team/fantasy_team_provider.dart';
 import 'package:sixers/backend/leagues/league_provider.dart';
+import 'package:sixers/backend/players/player_model.dart';
 import 'package:sixers/backend/players/player_provider.dart';
+import 'package:sixers/theme/colors.dart';
 import 'package:sixers/widgets/draft_app_bar.dart';
 import 'package:sixers/widgets/drafted_pick_card.dart';
 import 'package:sixers/widgets/player_draft_tile.dart';
+import 'package:sixers/widgets/position_filter_button.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../backend/leagues/league_model.dart';
@@ -22,6 +25,41 @@ class DraftLobby extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<DraftLobby> createState() => _DraftLobbyState();
+}
+
+// -------- Riverpod position filter state --------
+final posFilterProvider =
+    StateProvider<PositionFilter>((_) => PositionFilter.all);
+
+String labelForFilter(PositionFilter f) {
+  switch (f) {
+    case PositionFilter.all:
+      return 'Position';
+    case PositionFilter.batsman:
+      return 'Batsman';
+    case PositionFilter.bowler:
+      return 'Bowler';
+    case PositionFilter.wicketKeeper:
+      return 'Wicket Keeper';
+    case PositionFilter.allRounder:
+      return 'All Rounder';
+  }
+}
+
+String? roleValue(PositionFilter f) {
+  // DB roles per your schema
+  switch (f) {
+    case PositionFilter.batsman:
+      return 'Batsman';
+    case PositionFilter.bowler:
+      return 'Bowler';
+    case PositionFilter.wicketKeeper:
+      return 'Wicket-Keeper';
+    case PositionFilter.allRounder:
+      return 'All-Rounder';
+    case PositionFilter.all:
+      return null;
+  }
 }
 
 class _DraftLobbyState extends ConsumerState<DraftLobby> {
@@ -109,6 +147,13 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
         teams.where((t) => t.leagueId == widget.league.id).toList();
     final teamCount = leagueTeams.isEmpty ? 1 : leagueTeams.length;
 
+    // -------- use Riverpod filter state --------
+    final pos = ref.watch(posFilterProvider);
+    final role = roleValue(pos);
+    final filteredPlayers = role == null
+        ? availablePlayers
+        : availablePlayers.where((pl) => pl.role == role).toList();
+
     return Scaffold(
       appBar: DraftAppBar(
         secsLeft: secsLeft,
@@ -120,11 +165,10 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
           const SizedBox(height: 32),
           // -------- Drafted picks carousel (fixed height) --------
           SizedBox(
-            height: 140,
+            height: 114,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: picks.length,
               separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemBuilder: (_, i) {
@@ -158,8 +202,21 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
                   // Section title
                   Padding(
                     padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
-                    child: Text('Your Pick',
-                        style: Theme.of(context).textTheme.titleLarge),
+                    child: Text(
+                      'Your Pick',
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                            color: AppColors.black700,
+                          ),
+                    ),
+                  ),
+                  // Filter (uses Riverpod state)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+                    child: PositionFilterButton(
+                      selected: pos,
+                      onChanged: (v) =>
+                          ref.read(posFilterProvider.notifier).state = v,
+                    ),
                   ),
 
                   // Header row
@@ -205,10 +262,10 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
                   Expanded(
                     child: ListView.separated(
                       padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                      itemCount: availablePlayers.length,
+                      itemCount: filteredPlayers.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (_, i) {
-                        final pl = availablePlayers[i];
+                        final pl = filteredPlayers[i];
                         final rank = i + 1; // placeholder
 
                         return PlayerDraftTile(
@@ -243,14 +300,17 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> {
     }
 
     try {
-      await ref.read(draftPickActionsProvider.notifier).makePick(
+      await ref
+          .read(draftPickActionsProvider.notifier)
+          .makePick(
             leagueId: widget.league.id,
             teamId: myTeamId,
             playerId: playerId,
           );
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Pick failed: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Pick failed: $e')));
     }
   }
 
