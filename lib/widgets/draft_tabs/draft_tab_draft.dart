@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/players/player_model.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/widgets/draft_widgets/player_draft_tile.dart';
 import 'package:sixers/widgets/draft_widgets/position_filter_button.dart';
 
+// add these:
+import 'package:sixers/backend/real_team/real_team_model.dart';
+import 'package:sixers/backend/real_team/real_team_provider.dart';
+
 /// The Draft tab content only (no outer background).
 /// Parent provides: available players, whose turn, team id, and filter state.
-class DraftTabDraft extends StatelessWidget {
+class DraftTabDraft extends ConsumerWidget {
   const DraftTabDraft({
     super.key,
     required this.availablePlayers,
@@ -28,11 +33,27 @@ class DraftTabDraft extends StatelessWidget {
   final void Function(String, String?) onPick;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Figure out which tournament to load real teams for
+    final String? tournamentId = availablePlayers.isNotEmpty
+        ? availablePlayers.first.tournamentId
+        : null;
+
+    // Fetch real teams for that tournament (empty if we don't know yet)
+    final AsyncValue<List<RealTeam>> realTeamsA = ref.watch(
+      realTeamsProvider(tournamentId: tournamentId),
+    );
+
     final role = _roleValue(selectedFilter);
     final filteredPlayers = role == null
         ? availablePlayers
         : availablePlayers.where((p) => p.role == role).toList();
+
+    // Build a map id -> name (fallback to empty map while loading/error)
+    final Map<String, String> teamNameById = realTeamsA.maybeWhen(
+      data: (teams) => {for (final t in teams) t.id: t.name},
+      orElse: () => const {},
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,10 +112,14 @@ class DraftTabDraft extends StatelessWidget {
             itemBuilder: (_, i) {
               final pl = filteredPlayers[i];
               final rank = i + 1; // placeholder rank
+
+              // Look up the real team name by id
+              final realTeamName = teamNameById[pl.realTeamId] ?? 'Team';
+
               return PlayerDraftTile(
                 rank: rank,
                 playerName: pl.name,
-                realTeamName: 'Team', // TODO: wire real team
+                realTeamName: realTeamName,
                 stat1Label: 'Avg',
                 stat1Value: '—',
                 stat2Label: 'SR',

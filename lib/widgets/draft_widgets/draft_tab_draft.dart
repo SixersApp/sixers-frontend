@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sixers/backend/players/player_model.dart';
 import 'package:sixers/theme/colors.dart';
-import 'package:sixers/widgets/player_draft_tile.dart';
-import 'package:sixers/widgets/position_filter_button.dart';
+import 'package:sixers/widgets/draft_widgets/player_draft_tile.dart';
+import 'package:sixers/widgets/draft_widgets/position_filter_button.dart';
 
 /// The Draft tab content only (no outer background).
 /// Parent provides: available players, whose turn, team id, and filter state.
