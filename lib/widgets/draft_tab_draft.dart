@@ -42,10 +42,9 @@ class DraftTabDraft extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 10),
           child: Text(
             'Your Pick',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge!
-                .copyWith(color: AppColors.black700),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge!.copyWith(color: AppColors.black700),
           ),
         ),
         // Position filter
@@ -65,9 +64,8 @@ class DraftTabDraft extends StatelessWidget {
                 child: Text(
                   'Rank',
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color:
-                            Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
               Expanded(
@@ -76,10 +74,8 @@ class DraftTabDraft extends StatelessWidget {
                   child: Text(
                     'Stats',
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ),
@@ -105,6 +101,7 @@ class DraftTabDraft extends StatelessWidget {
                 stat2Value: '—',
                 enabled: myTurn,
                 onAdd: () => onPick(pl.id, myTeamId),
+                role: pl.role,
               );
             },
           ),

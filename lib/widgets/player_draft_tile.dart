@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sixers/theme/colors.dart';
+import 'package:sixers/widgets/helpers.dart';
 
 /// Visual-only tile for an available player row.
 /// Real team name + stats are placeholders for now.
@@ -9,16 +10,18 @@ class PlayerDraftTile extends StatelessWidget {
     required this.rank,
     required this.playerName,
     this.realTeamName = 'Team', // TODO: wire real team
-    this.stat1Label = 'Avg',    // TODO: wire stat values
+    this.stat1Label = 'Avg', // TODO: wire stat values
     this.stat1Value = '—',
     this.stat2Label = 'SR',
     this.stat2Value = '—',
     required this.enabled,
     required this.onAdd,
+    this.role,
   });
 
   final int rank;
   final String playerName;
+  final String? role;
 
   // placeholders you’ll plug into later
   final String realTeamName;
@@ -33,7 +36,8 @@ class PlayerDraftTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final text   = Theme.of(context).textTheme;
+    final text = Theme.of(context).textTheme;
+    final r = roleIconAndColor(role!);
 
     return Container(
       decoration: BoxDecoration(
@@ -47,10 +51,12 @@ class PlayerDraftTile extends StatelessWidget {
           SizedBox(
             width: 34,
             child: Center(
-              child: Text('$rank',
-                  style: text.labelLarge?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  )),
+              child: Text(
+                '$rank',
+                style: text.labelLarge?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 8),
@@ -71,16 +77,42 @@ class PlayerDraftTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(playerName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: text.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 2),
                 Text(
-                  realTeamName,
+                  playerName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                  style: text.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Text(
+                      realTeamName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                    SizedBox(width: 5),
+                    Container(
+                      width: 20,
+                      height: 20,
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: r.color,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        r.icon as IconData?,
+                        size: 12,
+                        color: AppColors.black800,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -107,14 +139,15 @@ class PlayerDraftTile extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
-                  // use outline for now; swap to a "success" token later
                   color: enabled ? AppColors.green300 : scheme.onSurfaceVariant,
                   width: 2,
                 ),
               ),
-              child: Icon(Icons.add,
-                  size: 20,
-                  color: enabled ? AppColors.green300 : scheme.onSurfaceVariant),
+              child: Icon(
+                Icons.add,
+                size: 20,
+                color: enabled ? AppColors.green300 : scheme.onSurfaceVariant,
+              ),
             ),
           ),
         ],

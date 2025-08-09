@@ -15,7 +15,7 @@ import 'package:sixers/theme/colors.dart';
 import 'package:sixers/theme/brand_tokens.dart';
 import 'package:sixers/widgets/draft_app_bar.dart';
 import 'package:sixers/widgets/draft_tab_board.dart';
-import 'package:sixers/widgets/draft_tab_dart.dart';
+import 'package:sixers/widgets/draft_tab_draft.dart';
 import 'package:sixers/widgets/draft_tab_roster.dart';
 import 'package:sixers/widgets/drafted_pick_card.dart';
 import 'package:sixers/widgets/player_draft_tile.dart';
@@ -213,7 +213,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
 
           // ─── Drafted picks carousel ──────────────────────────
           SizedBox(
-            height: 114,
+            height: 117,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -234,6 +234,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
                   fantasyTeamName: team?.teamName ?? 'Team',
                   roundNumber: round,
                   pickNumber: pickInRound,
+                  role: player?.role,
                 );
               },
             ),
