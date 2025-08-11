@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:sixers/backend/players/player_model.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:sixers/theme/colors.dart';
+import 'package:sixers/widgets/helpers.dart';
 
 /// Drafted player card for the horizontal carousel.
 /// Pure UI: plug real avatar/badge later via [avatarUrl]/[trailing].
@@ -9,8 +13,8 @@ class DraftedPickCard extends StatelessWidget {
     required this.fantasyTeamName,
     required this.roundNumber,
     required this.pickNumber,
-    this.avatarUrl,               // TODO: headshot later
-    this.trailing,                // TODO: small badge (e.g., keeper icon)
+    this.role,
+    this.avatarUrl, // TODO: headshot later
     this.width = 232,
   });
 
@@ -18,14 +22,15 @@ class DraftedPickCard extends StatelessWidget {
   final String fantasyTeamName;
   final int roundNumber;
   final int pickNumber;
+  final String? role;
   final String? avatarUrl;
-  final Widget? trailing;
   final double width;
 
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
+    final r = roleIconAndColor(role!);
 
     return Container(
       width: width,
@@ -49,10 +54,21 @@ class DraftedPickCard extends StatelessWidget {
                   style: t.labelLarge,
                 ),
               ),
-              if (trailing != null) ...[
-                const SizedBox(width: 8),
-                trailing!,
-              ],
+              Container(
+                width: 20,
+                height: 20,
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: r.color,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                alignment: Alignment.center,
+                child: Icon(
+                  r.icon as IconData?,
+                  size: 12,
+                  color: AppColors.black800,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
