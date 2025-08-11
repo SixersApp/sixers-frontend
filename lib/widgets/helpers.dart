@@ -5,14 +5,14 @@ import 'package:sixers/theme/colors.dart';
 
 ({Color color, Object icon}) roleIconAndColor(String role) => switch (role) {
   "Batsman" => (icon: PhosphorIcons.cricket(), color: AppColors.purple200),
-  "Bowler" => (icon: PhosphorIcons.boules(), color: AppColors.blue200),
+  "Bowler" => (icon: PhosphorIcons.boules(), color: AppColors.cyan200),
   "Wicket-Keeper" => (
     icon: PhosphorIcons.boxingGlove(),
-    color: AppColors.red100,
+    color: AppColors.blue200,
   ),
   "All-Rounder" => (
     icon: PhosphorIcons.star(),
-    color: AppColors.yellow200,
+    color: AppColors.pink200,
   ), // amber-ish
   // TODO: Handle this case.
   String() => (

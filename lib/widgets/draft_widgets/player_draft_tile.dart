@@ -88,15 +88,17 @@ class PlayerDraftTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    Text(
-                      realTeamName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
+                    Expanded(
+                      child: Text(
+                        realTeamName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: text.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
-                    SizedBox(width: 5),
+                    const SizedBox(width: 5),
                     Container(
                       width: 20,
                       height: 20,
@@ -129,27 +131,28 @@ class PlayerDraftTile extends StatelessWidget {
           ),
           const SizedBox(width: 8),
 
-          // Add button
-          InkWell(
-            onTap: enabled ? onAdd : null,
-            borderRadius: BorderRadius.circular(18),
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: enabled ? AppColors.green300 : scheme.onSurfaceVariant,
-                  width: 2,
+          // Add button only if enabled
+          if (enabled)
+            InkWell(
+              onTap: onAdd,
+              borderRadius: BorderRadius.circular(18),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: AppColors.green300,
+                    width: 2,
+                  ),
+                ),
+                child: Icon(
+                  Icons.add,
+                  size: 20,
+                  color: AppColors.green300,
                 ),
               ),
-              child: Icon(
-                Icons.add,
-                size: 20,
-                color: enabled ? AppColors.green300 : scheme.onSurfaceVariant,
-              ),
             ),
-          ),
         ],
       ),
     );

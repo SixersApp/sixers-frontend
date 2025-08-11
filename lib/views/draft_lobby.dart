@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/draft_pick/draft_pick_provider.dart';
@@ -14,12 +13,10 @@ import 'package:sixers/backend/players/player_provider.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/theme/brand_tokens.dart';
 import 'package:sixers/widgets/draft_widgets/draft_app_bar.dart';
-import 'package:sixers/widgets/draft_widgets/draft_tab_board.dart';
-import 'package:sixers/widgets/draft_widgets/draft_tab_draft.dart';
-import 'package:sixers/widgets/draft_widgets/draft_tab_roster.dart';
+import 'package:sixers/widgets/draft_tabs/draft_tab_board.dart';
+import 'package:sixers/widgets/draft_tabs/draft_tab_draft.dart';
+import 'package:sixers/widgets/draft_tabs/draft_tab_roster.dart';
 import 'package:sixers/widgets/draft_widgets/drafted_pick_card.dart';
-import 'package:sixers/widgets/draft_widgets/player_draft_tile.dart';
-import 'package:sixers/widgets/draft_widgets/position_filter_button.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../backend/leagues/league_model.dart';
@@ -33,18 +30,12 @@ class DraftLobby extends ConsumerStatefulWidget {
 }
 
 /* ───────────────────────────────────────────────
-   RIVERPOD GLOBAL STATE
+   RIVERPOD GLOBAL STATE (keep only position filter)
 ─────────────────────────────────────────────── */
 
-// position filter (existing)
 final posFilterProvider = StateProvider<PositionFilter>(
   (_) => PositionFilter.all,
 );
-
-// new tab enum + provider
-enum DraftTab { draft, board, roster }
-
-final draftTabProvider = StateProvider<DraftTab>((_) => DraftTab.draft);
 
 /* ───────────────────────────────────────────── */
 
@@ -82,10 +73,9 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
     with SingleTickerProviderStateMixin {
   Timer? _ticker;
 
-  // slider TabController (custom duration to feel snappy)
+  // Local TabController for slide animation between tabs
   late final TabController _segController;
 
-  // helper so we don’t hard-code black100 everywhere
   Color _black100(BuildContext c) =>
       Theme.of(c).extension<SurfaceColors>()!.background;
 
@@ -95,7 +85,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
     _segController = TabController(
       length: 3,
       vsync: this,
-      animationDuration: const Duration(milliseconds: 120),
+      animationDuration: const Duration(milliseconds: 220),
     );
   }
 
@@ -163,26 +153,21 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
     );
 
     final now = DateTime.now();
-    final secsLeft = state.pickDeadline
-        .difference(now)
-        .inSeconds
-        .clamp(0, 9999);
+    final secsLeft =
+        state.pickDeadline.difference(now).inSeconds.clamp(0, 9999);
 
     final myTeam = teams.firstWhereOrNull(
       (t) => t.leagueId == widget.league.id && t.userId == uid,
     );
-    final currentOwnerUid = teams
-        .firstWhereOrNull((t) => t.id == state.currentTeamId)
-        ?.userId;
+    final currentOwnerUid =
+        teams.firstWhereOrNull((t) => t.id == state.currentTeamId)?.userId;
     final myTurn = currentOwnerUid == uid;
 
-    final availablePlayers = players
-        .where((pl) => picks.every((p) => p.playerId != pl.id))
-        .toList();
+    final availablePlayers =
+        players.where((pl) => picks.every((p) => p.playerId != pl.id)).toList();
 
-    final leagueTeams = teams
-        .where((t) => t.leagueId == widget.league.id)
-        .toList();
+    final leagueTeams =
+        teams.where((t) => t.leagueId == widget.league.id).toList();
     final teamCount = leagueTeams.isEmpty ? 1 : leagueTeams.length;
 
     // position filtering
@@ -191,15 +176,6 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
     final filteredPlayers = role == null
         ? availablePlayers
         : availablePlayers.where((pl) => pl.role == role).toList();
-
-    // tab switching
-    final currentTab = ref.watch(draftTabProvider);
-
-    // keep controller in sync with provider without extra animation delay
-    final targetIndex = DraftTab.values.indexOf(currentTab);
-    if (_segController.index != targetIndex) {
-      _segController.index = targetIndex; // immediate
-    }
 
     return Scaffold(
       appBar: DraftAppBar(
@@ -221,9 +197,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
               separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemBuilder: (_, i) {
                 final p = picks[i];
-                final player = players.firstWhereOrNull(
-                  (pl) => pl.id == p.playerId,
-                );
+                final player = players.firstWhereOrNull((pl) => pl.id == p.playerId);
                 final team = teams.firstWhereOrNull((t) => t.id == p.teamId);
 
                 final round = ((p.pickNumber - 1) ~/ teamCount) + 1;
@@ -262,9 +236,8 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
                         child: TabBar(
                           controller: _segController,
                           onTap: (i) {
-                            // update provider immediately (no lag)
-                            ref.read(draftTabProvider.notifier).state =
-                                DraftTab.values[i];
+                            // Just animate locally; no global provider needed.
+                            _segController.animateTo(i);
                           },
                           isScrollable: false,
                           dividerColor: Colors.transparent,
@@ -276,9 +249,8 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
                             fontWeight: FontWeight.w700,
                           ),
                           labelColor: Colors.white,
-                          unselectedLabelColor: Theme.of(
-                            context,
-                          ).colorScheme.onSurfaceVariant,
+                          unselectedLabelColor:
+                              Theme.of(context).colorScheme.onSurfaceVariant,
                           indicator: const ShapeDecoration(
                             color: AppColors.black400, // selected bg
                             shape: StadiumBorder(
@@ -296,23 +268,26 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
                   ),
                   const SizedBox(height: 10),
 
-                  // Active tab body
-                  // Active tab body
+                  // ─── Animated tab body (slides) ─────────────────
                   Expanded(
-                    child: switch (currentTab) {
-                      DraftTab.draft => DraftTabDraft(
-                        availablePlayers: availablePlayers,
-                        myTurn: myTurn,
-                        myTeamId: (myTeam as dynamic)?.id,
-                        selectedFilter: ref.watch(posFilterProvider),
-                        onFilterChanged: (v) =>
-                            ref.read(posFilterProvider.notifier).state = v,
-                        onPick: (playerId, teamId) =>
-                            _pickPlayer(playerId, teamId),
-                      ),
-                      DraftTab.board => const DraftTabBoard(),
-                      DraftTab.roster => const DraftTabRoster(),
-                    },
+                    child: TabBarView(
+                      controller: _segController,
+                      children: [
+                        DraftTabDraft(
+                          availablePlayers: filteredPlayers,
+                          myTurn: myTurn,
+                          myTeamId: (myTeam as dynamic)?.id,
+                          tournamentId: widget.league.tournamentId,
+                          selectedFilter: ref.watch(posFilterProvider),
+                          onFilterChanged: (v) =>
+                              ref.read(posFilterProvider.notifier).state = v,
+                          onPick: (playerId, teamId) =>
+                              _pickPlayer(playerId, teamId),
+                        ),
+                        const DraftTabBoard(),
+                        const DraftTabRoster(),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -339,9 +314,8 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
             playerId: playerId,
           );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Pick failed: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Pick failed: $e')));
     }
   }
 

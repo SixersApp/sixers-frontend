@@ -17,6 +17,7 @@ class DraftTabDraft extends ConsumerWidget {
     required this.availablePlayers,
     required this.myTurn,
     required this.myTeamId,
+    required this.tournamentId,
     required this.selectedFilter,
     required this.onFilterChanged,
     required this.onPick,
@@ -25,6 +26,7 @@ class DraftTabDraft extends ConsumerWidget {
   final List<Player> availablePlayers;
   final bool myTurn;
   final String? myTeamId;
+  final String tournamentId;
 
   final PositionFilter selectedFilter;
   final ValueChanged<PositionFilter> onFilterChanged;
@@ -35,9 +37,6 @@ class DraftTabDraft extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Figure out which tournament to load real teams for
-    final String? tournamentId = availablePlayers.isNotEmpty
-        ? availablePlayers.first.tournamentId
-        : null;
 
     // Fetch real teams for that tournament (empty if we don't know yet)
     final AsyncValue<List<RealTeam>> realTeamsA = ref.watch(

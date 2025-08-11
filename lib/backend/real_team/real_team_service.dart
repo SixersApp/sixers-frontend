@@ -6,7 +6,6 @@ class RealTeamService {
   final client = Supabase.instance.client;
 
   Future<List<RealTeam>> fetchAllTeams() async {
-    debugPrint("fetching all teams");
     final rows = await client.from('real_teams').select();
     return (rows as List)
         .map((r) => RealTeam.fromJson(r as Map<String, dynamic>))

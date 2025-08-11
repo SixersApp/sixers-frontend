@@ -22,7 +22,11 @@ class AppColors {
 
   static const purple200 = Color(0xFFA362FF);
 
-  static const blue200 = Color(0xFF00E0DC);
+  static const cyan200 = Color(0xFF00E0DC);
+
+  static const blue200 = Color(0xFF3A7DFF);
 
   static const lime200 = Color(0xFFB7F34E);
+
+  static const pink200 = Color(0xFFFF5FCB);
 }
