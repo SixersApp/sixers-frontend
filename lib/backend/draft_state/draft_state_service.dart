@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -10,31 +9,33 @@ class DraftStateService {
   Stream<DraftState> stream(String leagueId) {
     final ctrl = StreamController<DraftState>.broadcast();
 
-   
-    _c
-        .from('league_draft_state')
-        .select()
-        .eq('league_id', leagueId)
-        .maybeSingle()
-        .then((row) {
+    _c.from('league_draft_state').select().eq('league_id', leagueId).maybeSingle().then((row) {
       if (row != null) ctrl.add(DraftState.fromJson(row));
     });
 
-  
-    final channel = _c
-        .channel('public:league_draft_state')          
-        .onPostgresChanges(
-          event: PostgresChangeEvent.all,              
-          schema: 'public',
-          table: 'league_draft_state',
-          filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'league_id', value: leagueId),
-          callback: (payload) {
-            debugPrint('RT ► ${payload.eventType}'
-                ' pick# ${payload.newRecord['current_pick_number']}');
-            ctrl.add(DraftState.fromJson(payload.newRecord));
-          },
-        )
-        .subscribe();
+    // Create a unique channel name for this league
+    final channelName = 'draft_state_$leagueId';
+
+    final channel = _c.channel(channelName);
+
+    // Listen to all changes on the league_draft_state table
+    channel.onPostgresChanges(
+      event: PostgresChangeEvent.all,
+      schema: 'public',
+      table: 'league_draft_state',
+      callback: (payload) {
+        // Check if the change affects this league
+        if (payload.newRecord != null && payload.newRecord['league_id'] == leagueId) {
+          debugPrint(
+            'RT ► ${payload.eventType}'
+            ' pick# ${payload.newRecord['current_pick_number']}',
+          );
+          ctrl.add(DraftState.fromJson(payload.newRecord));
+        }
+      },
+    );
+
+    channel.subscribe();
 
     ctrl.onCancel = () => _c.removeChannel(channel);
     return ctrl.stream;

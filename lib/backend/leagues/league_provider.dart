@@ -3,6 +3,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/leagues/league_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sixers/backend/draft_state/draft_state_provider.dart';
+import 'package:sixers/backend/draft_pick/draft_pick_provider.dart';
 
 part 'league_provider.g.dart';
 
@@ -64,6 +66,9 @@ class LeagueActions extends _$LeagueActions {
 
   Future<void> startDraft(String leagueId) async {
     await _svc.startDraft(leagueId);
-    
+    // Invalidate all draft-related providers to trigger immediate refresh
+    ref.invalidate(draftStateStreamProvider(leagueId));
+    ref.invalidate(draftPicksStreamProvider(leagueId));
+    ref.invalidate(leaguesProvider);
   }
 }
