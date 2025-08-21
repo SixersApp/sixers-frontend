@@ -81,9 +81,7 @@ class PlayerDraftTile extends StatelessWidget {
                   playerName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: text.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: text.titleMedium,
                 ),
                 const SizedBox(height: 2),
                 Row(
@@ -93,7 +91,7 @@ class PlayerDraftTile extends StatelessWidget {
                         realTeamName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: text.bodySmall?.copyWith(
+                        style: text.labelMedium?.copyWith(
                           color: scheme.onSurfaceVariant,
                         ),
                       ),
@@ -141,16 +139,9 @@ class PlayerDraftTile extends StatelessWidget {
                 height: 36,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: AppColors.green300,
-                    width: 2,
-                  ),
+                  border: Border.all(color: AppColors.green300, width: 2),
                 ),
-                child: Icon(
-                  Icons.add,
-                  size: 20,
-                  color: AppColors.green300,
-                ),
+                child: Icon(Icons.add, size: 20, color: AppColors.green300),
               ),
             ),
         ],

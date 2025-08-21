@@ -33,7 +33,9 @@ class DraftLobby extends ConsumerStatefulWidget {
    RIVERPOD GLOBAL STATE (keep only position filter)
 ─────────────────────────────────────────────── */
 
-final posFilterProvider = StateProvider<PositionFilter>((_) => PositionFilter.all);
+final posFilterProvider = StateProvider<PositionFilter>(
+  (_) => PositionFilter.all,
+);
 
 /* ───────────────────────────────────────────── */
 
@@ -67,18 +69,24 @@ String? roleValue(PositionFilter f) {
   }
 }
 
-class _DraftLobbyState extends ConsumerState<DraftLobby> with SingleTickerProviderStateMixin {
+class _DraftLobbyState extends ConsumerState<DraftLobby>
+    with SingleTickerProviderStateMixin {
   Timer? _ticker;
 
   // Local TabController for slide animation between tabs
   late final TabController _segController;
 
-  Color _black100(BuildContext c) => Theme.of(c).extension<SurfaceColors>()!.background;
+  Color _black100(BuildContext c) =>
+      Theme.of(c).extension<SurfaceColors>()!.background;
 
   @override
   void initState() {
     super.initState();
-    _segController = TabController(length: 3, vsync: this, animationDuration: const Duration(milliseconds: 220));
+    _segController = TabController(
+      length: 3,
+      vsync: this,
+      animationDuration: const Duration(milliseconds: 220),
+    );
   }
 
   @override
@@ -117,7 +125,9 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> with SingleTickerProvid
           child: widget.league.creatorId == uid
               ? ElevatedButton(
                   onPressed: () async {
-                    await ref.read(leagueActionsProvider.notifier).startDraft(widget.league.id);
+                    await ref
+                        .read(leagueActionsProvider.notifier)
+                        .startDraft(widget.league.id);
                   },
                   child: const Text('Start Draft'),
                 )
@@ -137,27 +147,47 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> with SingleTickerProvid
     final teams = teamsA.requireValue;
     final players = playersA.requireValue;
 
-    _ticker ??= Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
+    _ticker ??= Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => setState(() {}),
+    );
 
     final now = DateTime.now();
-    final secsLeft = state.pickDeadline.difference(now).inSeconds.clamp(0, 9999);
+    final secsLeft = state.pickDeadline
+        .difference(now)
+        .inSeconds
+        .clamp(0, 9999);
 
-    final myTeam = teams.firstWhereOrNull((t) => t.leagueId == widget.league.id && t.userId == uid);
-    final currentOwnerUid = teams.firstWhereOrNull((t) => t.id == state.currentTeamId)?.userId;
+    final myTeam = teams.firstWhereOrNull(
+      (t) => t.leagueId == widget.league.id && t.userId == uid,
+    );
+    final currentOwnerUid = teams
+        .firstWhereOrNull((t) => t.id == state.currentTeamId)
+        ?.userId;
     final myTurn = currentOwnerUid == uid;
 
-    final availablePlayers = players.where((pl) => picks.every((p) => p.playerId != pl.id)).toList();
+    final availablePlayers = players
+        .where((pl) => picks.every((p) => p.playerId != pl.id))
+        .toList();
 
-    final leagueTeams = teams.where((t) => t.leagueId == widget.league.id).toList();
+    final leagueTeams = teams
+        .where((t) => t.leagueId == widget.league.id)
+        .toList();
     final teamCount = leagueTeams.isEmpty ? 1 : leagueTeams.length;
 
     // position filtering
     final pos = ref.watch(posFilterProvider);
     final role = roleValue(pos);
-    final filteredPlayers = role == null ? availablePlayers : availablePlayers.where((pl) => pl.role == role).toList();
+    final filteredPlayers = role == null
+        ? availablePlayers
+        : availablePlayers.where((pl) => pl.role == role).toList();
 
     return Scaffold(
-      appBar: DraftAppBar(secsLeft: secsLeft, roundNumber: state.roundNumber, pickNumber: state.pickNumber),
+      appBar: DraftAppBar(
+        secsLeft: secsLeft,
+        roundNumber: state.roundNumber,
+        pickNumber: state.pickNumber,
+      ),
       body: Column(
         children: [
           const SizedBox(height: 32),
@@ -172,7 +202,9 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> with SingleTickerProvid
               separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemBuilder: (_, i) {
                 final p = picks[i];
-                final player = players.firstWhereOrNull((pl) => pl.id == p.playerId);
+                final player = players.firstWhereOrNull(
+                  (pl) => pl.id == p.playerId,
+                );
                 final team = teams.firstWhereOrNull((t) => t.id == p.teamId);
 
                 final round = ((p.pickNumber - 1) ~/ teamCount) + 1;
@@ -217,13 +249,21 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> with SingleTickerProvid
                           isScrollable: false,
                           dividerColor: Colors.transparent,
                           indicatorSize: TabBarIndicatorSize.tab,
-                          labelPadding: const EdgeInsets.symmetric(horizontal: 24),
-                          labelStyle: const TextStyle(fontWeight: FontWeight.w700),
+                          labelPadding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                          ),
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                          ),
                           labelColor: Colors.white,
-                          unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                          unselectedLabelColor: Theme.of(
+                            context,
+                          ).colorScheme.onSurfaceVariant,
                           indicator: const ShapeDecoration(
                             color: AppColors.black400, // selected bg
-                            shape: StadiumBorder(side: BorderSide(color: Colors.white, width: 2)),
+                            shape: StadiumBorder(
+                              side: BorderSide(color: Colors.white, width: 2),
+                            ),
                           ),
                           tabs: const [
                             Tab(text: 'Draft'),
@@ -247,10 +287,15 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> with SingleTickerProvid
                           myTeamId: (myTeam as dynamic)?.id,
                           tournamentId: widget.league.tournamentId,
                           selectedFilter: ref.watch(posFilterProvider),
-                          onFilterChanged: (v) => ref.read(posFilterProvider.notifier).state = v,
-                          onPick: (playerId, teamId) => _pickPlayer(playerId, teamId),
+                          onFilterChanged: (v) =>
+                              ref.read(posFilterProvider.notifier).state = v,
+                          onPick: (playerId, teamId) =>
+                              _pickPlayer(playerId, teamId),
                         ),
-                        const DraftTabBoard(),
+                        DraftTabBoard(
+                          leagueId: widget.league.id,
+                          tournamentId: widget.league.tournamentId,
+                        ),
                         const DraftTabRoster(),
                       ],
                     ),
@@ -266,15 +311,23 @@ class _DraftLobbyState extends ConsumerState<DraftLobby> with SingleTickerProvid
 
   Future<void> _pickPlayer(String playerId, String? myTeamId) async {
     if (myTeamId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Your team not found for this league')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Your team not found for this league')),
+      );
       return;
     }
     try {
       await ref
           .read(draftPickActionsProvider.notifier)
-          .makePick(leagueId: widget.league.id, teamId: myTeamId, playerId: playerId);
+          .makePick(
+            leagueId: widget.league.id,
+            teamId: myTeamId,
+            playerId: playerId,
+          );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Pick failed: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Pick failed: $e')));
     }
   }
 

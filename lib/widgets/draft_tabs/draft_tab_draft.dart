@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/players/player_model.dart';
 import 'package:sixers/theme/colors.dart';
-import 'package:sixers/widgets/draft_widgets/player_draft_tile.dart';
-import 'package:sixers/widgets/draft_widgets/position_filter_button.dart';
+import 'package:sixers/widgets/draft_widgets/draft_tab_draft_widgets/player_draft_tile.dart';
+import 'package:sixers/widgets/draft_widgets/draft_tab_draft_widgets/position_filter_button.dart';
 
 // add these:
 import 'package:sixers/backend/real_team/real_team_model.dart';
