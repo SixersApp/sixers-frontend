@@ -1,4 +1,3 @@
-// lib/widgets/board/board_grid.dart
 import 'package:flutter/material.dart';
 import 'package:sixers/widgets/draft_widgets/draft_tab_board_widgets/pick_cell.dart';
 import 'package:sixers/widgets/draft_widgets/draft_tab_board_widgets/team_header.dart';
@@ -11,7 +10,6 @@ class BoardGrid extends StatelessWidget {
     required this.playersById,
     required this.teamCount,
     required this.rounds,
-    this.bleedRightOverride, // set if parent padding isn't symmetric
   });
 
   final List<dynamic> teams; // FantasyTeam
@@ -19,9 +17,6 @@ class BoardGrid extends StatelessWidget {
   final Map<String, dynamic> playersById; // id -> Player
   final int teamCount;
   final int rounds;
-
-  /// If your parent padding isn't symmetric, pass the exact pixels to bleed.
-  final double? bleedRightOverride;
 
   // Square sizes
   static const double _tileSize = 132;
@@ -44,7 +39,7 @@ class BoardGrid extends StatelessWidget {
       byTeamRound[teamId]![r] = p;
     }
 
-    // Header row (square headers)
+    // Header row (square headers, gap only BETWEEN items)
     Widget buildHeader() => Row(
       children: [
         for (var i = 0; i < teams.length; i++) ...[
@@ -53,13 +48,12 @@ class BoardGrid extends StatelessWidget {
             name: ((teams[i] as dynamic).teamName ?? 'Team') as String,
             scheme: scheme,
           ),
-          if (i != teams.length - 1)
-            const SizedBox(width: _gap), // no trailing gap
+          if (i != teams.length - 1) const SizedBox(width: _gap),
         ],
       ],
     );
 
-    // Body columns (square cells)
+    // Body columns (square cells, gap only BETWEEN items)
     Widget buildBody() => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -93,89 +87,42 @@ class BoardGrid extends StatelessWidget {
                           );
                         },
                       ),
-                      if (r != rounds)
-                        const SizedBox(height: _gap), // only between rows
+                      if (r != rounds) const SizedBox(height: _gap),
                     ],
                   ],
                 ),
               );
             },
           ),
-          if (i != teams.length - 1)
-            const SizedBox(width: _gap), // no trailing gap
+          if (i != teams.length - 1) const SizedBox(width: _gap),
         ],
       ],
     );
 
-    // lib/widgets/board/board_grid.dart  (inside build -> LayoutBuilder)
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final screenW = MediaQuery.of(context).size.width;
-
-        // How much the parent narrowed us (usually its left+right padding)
-        final totalPadding = (screenW - constraints.maxWidth).clamp(
-          0.0,
-          double.infinity,
-        );
-
-        // ---- choose your inner padding (we keep only left) ----
-        const double contentLeftPad = 16.0;
-        const double contentRightPad =
-            0.0; // <-- make right = 0 so it can flush
-
-        // Bleed to the right by the parent's right padding,
-        // plus any inner right padding (which is 0 here).
-        final bleedRight =
-            (bleedRightOverride ??
-                (totalPadding > 0 ? totalPadding / 2 : 0.0)) +
-            contentRightPad;
-
-        final targetMinWidth = constraints.maxWidth + bleedRight;
-
-        final content = Scrollbar(
-          thumbVisibility: true,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minWidth: targetMinWidth),
-              child: Scrollbar(
-                thumbVisibility: true,
-                child: SingleChildScrollView(
-                  child: Padding(
-                    // ⬇⬇ keep only LEFT padding inside the grid
-                    padding: const EdgeInsets.only(
-                      left: contentLeftPad,
-                      right: contentRightPad, // 0
-                      top: 8,
-                      bottom: 8,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        buildHeader(),
-                        const SizedBox(height: _gap),
-                        buildBody(),
-                      ],
-                    ),
-                  ),
-                ),
+    // 2D scroll (horizontal + vertical) — NO internal padding anywhere
+    return Scrollbar(
+      thumbVisibility: true,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: MediaQuery.of(context).size.width,
+          ),
+          child: Scrollbar(
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  buildHeader(),
+                  const SizedBox(height: _gap),
+                  buildBody(),
+                ],
               ),
             ),
           ),
-        );
-
-        // Grow width to the right without shifting left.
-        if (bleedRight > 0) {
-          return OverflowBox(
-            alignment: Alignment.topLeft, // keep left edge fixed
-            minWidth: targetMinWidth,
-            maxWidth: targetMinWidth,
-            child: SizedBox(width: targetMinWidth, child: content),
-          );
-        }
-        return content;
-      },
+        ),
+      ),
     );
   }
 }
