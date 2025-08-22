@@ -23,8 +23,7 @@ class BoardGrid extends StatelessWidget {
   static const double _gap = 12;
 
   int _roundOf(dynamic p) => (((p.pickNumber as int) - 1) ~/ teamCount) + 1;
-  int _pickInRoundOf(dynamic p) =>
-      (((p.pickNumber as int) - 1) % teamCount) + 1;
+  int _pickInRoundOf(dynamic p) => (((p.pickNumber as int) - 1) % teamCount) + 1;
 
   @override
   Widget build(BuildContext context) {
@@ -41,63 +40,72 @@ class BoardGrid extends StatelessWidget {
 
     // Header row (square headers, gap only BETWEEN items)
     Widget buildHeader() => Row(
-      children: [
-        for (var i = 0; i < teams.length; i++) ...[
-          TeamHeader(
-            size: _tileSize,
-            name: ((teams[i] as dynamic).teamName ?? 'Team') as String,
-            scheme: scheme,
-          ),
-          if (i != teams.length - 1) const SizedBox(width: _gap),
-        ],
-      ],
-    );
+          children: [
+            for (var i = 0; i < teams.length; i++) ...[
+              TeamHeader(
+                size: _tileSize,
+                name: ((teams[i] as dynamic).teamName ?? 'Team') as String,
+                scheme: scheme,
+              ),
+              if (i != teams.length - 1) const SizedBox(width: _gap),
+            ],
+          ],
+        );
 
     // Body columns (square cells, gap only BETWEEN items)
     Widget buildBody() => Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (var i = 0; i < teams.length; i++) ...[
-          Builder(
-            builder: (context) {
-              final team = teams[i] as dynamic;
-              final String teamId = team.id as String;
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (var i = 0; i < teams.length; i++) ...[
+              Builder(
+                builder: (context) {
+                  final team = teams[i] as dynamic;
+                  final String teamId = team.id as String;
 
-              return SizedBox(
-                width: _tileSize,
-                child: Column(
-                  children: [
-                    for (int r = 1; r <= rounds; r++) ...[
-                      Builder(
-                        builder: (context) {
-                          final pick = byTeamRound[teamId]?[r];
-                          final label = pick == null
-                              ? '$r.'
-                              : '$r.${_pickInRoundOf(pick)}';
-                          final player = pick == null
-                              ? null
-                              : playersById[pick.playerId as String];
+                  return SizedBox(
+                    width: _tileSize,
+                    child: Column(
+                      children: [
+                        for (int r = 1; r <= rounds; r++) ...[
+                          Builder(
+                            builder: (context) {
+                              final pick = byTeamRound[teamId]?[r];
 
-                          return PickCell(
-                            size: _tileSize,
-                            scheme: scheme,
-                            label: label,
-                            player: player,
-                            pick: pick,
-                          );
-                        },
-                      ),
-                      if (r != rounds) const SizedBox(height: _gap),
-                    ],
-                  ],
-                ),
-              );
-            },
-          ),
-          if (i != teams.length - 1) const SizedBox(width: _gap),
-        ],
-      ],
-    );
+                              // ⬇️ If no pick in the *current* round, render a blank square.
+                              if (pick == null && r == rounds) {
+                                return const SizedBox.square(
+                                  dimension: _tileSize,
+                                );
+                              }
+
+                              // Otherwise render the normal cell (older rounds will be filled)
+                              final label = pick == null
+                                  ? '$r.' // defensive; usually shouldn't happen for older rounds
+                                  : '$r.${_pickInRoundOf(pick)}';
+                              final player = pick == null
+                                  ? null
+                                  : playersById[pick.playerId as String];
+
+                              return PickCell(
+                                size: _tileSize,
+                                scheme: scheme,
+                                label: label,
+                                player: player,
+                                pick: pick,
+                              );
+                            },
+                          ),
+                          if (r != rounds) const SizedBox(height: _gap),
+                        ],
+                      ],
+                    ),
+                  );
+                },
+              ),
+              if (i != teams.length - 1) const SizedBox(width: _gap),
+            ],
+          ],
+        );
 
     // 2D scroll (horizontal + vertical) — NO internal padding anywhere
     return Scrollbar(

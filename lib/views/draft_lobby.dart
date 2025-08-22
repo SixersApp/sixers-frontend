@@ -232,9 +232,10 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
                 children: [
                   // ─── Slider (pill) — 46px tall, snappy, black400 selected ──
                   SizedBox(
-                    height: 46,
+                    height: 40,
+                    width: 344,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
                       child: Container(
                         decoration: BoxDecoration(
                           color: _black100(context), // dark track
