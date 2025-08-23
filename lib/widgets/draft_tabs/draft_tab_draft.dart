@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/players/player_model.dart';
 import 'package:sixers/theme/colors.dart';
-import 'package:sixers/widgets/draft_widgets/player_draft_tile.dart';
-import 'package:sixers/widgets/draft_widgets/position_filter_button.dart';
+import 'package:sixers/widgets/draft_widgets/draft_tab_draft_widgets/player_draft_tile.dart';
+import 'package:sixers/widgets/draft_widgets/draft_tab_draft_widgets/position_filter_button.dart';
 
 // add these:
 import 'package:sixers/backend/real_team/real_team_model.dart';
@@ -54,83 +54,86 @@ class DraftTabDraft extends ConsumerWidget {
       orElse: () => const {},
     );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Section title
-        Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Text(
-            'Your Pick',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge!.copyWith(color: AppColors.black700),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section title
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Text(
+              'Your Pick',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge!.copyWith(color: AppColors.black700),
+            ),
           ),
-        ),
-        // Position filter
-        Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: PositionFilterButton(
-            selected: selectedFilter,
-            onChanged: onFilterChanged,
+          // Position filter
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: PositionFilterButton(
+              selected: selectedFilter,
+              onChanged: onFilterChanged,
+            ),
           ),
-        ),
-        // Header row
-        Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Rank',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerRight,
+          // Header row
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Row(
+              children: [
+                Expanded(
                   child: Text(
-                    'Stats',
+                    'Rank',
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
-              ),
-            ],
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      'Stats',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        // List
-        Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.only(bottom: 10),
-            itemCount: filteredPlayers.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (_, i) {
-              final pl = filteredPlayers[i];
-              final rank = i + 1; // placeholder rank
-
-              // Look up the real team name by id
-              final realTeamName = teamNameById[pl.realTeamId] ?? 'Team';
-
-              return PlayerDraftTile(
-                rank: rank,
-                playerName: pl.name,
-                realTeamName: realTeamName,
-                stat1Label: 'Avg',
-                stat1Value: '—',
-                stat2Label: 'SR',
-                stat2Value: '—',
-                enabled: myTurn,
-                onAdd: () => onPick(pl.id, myTeamId),
-                role: pl.role,
-              );
-            },
+          // List
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.only(bottom: 10),
+              itemCount: filteredPlayers.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (_, i) {
+                final pl = filteredPlayers[i];
+                final rank = i + 1; // placeholder rank
+      
+                // Look up the real team name by id
+                final realTeamName = teamNameById[pl.realTeamId] ?? 'Team';
+      
+                return PlayerDraftTile(
+                  rank: rank,
+                  playerName: pl.name,
+                  realTeamName: realTeamName,
+                  stat1Label: 'Avg',
+                  stat1Value: '—',
+                  stat2Label: 'SR',
+                  stat2Value: '—',
+                  enabled: myTurn,
+                  onAdd: () => onPick(pl.id, myTeamId),
+                  role: pl.role,
+                );
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

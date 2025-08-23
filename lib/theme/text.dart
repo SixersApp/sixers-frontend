@@ -49,7 +49,7 @@ TextTheme buildTextTheme(Brightness b) {
     ),
 
     titleMedium: base.titleMedium?.copyWith(
-      fontFamily: heading,
+      fontFamily: body,
       fontWeight: FontWeight.w600,
     ),
 
