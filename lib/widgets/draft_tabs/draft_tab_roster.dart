@@ -11,8 +11,8 @@ class DraftTabRoster extends ConsumerWidget {
   const DraftTabRoster({
     super.key,
     required this.myTeamId,
-    required this.allPicks,      // List<DraftPick>
-    required this.playersById,   // Map<String, Player>
+    required this.allPicks, // List<DraftPick>
+    required this.playersById, // Map<String, Player>
     required this.tournamentId,
   });
 
@@ -35,9 +35,7 @@ class DraftTabRoster extends ConsumerWidget {
     );
 
     // Filter to my team's picks and keep draft order
-    final myPicks = allPicks
-        .where((p) => p.teamId == myTeamId)
-        .toList()
+    final myPicks = allPicks.where((p) => p.teamId == myTeamId).toList()
       ..sort((a, b) => a.pickNumber.compareTo(b.pickNumber));
 
     if (myPicks.isEmpty) {
@@ -103,17 +101,18 @@ class DraftTabRoster extends ConsumerWidget {
               final stat2Label = isBowler ? 'Wkts' : 'SR';
 
               return PlayerDraftTile(
-                // Show the player's overall rank on the left (like the mock)
                 rank: (i + 1),
                 playerName: player.name,
                 realTeamName: realTeamName,
-                role: player.role ?? 'Batsman',
+                role: player.role,
                 stat1Label: stat1Label,
-                stat1Value: '—', // plug real values when available
+                stat1Value: '—',
                 stat2Label: stat2Label,
                 stat2Value: '—',
-                enabled: false,  // roster view shouldn't allow adding
+                enabled: false,
                 onAdd: () {},
+                isRoster: true,
+                draftNumber: '1.1', // or any precomputed string
               );
             },
           ),

@@ -3,7 +3,7 @@ import 'package:sixers/theme/colors.dart';
 import 'package:sixers/widgets/helpers.dart';
 
 /// Visual-only tile for an available player row.
-/// Real team name + stats are placeholders for now.
+/// If [isRoster] is true, the trailing + button is replaced by [draftNumber].
 class PlayerDraftTile extends StatelessWidget {
   const PlayerDraftTile({
     super.key,
@@ -17,7 +17,12 @@ class PlayerDraftTile extends StatelessWidget {
     required this.enabled,
     required this.onAdd,
     this.role,
-  });
+    this.isRoster = false,
+    this.draftNumber, // e.g., "1.1"
+  }) : assert(
+         isRoster == false || draftNumber != null,
+         'When isRoster is true, draftNumber must be provided',
+       );
 
   final int rank;
   final String playerName;
@@ -33,6 +38,10 @@ class PlayerDraftTile extends StatelessWidget {
   final bool enabled;
   final VoidCallback onAdd;
 
+  /// Roster-mode options
+  final bool isRoster;
+  final String? draftNumber;
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -44,27 +53,21 @@ class PlayerDraftTile extends StatelessWidget {
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(10),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       child: Row(
         children: [
-          // Rank
-          SizedBox(
-            width: 34,
-            child: Center(
-              child: Text(
-                '$rank',
-                style: text.labelLarge?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-            ),
+          // Rank (left column)
+          Text(
+            '$rank',
+            style: text.labelLarge?.copyWith(color: scheme.onSurfaceVariant),
           ),
-          const SizedBox(width: 8),
+
+          const SizedBox(width: 10),
 
           // Avatar placeholder
           Container(
-            width: 44,
-            height: 44,
+            width: 45,
+            height: 45,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: scheme.surface, // black200
@@ -73,7 +76,8 @@ class PlayerDraftTile extends StatelessWidget {
           const SizedBox(width: 10),
 
           // Name + team
-          Expanded(
+          SizedBox(
+            width: 145,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -86,14 +90,12 @@ class PlayerDraftTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    Expanded(
-                      child: Text(
-                        realTeamName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: text.labelMedium?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                        ),
+                    Text(
+                      realTeamName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.labelMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(width: 5),
@@ -117,31 +119,61 @@ class PlayerDraftTile extends StatelessWidget {
               ],
             ),
           ),
-
+          SizedBox(width: 10),
           // Stats (right column)
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('$stat1Label: $stat1Value', style: text.bodySmall),
-              Text('$stat2Label: $stat2Value', style: text.bodySmall),
+              Text(
+                '$stat1Label: $stat1Value',
+                style: text.labelMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+              Text(
+                '$stat2Label: $stat2Value',
+                style: text.labelMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
             ],
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
 
-          // Add button only if enabled
-          if (enabled)
-            InkWell(
-              onTap: onAdd,
-              borderRadius: BorderRadius.circular(18),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: AppColors.green300, width: 2),
+          // Trailing control:
+          // - Roster mode: show draft number (e.g., "1.1")
+          // - Draft list mode: show + button if enabled
+          if (isRoster)
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  draftNumber!,
+                  style: text.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: scheme.onSurfaceVariant,
+                  ),
                 ),
-                child: Icon(Icons.add, size: 20, color: AppColors.green300),
+              ),
+            )
+          else if (enabled)
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: InkWell(
+                  onTap: onAdd,
+                  borderRadius: BorderRadius.circular(18),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: AppColors.green300, width: 2),
+                    ),
+                    child: Icon(Icons.add, size: 20, color: AppColors.green300),
+                  ),
+                ),
               ),
             ),
         ],
