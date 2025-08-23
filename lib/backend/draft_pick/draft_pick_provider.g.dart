@@ -146,7 +146,7 @@ class _DraftPicksProviderElement
   String get leagueId => (origin as DraftPicksProvider).leagueId;
 }
 
-String _$draftPickActionsHash() => r'6b864dd54e71d4085ea2cf11632b7d560b47ac41';
+String _$draftPickActionsHash() => r'fe014cc0da4480d9f7291b0dbdd8184f5489b1d4';
 
 /// See also [DraftPickActions].
 @ProviderFor(DraftPickActions)
