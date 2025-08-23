@@ -19,7 +19,7 @@ class PickCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double pad = 12;
+    const double pad = 10;
 
     final String? role = player?.role as String?;
     final rc = (role == null || role.isEmpty) ? null : roleIconAndColor(role);
@@ -42,18 +42,18 @@ class PickCell extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // pick label (top-left)
-            Text(label, style: Theme.of(context).textTheme.labelMedium),
-            const SizedBox(height: 4),
+            Text(label, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
+            const SizedBox(height: 5),
             // player name (kept to 2 lines to avoid overflow)
             Text(
               player?.name ?? '—',
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 5),
             // team short/name
             Text(
               'GL',

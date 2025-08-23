@@ -34,12 +34,15 @@ class DraftTabBoard extends ConsumerWidget {
         ? 1
         : ((picks.length + teamCount - 1) ~/ teamCount);
 
-    return BoardGrid(
-      teams: teams,
-      picks: picks,
-      playersById: playersById,
-      teamCount: teamCount,
-      rounds: rounds,
+    return Padding(
+      padding: const EdgeInsets.only(left: 20),
+      child: BoardGrid(
+        teams: teams,
+        picks: picks,
+        playersById: playersById,
+        teamCount: teamCount,
+        rounds: rounds,
+      ),
     );
   }
 }

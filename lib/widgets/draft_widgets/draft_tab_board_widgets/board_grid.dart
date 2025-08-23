@@ -19,8 +19,8 @@ class BoardGrid extends StatelessWidget {
   final int rounds;
 
   // Square sizes
-  static const double _tileSize = 132;
-  static const double _gap = 12;
+  static const double _tileSize = 100;
+  static const double _gap = 10;
 
   int _roundOf(dynamic p) => (((p.pickNumber as int) - 1) ~/ teamCount) + 1;
   int _pickInRoundOf(dynamic p) => (((p.pickNumber as int) - 1) % teamCount) + 1;

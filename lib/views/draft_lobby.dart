@@ -182,6 +182,8 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
         ? availablePlayers
         : availablePlayers.where((pl) => pl.role == role).toList();
 
+
+
     return Scaffold(
       appBar: DraftAppBar(
         secsLeft: secsLeft,
@@ -227,7 +229,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
           Expanded(
             child: Container(
               color: Theme.of(context).colorScheme.surface, // black200
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
               child: Column(
                 children: [
                   // ─── Slider (pill) — 46px tall, snappy, black400 selected ──
@@ -297,7 +299,14 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
                           leagueId: widget.league.id,
                           tournamentId: widget.league.tournamentId,
                         ),
-                        const DraftTabRoster(),
+                        
+                        DraftTabRoster(
+                          myTeamId: (myTeam as dynamic)?.id ?? '', // safe if user isn’t on a team yet
+                          allPicks: picks,                         // full draft_picks list
+                          playersById: { for (final p in players) p.id: p }, 
+                          tournamentId: widget.league.tournamentId,               // id -> Player
+                        ),
+
                       ],
                     ),
                   ),
