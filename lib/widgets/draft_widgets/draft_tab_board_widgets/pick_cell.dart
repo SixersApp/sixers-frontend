@@ -8,17 +8,19 @@ class PickCell extends StatelessWidget {
     required this.scheme,
     required this.label,
     required this.player,
-    this.pick,
+    required this.shortTeamName,
   });
 
   final double size; // square tile size
   final ColorScheme scheme;
   final String label; // e.g. "1.1"
   final dynamic player; // Player?
-  final dynamic pick; // DraftPick?
+  final String shortTeamName;
+  
 
   @override
   Widget build(BuildContext context) {
+
     const double pad = 10;
 
     final String? role = player?.role as String?;
@@ -56,7 +58,7 @@ class PickCell extends StatelessWidget {
             const SizedBox(height: 5),
             // team short/name
             Text(
-              'GL',
+              shortTeamName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(
