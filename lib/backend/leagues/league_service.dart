@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -46,36 +47,25 @@ class LeagueService {
     return res == null ? null : League.fromJson(res);
   }
 
+  Future<League?> getLeagueByJoinCode(String joinCode) async {
+    final res = await client.from('leagues').select().eq('join_code', joinCode).eq('status', 'draft_pending').maybeSingle();
+    return res == null ? null : League.fromJson(res);
+  }
+
   Future<void> startDraft(String leagueId) async {
-    print('[startDraft] leagueId = $leagueId');
     try {
-      // First check if the league exists and get its current status
-      print('[startDraft] Checking if league exists...');
+    
       final league = await getLeagueById(leagueId);
       if (league == null) {
         throw Exception('League not found: $leagueId');
       }
-      print('[startDraft] League found: ${league.name}, current status: ${league.status}');
-
-      // Test basic database connectivity
-      print('[startDraft] Testing database connectivity...');
       final testResult = await client.from('leagues').select('id').eq('id', leagueId).maybeSingle();
-      print('[startDraft] Test query result: $testResult');
-
-      print('[startDraft] Attempting to update league status...');
+  
       final result = await client.from('leagues').update({'status': 'draft_in_progress'}).eq('id', leagueId);
-      print('[startDraft] Update result: $result');
-      print('[startDraft] Draft started successfully');
+
     } catch (e) {
-      print('[startDraft] Error starting draft: $e');
-      print('[startDraft] Error type: ${e.runtimeType}');
-      if (e is PostgrestException) {
-        print('[startDraft] PostgrestException details:');
-        print('[startDraft] - Message: ${e.message}');
-        print('[startDraft] - Code: ${e.code}');
-        print('[startDraft] - Details: ${e.details}');
-        print('[startDraft] - Hint: ${e.hint}');
-      }
+      debugPrint('[startDraft] Error starting draft: $e');
+      debugPrint('[startDraft] Error type: ${e.runtimeType}');
       rethrow;
     }
   }

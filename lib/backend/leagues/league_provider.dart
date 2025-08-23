@@ -50,6 +50,10 @@ class Leagues extends _$Leagues {
     await refresh();
   }
 
+  Future<League?> getLeagueByJoinCode(String joinCode) async {
+    return _service.getLeagueByJoinCode(joinCode);
+  }
+
   Future<void> startDraft(String leagueId) async {
     await _service.startDraft(leagueId);
     await refresh(); // refresh provider state
