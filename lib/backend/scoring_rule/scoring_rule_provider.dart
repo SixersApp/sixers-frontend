@@ -1,29 +1,38 @@
-// lib/providers/scoring_rule_providers.dart
+// lib/backend/scoring_rule/scoring_rule_provider.dart
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sixers/backend/scoring_rule/scoring_rule_model.dart';
-import 'package:sixers/backend/scoring_rule/scoring_rule_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'scoring_rule_model.dart';
+import 'scoring_rule_service.dart';
 
 part 'scoring_rule_provider.g.dart';
 
-@Riverpod(keepAlive: true)
-ScoringRuleService scoringRuleService(ref) {
-  return ScoringRuleService();
-}
-
-/// Defaults (league_id IS NULL)
 @riverpod
-Future<List<ScoringRule>> defaultScoringRules(ref) async {
-  final ScoringRuleService svc = ref.read(scoringRuleServiceProvider);
-  return svc.fetchDefaults();
-}
+class ScoringRules extends _$ScoringRules {
+  final _service = ScoringRuleService();
+  String? _leagueId; // remember current scope for refresh()
 
-/// Full league rules (materialized copy)
-@riverpod
-Future<List<ScoringRule>> scoringRulesByLeague(
-  ref,
-  String leagueId,
-) async {
-  final ScoringRuleService svc = ref.read(scoringRuleServiceProvider);
-  return svc.fetchByLeagueId(leagueId);
+  @override
+  Future<List<ScoringRule>> build({String? leagueId}) async {
+    _leagueId = leagueId;
+    if (leagueId == null) {
+      // league_id IS NULL -> default rules
+      return _service.fetchDefaults();
+    }
+    return _service.fetchByLeagueId(leagueId);
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final id = _leagueId;
+      return id == null
+          ? _service.fetchDefaults()
+          : _service.fetchByLeagueId(id);
+    });
+  }
+
+  // /// Optional helper when you want to replace all rules for a league then refresh.
+  // Future<void> replaceAll(String leagueId, List<ScoringRule> rules) async {
+  //   await _service.replaceAllForLeague(leagueId, rules);
+  //   await refresh();
+  // }
 }

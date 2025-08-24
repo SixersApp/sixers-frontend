@@ -1,21 +1,20 @@
-
+// lib/backend/scoring/scoring_rule_model.dart
 import 'package:json_annotation/json_annotation.dart';
 
 part 'scoring_rule_model.g.dart';
 
-/// Matches Postgres enum `rule_mode` values
+/// Matches Postgres enum rule_mode: 'per_unit' | 'flat' | 'threshold' | 'band' | 'multiplier'
 @JsonEnum(fieldRename: FieldRename.snake)
 enum RuleMode { perUnit, flat, threshold, band, multiplier }
 
-/// Minimal range type for Postgres `numrange`
-/// Serialized as the standard PG text form, e.g. "[0,30)", "(-infinity,10]"
+/// Postgres numrange <-> text, e.g. "[0,30)", "(-infinity,10]"
 class NumRange {
-  final num? lower;               // null if -infinity
-  final num? upper;               // null if +infinity
-  final bool lowerInclusive;      // '[' vs '('
-  final bool upperInclusive;      // ']' vs ')'
-  final bool lowerInfinite;       // -infinity
-  final bool upperInfinite;       // +infinity
+  final num? lower; // null => -infinity
+  final num? upper; // null => +infinity
+  final bool lowerInclusive; // '[' vs '('
+  final bool upperInclusive; // ']' vs ')'
+  final bool lowerInfinite; // -infinity
+  final bool upperInfinite; // +infinity
 
   const NumRange({
     this.lower,
@@ -26,7 +25,6 @@ class NumRange {
     this.upperInfinite = false,
   });
 
-  /// Parse Postgres numrange text to NumRange
   factory NumRange.fromPostgresText(String text) {
     final s = text.trim();
     if (s.isEmpty || s.toLowerCase() == 'empty') {
@@ -60,14 +58,15 @@ class NumRange {
     );
   }
 
-  /// Convert to Postgres numrange text (e.g. "[0,30)")
   String toPostgresText() {
-    String lowerStr =
-        lowerInfinite ? '-infinity' : (lower == null ? '' : '$lower');
-    String upperStr =
-        upperInfinite ? 'infinity' : (upper == null ? '' : '$upper');
     final open = lowerInclusive ? '[' : '(';
     final close = upperInclusive ? ']' : ')';
+    final lowerStr = lowerInfinite
+        ? '-infinity'
+        : (lower == null ? '' : '$lower');
+    final upperStr = upperInfinite
+        ? 'infinity'
+        : (upper == null ? '' : '$upper');
     return '$open$lowerStr,$upperStr$close';
   }
 
@@ -75,12 +74,12 @@ class NumRange {
   String toString() => toPostgresText();
 }
 
-/// JSON converter for the `band` column (PG `numrange` <-> text)
+/// numrange <-> text converter for json_serializable
 class PgNumRangeConverter implements JsonConverter<NumRange?, String?> {
   const PgNumRangeConverter();
   @override
   NumRange? fromJson(String? json) =>
-      (json == null) ? null : NumRange.fromPostgresText(json);
+      json == null ? null : NumRange.fromPostgresText(json);
   @override
   String? toJson(NumRange? object) => object?.toPostgresText();
 }
@@ -89,19 +88,20 @@ class PgNumRangeConverter implements JsonConverter<NumRange?, String?> {
 /// DB uniqueness/exclusion constraints are enforced server-side.
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ScoringRule {
-  final String? id;             // uuid PK
-  final String? leagueId;       // null => global default/template
-  final String stat;            // e.g., "points_per_run", "catch_bonus"
-  final String category;        // e.g., "batting", "fielding", "leadership"
+  final String? id; // uuid PK
+  final String? leagueId; // null => global default/template
+  final String stat; // e.g., "points_per_run", "catch_bonus"
+  final String category; // e.g., "batting", "fielding", "leadership"
+  @JsonKey(unknownEnumValue: RuleMode.perUnit)
   final RuleMode mode;
 
   // Only one of these sets is valid at a time, depending on `mode`.
-  final num? perUnitPoints;     // mode = per_unit
-  final num? flatPoints;        // mode = flat, threshold, band
-  final int? threshold;         // mode = threshold
+  final num? perUnitPoints; // mode = per_unit
+  final num? flatPoints; // mode = flat, threshold, band
+  final int? threshold; // mode = threshold
   @PgNumRangeConverter()
-  final NumRange? band;         // mode = band (no overlaps per league/category/stat)
-  final num? multiplier;        // mode = multiplier
+  final NumRange? band; // mode = band (no overlaps per league/category/stat)
+  final num? multiplier; // mode = multiplier
 
   final DateTime? createdAt;
 
@@ -119,128 +119,103 @@ class ScoringRule {
     this.createdAt,
   });
 
-  /// Handy constructors that mirror your CHECK constraint
-  factory ScoringRule.perUnit({
-    String? id,
-    String? leagueId,
-    required String stat,
-    required String category,
-    required num perUnitPoints,
-  }) =>
-      ScoringRule(
-        id: id,
-        leagueId: leagueId,
-        stat: stat,
-        category: category,
-        mode: RuleMode.perUnit,
-        perUnitPoints: perUnitPoints,
-      );
+  /// Stable identity for updates in lists (independent of DB id).
+  /// Mirrors DB uniqueness rules (adds threshold or band text for those modes).
+  String key() {
+    final base = '${category}|${stat}|${mode.name}';
+    switch (mode) {
+      case RuleMode.threshold:
+        return '$base|thr=${threshold ?? ''}';
+      case RuleMode.band:
+        return '$base|band=${band?.toPostgresText() ?? ''}';
+      default:
+        return base;
+    }
+  }
 
-  factory ScoringRule.flat({
-    String? id,
-    String? leagueId,
-    required String stat,
-    required String category,
-    required num flatPoints,
-  }) =>
-      ScoringRule(
-        id: id,
-        leagueId: leagueId,
-        stat: stat,
-        category: category,
-        mode: RuleMode.flat,
-        flatPoints: flatPoints,
-      );
+  /// Prepare for bulk insert: drop id, set leagueId.
+  ScoringRule copyForLeague(String leagueId) =>
+      copyWith(id: null, leagueId: leagueId);
 
-  factory ScoringRule.threshold({
-    String? id,
-    String? leagueId,
-    required String stat,
-    required String category,
-    required int threshold,
-    required num flatPoints,
-  }) =>
-      ScoringRule(
-        id: id,
-        leagueId: leagueId,
-        stat: stat,
-        category: category,
-        mode: RuleMode.threshold,
-        threshold: threshold,
-        flatPoints: flatPoints,
-      );
+  /// Clear fields that are not allowed for the current mode,
+  /// so outgoing JSON always satisfies the DB CHECK constraint.
+  ScoringRule normalizedForMode() {
+    switch (mode) {
+      case RuleMode.perUnit:
+        return copyWith(
+          flatPoints: null,
+          threshold: null,
+          band: null,
+          multiplier: null,
+        );
+      case RuleMode.flat:
+        return copyWith(
+          perUnitPoints: null,
+          threshold: null,
+          band: null,
+          multiplier: null,
+        );
+      case RuleMode.threshold:
+        return copyWith(perUnitPoints: null, band: null, multiplier: null);
+      case RuleMode.band:
+        return copyWith(perUnitPoints: null, threshold: null, multiplier: null);
+      case RuleMode.multiplier:
+        return copyWith(
+          perUnitPoints: null,
+          flatPoints: null,
+          threshold: null,
+          band: null,
+        );
+    }
+  }
 
-  factory ScoringRule.band({
-    String? id,
-    String? leagueId,
-    required String stat,
-    required String category,
-    required NumRange band,
-    required num flatPoints,
-  }) =>
-      ScoringRule(
-        id: id,
-        leagueId: leagueId,
-        stat: stat,
-        category: category,
-        mode: RuleMode.band,
-        band: band,
-        flatPoints: flatPoints,
-      );
-
-  factory ScoringRule.multiplier({
-    String? id,
-    String? leagueId,
-    required String stat,
-    required String category,
-    required num multiplier,
-  }) =>
-      ScoringRule(
-        id: id,
-        leagueId: leagueId,
-        stat: stat,
-        category: category,
-        mode: RuleMode.multiplier,
-        multiplier: multiplier,
-      );
-
-  /// Optional client-side check mirroring the DB CHECK constraint
+  /// Debug-time mirror of the DB CHECK.
   void assertValid() {
     switch (mode) {
       case RuleMode.perUnit:
-        assert(perUnitPoints != null &&
-            flatPoints == null &&
-            threshold == null &&
-            band == null &&
-            multiplier == null);
+        assert(
+          perUnitPoints != null &&
+              flatPoints == null &&
+              threshold == null &&
+              band == null &&
+              multiplier == null,
+        );
         break;
       case RuleMode.flat:
-        assert(flatPoints != null &&
-            perUnitPoints == null &&
-            threshold == null &&
-            band == null &&
-            multiplier == null);
+        assert(
+          flatPoints != null &&
+              perUnitPoints == null &&
+              threshold == null &&
+              band == null &&
+              multiplier == null,
+        );
         break;
       case RuleMode.threshold:
-        assert(threshold != null &&
-            flatPoints != null &&
-            perUnitPoints == null &&
-            band == null &&
-            multiplier == null);
+        assert(
+          threshold != null &&
+              flatPoints != null &&
+              perUnitPoints == null &&
+              band == null &&
+              multiplier == null,
+        );
         break;
       case RuleMode.band:
-        assert(band != null &&
-            flatPoints != null &&
-            perUnitPoints == null &&
-            threshold == null &&
-            multiplier == null);
+        assert(
+          band != null &&
+              flatPoints != null &&
+              perUnitPoints == null &&
+              threshold == null &&
+              multiplier == null,
+        );
         break;
       case RuleMode.multiplier:
-        assert(multiplier != null &&
-            perUnitPoints == null &&
-            flatPoints == null &&
-            threshold == null &&
-            band == null);
+        assert(
+          multiplier != null &&
+              perUnitPoints == null &&
+              flatPoints == null &&
+              threshold == null &&
+              band == null,
+        );
         break;
     }
   }
@@ -277,4 +252,19 @@ class ScoringRule {
       createdAt: createdAt ?? this.createdAt,
     );
   }
+
+  // Equality based on stable key (so list updates work even before insert)
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ScoringRule &&
+          runtimeType == other.runtimeType &&
+          key() == other.key();
+
+  @override
+  int get hashCode => key().hashCode;
+
+  @override
+  String toString() =>
+      'ScoringRule{key=${key()}, perUnit=$perUnitPoints, flat=$flatPoints, thr=$threshold, band=$band, mult=$multiplier}';
 }

@@ -6,48 +6,7 @@ part of 'scoring_rule_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$scoringRuleServiceHash() =>
-    r'becfe86c660ade2a11104c7f8730784d24afa8fe';
-
-/// See also [scoringRuleService].
-@ProviderFor(scoringRuleService)
-final scoringRuleServiceProvider = Provider<ScoringRuleService>.internal(
-  scoringRuleService,
-  name: r'scoringRuleServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$scoringRuleServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ScoringRuleServiceRef = ProviderRef<ScoringRuleService>;
-String _$defaultScoringRulesHash() =>
-    r'da8090464e7a64da368ba23104eecb93d2666308';
-
-/// Defaults (league_id IS NULL)
-///
-/// Copied from [defaultScoringRules].
-@ProviderFor(defaultScoringRules)
-final defaultScoringRulesProvider =
-    AutoDisposeFutureProvider<List<ScoringRule>>.internal(
-      defaultScoringRules,
-      name: r'defaultScoringRulesProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$defaultScoringRulesHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef DefaultScoringRulesRef =
-    AutoDisposeFutureProviderRef<List<ScoringRule>>;
-String _$scoringRulesByLeagueHash() =>
-    r'681732f725b46adc1f117e469f74b2f2a4506442';
+String _$scoringRulesHash() => r'6a5f0df49699c2a536f7d8533f7d6b3ee584a61e';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -70,33 +29,32 @@ class _SystemHash {
   }
 }
 
-/// Full league rules (materialized copy)
-///
-/// Copied from [scoringRulesByLeague].
-@ProviderFor(scoringRulesByLeague)
-const scoringRulesByLeagueProvider = ScoringRulesByLeagueFamily();
+abstract class _$ScoringRules
+    extends BuildlessAutoDisposeAsyncNotifier<List<ScoringRule>> {
+  late final String? leagueId;
 
-/// Full league rules (materialized copy)
-///
-/// Copied from [scoringRulesByLeague].
-class ScoringRulesByLeagueFamily extends Family<AsyncValue<List<ScoringRule>>> {
-  /// Full league rules (materialized copy)
-  ///
-  /// Copied from [scoringRulesByLeague].
-  const ScoringRulesByLeagueFamily();
+  FutureOr<List<ScoringRule>> build({String? leagueId});
+}
 
-  /// Full league rules (materialized copy)
-  ///
-  /// Copied from [scoringRulesByLeague].
-  ScoringRulesByLeagueProvider call(String leagueId) {
-    return ScoringRulesByLeagueProvider(leagueId);
+/// See also [ScoringRules].
+@ProviderFor(ScoringRules)
+const scoringRulesProvider = ScoringRulesFamily();
+
+/// See also [ScoringRules].
+class ScoringRulesFamily extends Family<AsyncValue<List<ScoringRule>>> {
+  /// See also [ScoringRules].
+  const ScoringRulesFamily();
+
+  /// See also [ScoringRules].
+  ScoringRulesProvider call({String? leagueId}) {
+    return ScoringRulesProvider(leagueId: leagueId);
   }
 
   @override
-  ScoringRulesByLeagueProvider getProviderOverride(
-    covariant ScoringRulesByLeagueProvider provider,
+  ScoringRulesProvider getProviderOverride(
+    covariant ScoringRulesProvider provider,
   ) {
-    return call(provider.leagueId);
+    return call(leagueId: provider.leagueId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -111,32 +69,29 @@ class ScoringRulesByLeagueFamily extends Family<AsyncValue<List<ScoringRule>>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'scoringRulesByLeagueProvider';
+  String? get name => r'scoringRulesProvider';
 }
 
-/// Full league rules (materialized copy)
-///
-/// Copied from [scoringRulesByLeague].
-class ScoringRulesByLeagueProvider
-    extends AutoDisposeFutureProvider<List<ScoringRule>> {
-  /// Full league rules (materialized copy)
-  ///
-  /// Copied from [scoringRulesByLeague].
-  ScoringRulesByLeagueProvider(String leagueId)
+/// See also [ScoringRules].
+class ScoringRulesProvider
+    extends
+        AutoDisposeAsyncNotifierProviderImpl<ScoringRules, List<ScoringRule>> {
+  /// See also [ScoringRules].
+  ScoringRulesProvider({String? leagueId})
     : this._internal(
-        (ref) => scoringRulesByLeague(ref as ScoringRulesByLeagueRef, leagueId),
-        from: scoringRulesByLeagueProvider,
-        name: r'scoringRulesByLeagueProvider',
+        () => ScoringRules()..leagueId = leagueId,
+        from: scoringRulesProvider,
+        name: r'scoringRulesProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
             ? null
-            : _$scoringRulesByLeagueHash,
-        dependencies: ScoringRulesByLeagueFamily._dependencies,
+            : _$scoringRulesHash,
+        dependencies: ScoringRulesFamily._dependencies,
         allTransitiveDependencies:
-            ScoringRulesByLeagueFamily._allTransitiveDependencies,
+            ScoringRulesFamily._allTransitiveDependencies,
         leagueId: leagueId,
       );
 
-  ScoringRulesByLeagueProvider._internal(
+  ScoringRulesProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -146,17 +101,21 @@ class ScoringRulesByLeagueProvider
     required this.leagueId,
   }) : super.internal();
 
-  final String leagueId;
+  final String? leagueId;
 
   @override
-  Override overrideWith(
-    FutureOr<List<ScoringRule>> Function(ScoringRulesByLeagueRef provider)
-    create,
+  FutureOr<List<ScoringRule>> runNotifierBuild(
+    covariant ScoringRules notifier,
   ) {
+    return notifier.build(leagueId: leagueId);
+  }
+
+  @override
+  Override overrideWith(ScoringRules Function() create) {
     return ProviderOverride(
       origin: this,
-      override: ScoringRulesByLeagueProvider._internal(
-        (ref) => create(ref as ScoringRulesByLeagueRef),
+      override: ScoringRulesProvider._internal(
+        () => create()..leagueId = leagueId,
         from: from,
         name: null,
         dependencies: null,
@@ -168,13 +127,14 @@ class ScoringRulesByLeagueProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<List<ScoringRule>> createElement() {
-    return _ScoringRulesByLeagueProviderElement(this);
+  AutoDisposeAsyncNotifierProviderElement<ScoringRules, List<ScoringRule>>
+  createElement() {
+    return _ScoringRulesProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is ScoringRulesByLeagueProvider && other.leagueId == leagueId;
+    return other is ScoringRulesProvider && other.leagueId == leagueId;
   }
 
   @override
@@ -188,19 +148,20 @@ class ScoringRulesByLeagueProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin ScoringRulesByLeagueRef
-    on AutoDisposeFutureProviderRef<List<ScoringRule>> {
+mixin ScoringRulesRef
+    on AutoDisposeAsyncNotifierProviderRef<List<ScoringRule>> {
   /// The parameter `leagueId` of this provider.
-  String get leagueId;
+  String? get leagueId;
 }
 
-class _ScoringRulesByLeagueProviderElement
-    extends AutoDisposeFutureProviderElement<List<ScoringRule>>
-    with ScoringRulesByLeagueRef {
-  _ScoringRulesByLeagueProviderElement(super.provider);
+class _ScoringRulesProviderElement
+    extends
+        AutoDisposeAsyncNotifierProviderElement<ScoringRules, List<ScoringRule>>
+    with ScoringRulesRef {
+  _ScoringRulesProviderElement(super.provider);
 
   @override
-  String get leagueId => (origin as ScoringRulesByLeagueProvider).leagueId;
+  String? get leagueId => (origin as ScoringRulesProvider).leagueId;
 }
 
 // ignore_for_file: type=lint
