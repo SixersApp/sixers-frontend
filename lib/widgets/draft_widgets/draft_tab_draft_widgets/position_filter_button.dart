@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sixers/backend/players/player_model.dart';
 import 'package:sixers/theme/colors.dart';
-import 'package:sixers/views/draft_lobby.dart';
+import 'package:sixers/views/draft_lobby_screen.dart';
 
 class PositionFilterButton extends StatelessWidget {
   const PositionFilterButton({

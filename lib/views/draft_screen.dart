@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../backend/leagues/league_provider.dart';
 import '../backend/fantasy_team/fantasy_team_provider.dart';
-import 'draft_lobby.dart'; 
+import 'draft_lobby_screen.dart'; 
 
 class DraftScreen extends ConsumerWidget {
   const DraftScreen({super.key});
