@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
+import 'package:sixers/backend/scoring_rule/scoring_rule_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LeagueService {
@@ -8,30 +9,75 @@ class LeagueService {
   Future<List<League>> fetchLeaguesForUser(String userId) async {
     print('[fetchLeaguesForUser] userId = $userId');
 
-    final teamRows = await client.from('fantasy_teams').select('league_id').eq('user_id', userId);
+    final teamRows = await client
+        .from('fantasy_teams')
+        .select('league_id')
+        .eq('user_id', userId);
 
     print('[fetchLeaguesForUser] teamRows: $teamRows');
 
-    final ids = (teamRows as List).map((row) => row['league_id'] as String).toSet().toList();
+    final ids = (teamRows as List)
+        .map((row) => row['league_id'] as String)
+        .toSet()
+        .toList();
 
     if (ids.isEmpty) {
       print('[fetchLeaguesForUser] no league_ids found');
       return [];
     }
 
-    final leagueRows = await client.from('leagues').select().inFilter('id', ids);
+    final leagueRows = await client
+        .from('leagues')
+        .select()
+        .inFilter('id', ids);
 
     print('[fetchLeaguesForUser] leagueRows: $leagueRows');
 
-    return (leagueRows as List).map((json) => League.fromJson(json as Map<String, dynamic>)).toList();
+    return (leagueRows as List)
+        .map((json) => League.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<String> createLeagueWithRules({
+    required League league,
+    required String ownerUserId,
+    List<ScoringRule>? rules, // <- accept model objects
+  }) async {
+    final payload = Map<String, dynamic>.from(league.toJson())
+      ..remove('id')
+      ..remove('join_code')
+      ..remove('created_at')
+      ..remove('updated_at');
+
+    final rulesJson = (rules == null)
+        ? <Map<String, dynamic>>[] // null/empty => use DB defaults
+        : rules.map((r) => r.toRpcJson()).toList();
+
+    final res = await Supabase.instance.client.rpc(
+      'create_league_with_rules',
+      params: {
+        'p_league': payload,
+        'p_owner': ownerUserId,
+        'p_rules': rulesJson,
+      },
+    );
+    return res as String;
   }
 
   Future<void> createLeague(League league, String userId) async {
-    final inserted = await client.from('leagues').insert(league.toJson()).select().single();
+    final inserted = await client
+        .from('leagues')
+        .insert(league.toJson())
+        .select()
+        .single();
 
     final leagueId = inserted['id'] as String;
 
-    await client.from('fantasy_teams').insert({'league_id': leagueId, 'user_id': userId, 'team_name': '${league.name} Team'});
+    await client.from('fantasy_teams').insert({
+      'league_id': leagueId,
+      'user_id': userId,
+      'team_name': '${league.name} Team',
+    });
   }
 
   Future<void> updateLeague(League league) async {
@@ -43,26 +89,40 @@ class LeagueService {
   }
 
   Future<League?> getLeagueById(String id) async {
-    final res = await client.from('leagues').select().eq('id', id).maybeSingle();
+    final res = await client
+        .from('leagues')
+        .select()
+        .eq('id', id)
+        .maybeSingle();
     return res == null ? null : League.fromJson(res);
   }
 
   Future<League?> getLeagueByJoinCode(String joinCode) async {
-    final res = await client.from('leagues').select().eq('join_code', joinCode).eq('status', 'draft_pending').maybeSingle();
+    final res = await client
+        .from('leagues')
+        .select()
+        .eq('join_code', joinCode)
+        .eq('status', 'draft_pending')
+        .maybeSingle();
     return res == null ? null : League.fromJson(res);
   }
 
   Future<void> startDraft(String leagueId) async {
     try {
-    
       final league = await getLeagueById(leagueId);
       if (league == null) {
         throw Exception('League not found: $leagueId');
       }
-      final testResult = await client.from('leagues').select('id').eq('id', leagueId).maybeSingle();
-  
-      final result = await client.from('leagues').update({'status': 'draft_in_progress'}).eq('id', leagueId);
+      final testResult = await client
+          .from('leagues')
+          .select('id')
+          .eq('id', leagueId)
+          .maybeSingle();
 
+      final result = await client
+          .from('leagues')
+          .update({'status': 'draft_in_progress'})
+          .eq('id', leagueId);
     } catch (e) {
       debugPrint('[startDraft] Error starting draft: $e');
       debugPrint('[startDraft] Error type: ${e.runtimeType}');

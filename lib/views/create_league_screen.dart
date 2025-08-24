@@ -1,12 +1,15 @@
 // lib/ui/create_league/create_league_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sixers/backend/leagues/league_model.dart';
+import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/backend/scoring_rule/scoring_rule_model.dart';
 import 'package:sixers/backend/scoring_rule/scoring_rule_provider.dart';
 import 'package:sixers/backend/tournament/tournament_provider.dart';
 import 'package:sixers/widgets/create_league_widgets/header.dart';
 import 'package:sixers/widgets/create_league_widgets/scoring_section.dart';
 import 'package:sixers/widgets/create_league_widgets/shimmer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 
 class CreateLeagueScreen extends ConsumerStatefulWidget {
@@ -21,6 +24,7 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
   String? _tournamentId;
   bool _showScoring = false;
   List<ScoringRule> _rules = []; // full, editable copy
+  final uid = Supabase.instance.client.auth.currentUser?.id;
 
   @override
   void dispose() {
@@ -40,7 +44,8 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
     });
 
     final tournamentsAv = ref.watch(tournamentsProvider);
-    final defaultsAv = ref.watch(scoringRulesProvider()); // triggers fetch
+    final defaultsAv = ref.watch(scoringRulesProvider()); 
+    final leaguesA = ref.read(leaguesProvider.notifier);
 
     return Scaffold(
       body: SafeArea(
@@ -136,12 +141,10 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
             onPressed: (_nameCtrl.text.trim().isEmpty || _tournamentId == null)
                 ? null
                 : () async {
-                    // TODO: call your transactional RPC/service here.
-                    // Example shape:
-                    // await ref.read(leagueServiceProvider).createLeagueWithRulesFull(
-                    //   LeagueInput(name: _nameCtrl.text.trim(), tournamentId: _tournamentId!),
-                    //   _rules.map((r) => r.copyWith(id: null, leagueId: null)).toList(),
-                    // );
+                    // TODO: call create league with rules
+                    final league = League(id: '-1', name: _nameCtrl.text, tournamentId: _tournamentId!, creatorId: uid!, status: LeagueStatus.draft_pending, maxTeams: 10, joinCode: '000000');
+                    final res = leaguesA.createLeagueWithRules(league, _rules);
+                    debugPrint(res.toString());
                   },
             child: const Text('Create'),
           ),

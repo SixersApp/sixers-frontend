@@ -268,3 +268,36 @@ class ScoringRule {
   String toString() =>
       'ScoringRule{key=${key()}, perUnit=$perUnitPoints, flat=$flatPoints, thr=$threshold, band=$band, mult=$multiplier}';
 }
+
+extension ScoringRuleRpc on ScoringRule {
+  String get modeSnake => switch (mode) {
+    RuleMode.perUnit => 'per_unit',
+    RuleMode.flat => 'flat',
+    RuleMode.threshold => 'threshold',
+    RuleMode.band => 'band',
+    RuleMode.multiplier => 'multiplier',
+  };
+
+  Map<String, dynamic> toRpcJson() {
+    final norm = normalizedForMode(); // ensures only valid fields per mode
+    Map<String, dynamic> out = {
+      'category': norm.category,
+      'stat': norm.stat,
+      'mode': modeSnake,
+      if (norm.perUnitPoints != null) 'per_unit_points': norm.perUnitPoints,
+      if (norm.flatPoints != null) 'flat_points': norm.flatPoints,
+      if (norm.threshold != null) 'threshold': norm.threshold,
+      if (norm.multiplier != null) 'multiplier': norm.multiplier,
+    };
+    if (norm.mode == RuleMode.band && norm.band != null) {
+      final b = norm.band!;
+      out['band'] = {
+        'lower': b.lowerInfinite ? null : b.lower,
+        'upper': b.upperInfinite ? null : b.upper,
+        'bounds': '${b.lowerInclusive ? '[' : '('}${b.upperInclusive ? ']' : ')'}',
+      };
+    }
+    out.removeWhere((_, v) => v == null);
+    return out;
+  }
+}

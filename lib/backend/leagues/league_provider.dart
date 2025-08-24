@@ -2,6 +2,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/leagues/league_service.dart';
+import 'package:sixers/backend/scoring_rule/scoring_rule_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sixers/backend/draft_state/draft_state_provider.dart';
 import 'package:sixers/backend/draft_pick/draft_pick_provider.dart';
@@ -31,6 +32,21 @@ class Leagues extends _$Leagues {
       return;
     }
     state = await AsyncValue.guard(() => _service.fetchLeaguesForUser(uid));
+  }
+
+  Future<String?> createLeagueWithRules(
+    League league,
+    List<ScoringRule>? rules,
+  ) async {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid == null) return null;
+    final id = await _service.createLeagueWithRules(
+      league: league,
+      ownerUserId: uid,
+      rules: rules, // pass models; service maps to JSON
+    );
+    await refresh();
+    return id;
   }
 
   Future<void> createLeague(League league) async {
@@ -82,7 +98,9 @@ class LeagueActions extends _$LeagueActions {
         ref.invalidate(allPlayersProvider(league.tournamentId));
       }
     } catch (e) {
-      print('[LeagueActions] Error getting league for players invalidation: $e');
+      print(
+        '[LeagueActions] Error getting league for players invalidation: $e',
+      );
     }
   }
 }
