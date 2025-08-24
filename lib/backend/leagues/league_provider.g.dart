@@ -6,7 +6,7 @@ part of 'league_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$leaguesHash() => r'0eff00259ad6fbcffd52ae9166ad91b96207a194';
+String _$leaguesHash() => r'83ec4bea0dd961f69b0d8595437aac8c6e09767b';
 
 /// See also [Leagues].
 @ProviderFor(Leagues)
@@ -22,7 +22,7 @@ final leaguesProvider =
     );
 
 typedef _$Leagues = AutoDisposeAsyncNotifier<List<League>>;
-String _$leagueActionsHash() => r'df225bb98f1cfc5cadf552cc4285a8be5bb93daa';
+String _$leagueActionsHash() => r'45ebd205221751058240cd7965dc6ae7ed56b65d';
 
 /// See also [LeagueActions].
 @ProviderFor(LeagueActions)

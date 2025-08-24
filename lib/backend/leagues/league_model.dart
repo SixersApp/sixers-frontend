@@ -15,6 +15,7 @@ sealed class League with _$League {
     @JsonKey(name: 'creator_id') required String creatorId,
     required LeagueStatus status,
     @JsonKey(name: 'max_teams') required int maxTeams,
+    @JsonKey(name: 'join_code') required String joinCode,
     @JsonKey(name: 'created_at') DateTime? createdAt,
   }) = _League;
 

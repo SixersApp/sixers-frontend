@@ -11,6 +11,7 @@ sealed class FantasyTeam with _$FantasyTeam {
     @JsonKey(name: 'league_id') required String leagueId,
     @JsonKey(name: 'user_id') required String userId,
     @JsonKey(name: 'team_name') required String teamName,
+    @JsonKey(name: 'aka_name') required String akaName,
     @JsonKey(name: 'draft_order') int? draftOrder,
     @JsonKey(name: 'created_at') DateTime? createdAt,
   }) = _FantasyTeam;
