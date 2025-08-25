@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/fantasy_team/fantasy_team_model.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/theme/colors.dart';
+import 'package:sixers/widgets/draft_widgets/pre_draft_info_tile.dart';
+import 'package:sixers/widgets/draft_widgets/pre_draft_team_tile.dart';
 
 class PreDraftLobby extends ConsumerWidget {
   final League league;
@@ -52,9 +54,9 @@ class PreDraftLobby extends ConsumerWidget {
           league.name.toUpperCase(),
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-              ),
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+          ),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -75,25 +77,24 @@ class PreDraftLobby extends ConsumerWidget {
           // Teams
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               itemCount: teams.length,
-              itemBuilder: (_, i) => _teamTile(context, teams[i], i),
+              itemBuilder: (_, i) => TeamTile(team: teams[i], index: i),
             ),
           ),
 
           // Bottom controls
           SafeArea(
-            minimum: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            minimum: const EdgeInsets.fromLTRB(20, 8, 16, 20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                   children: [
                     Expanded(
-                      child: _infoCard(
-                        context: context,
+                      child: DraftInfoCard(
                         title: 'Draft Timer',
-                        valueWidget: Row(
+                        value: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Flexible(
@@ -104,31 +105,26 @@ class PreDraftLobby extends ConsumerWidget {
                                   _mmss(secondsPerPick),
                                   style: Theme.of(context)
                                       .textTheme
-                                      .displaySmall
-                                      ?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w900,
-                                      ),
+                                      .headlineMedium
                                 ),
                               ),
                             ),
                             const SizedBox(width: 8),
-                            Icon(
+                            const Icon(
                               Icons.edit,
-                              size: 18,
-                              color: canStart ? Colors.white : Colors.white54,
+                              size: 20,
+                              color: Colors.white,
                             ),
                           ],
                         ),
-                        onTapTrailing: canStart ? onEditTimer : null,
+                        onTapValue: canStart ? onEditTimer : null,
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 10),
                     Expanded(
-                      child: _infoCard(
-                        context: context,
+                      child: DraftInfoCard(
                         title: 'Invite Code',
-                        valueWidget: Row(
+                        value: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Flexible(
@@ -139,27 +135,19 @@ class PreDraftLobby extends ConsumerWidget {
                                   league.joinCode,
                                   style: Theme.of(context)
                                       .textTheme
-                                      .displaySmall
-                                      ?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w900,
-                                      ),
+                                      .headlineMedium
                                 ),
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(Icons.copy, size: 18, color: Colors.white),
+                            const Icon(
+                              Icons.copy,
+                              size: 20,
+                              color: Colors.white,
+                            ),
                           ],
                         ),
-                        onTapTrailing: () async {
-                          await Clipboard.setData(
-                              ClipboardData(text: league.joinCode));
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Invite code copied')),
-                            );
-                          }
-                        },
+                        //onTapValue: , add copy to clipboard
                       ),
                     ),
                   ],
@@ -167,142 +155,28 @@ class PreDraftLobby extends ConsumerWidget {
                 const SizedBox(height: 16),
 
                 // White container + purple-outline Begin Draft
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.black300,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  padding: const EdgeInsets.all(12),
-                  child: SizedBox(
-                    height: 52,
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(width: 3, color: Colors.purple),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                SizedBox(
+                  height: 52,
+                  width: double.infinity,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      elevation: 0, // stays flat
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      onPressed: canStart ? onStartDraft : null,
-                      child: Text(
-                        canStart ? 'Begin Draft' : 'Waiting for commissioner…',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w800),
+                      backgroundColor: AppColors.black800,
+                    ),
+                    onPressed: canStart ? onStartDraft : null,
+                    child: Text(
+                      canStart ? 'Begin Draft' : 'Waiting for commissioner…',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.black100,
                       ),
                     ),
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ===== UI helpers =====
-
-  Widget _teamTile(BuildContext context, FantasyTeam t, int i) {
-    final color = _colorForIndex(i);
-    final aka = t.akaName ?? '';
-
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        // keep subtle left glow, but main tile uses black300
-        gradient: LinearGradient(
-          colors: [color.withOpacity(0.22), Colors.transparent],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppColors.black300,
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.sports_cricket, color: Colors.white),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: RichText(
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: "${t.teamName}  ",
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                          ),
-                    ),
-                    TextSpan(
-                      text: "AKA $aka",
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w500,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _infoCard({
-    required BuildContext context,
-    required String title,
-    required Widget valueWidget, // value + optional icon inline
-    VoidCallback? onTapTrailing,
-  }) {
-    return Container(
-      height: 112,
-      decoration: BoxDecoration(
-        color: AppColors.black300, // <-- black300 background
-        borderRadius: BorderRadius.circular(16),
-      ),
-      padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Colors.white70, // label text
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Expanded(
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: GestureDetector(
-                onTap: onTapTrailing,
-                behavior: HitTestBehavior.opaque,
-                child: valueWidget, // styled with white text where built
-              ),
             ),
           ),
         ],
