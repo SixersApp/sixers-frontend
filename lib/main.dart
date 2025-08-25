@@ -25,6 +25,7 @@ class SixersApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Sixers',
       theme: AppTheme.dark,
       darkTheme: AppTheme.dark,

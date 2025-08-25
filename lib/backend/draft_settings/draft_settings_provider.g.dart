@@ -6,7 +6,7 @@ part of 'draft_settings_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$draftSettingsHash() => r'72b90c7c5e35e903eefacbb324e1911755caf331';
+String _$draftSettingsHash() => r'c1fc2d8f98e9bb47fa8ae3571a228cc804b3b1b8';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -36,16 +36,24 @@ abstract class _$DraftSettings
   FutureOr<model.DraftSettings?> build(String leagueId);
 }
 
-/// See also [DraftSettings].
+/// Family provider: fetches draft settings for a given league.
+///
+/// Copied from [DraftSettings].
 @ProviderFor(DraftSettings)
 const draftSettingsProvider = DraftSettingsFamily();
 
-/// See also [DraftSettings].
+/// Family provider: fetches draft settings for a given league.
+///
+/// Copied from [DraftSettings].
 class DraftSettingsFamily extends Family<AsyncValue<model.DraftSettings?>> {
-  /// See also [DraftSettings].
+  /// Family provider: fetches draft settings for a given league.
+  ///
+  /// Copied from [DraftSettings].
   const DraftSettingsFamily();
 
-  /// See also [DraftSettings].
+  /// Family provider: fetches draft settings for a given league.
+  ///
+  /// Copied from [DraftSettings].
   DraftSettingsProvider call(String leagueId) {
     return DraftSettingsProvider(leagueId);
   }
@@ -72,14 +80,18 @@ class DraftSettingsFamily extends Family<AsyncValue<model.DraftSettings?>> {
   String? get name => r'draftSettingsProvider';
 }
 
-/// See also [DraftSettings].
+/// Family provider: fetches draft settings for a given league.
+///
+/// Copied from [DraftSettings].
 class DraftSettingsProvider
     extends
         AutoDisposeAsyncNotifierProviderImpl<
           DraftSettings,
           model.DraftSettings?
         > {
-  /// See also [DraftSettings].
+  /// Family provider: fetches draft settings for a given league.
+  ///
+  /// Copied from [DraftSettings].
   DraftSettingsProvider(String leagueId)
     : this._internal(
         () => DraftSettings()..leagueId = leagueId,

@@ -122,10 +122,10 @@ class PreDraftLobby extends ConsumerWidget {
                           await EditPickTimerSheet.show(
                             context,
                             leagueId: league.id,
-                            initialSeconds:
-                                secondsPerPick, // or secondsPerPick in your model
-                            maxMinutes: 20,
-                          );
+                            initialSeconds: secondsPerPick,
+                          ).whenComplete(() async {
+                            // optional: auto-save with current state if you pass it out via `Navigator.pop`
+                          });
                         },
                       ),
                     ),

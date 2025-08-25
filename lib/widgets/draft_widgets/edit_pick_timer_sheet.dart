@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/theme/colors.dart';
-
-// ⬇️ change this import/name if your actions provider is different
 import 'package:sixers/backend/draft_settings/draft_settings_provider.dart'
-  show draftSettingsActionsProvider;
+    show draftSettingsActionsProvider;
 
 class EditPickTimerSheet extends ConsumerStatefulWidget {
   const EditPickTimerSheet({
@@ -49,14 +47,19 @@ class _EditPickTimerSheetState extends ConsumerState<EditPickTimerSheet> {
   late final FixedExtentScrollController _minCtrl;
   late final FixedExtentScrollController _secCtrl;
 
+  late int _min; // <-- local state (do NOT read controller.selectedItem)
+  late int _sec;
+
   int get _initMin => (widget.initialSeconds ~/ 60).clamp(0, widget.maxMinutes);
   int get _initSec => (widget.initialSeconds % 60).clamp(0, 59);
 
   @override
   void initState() {
     super.initState();
-    _minCtrl = FixedExtentScrollController(initialItem: _initMin);
-    _secCtrl = FixedExtentScrollController(initialItem: _initSec);
+    _min = _initMin;
+    _sec = _initSec;
+    _minCtrl = FixedExtentScrollController(initialItem: _min);
+    _secCtrl = FixedExtentScrollController(initialItem: _sec);
   }
 
   @override
@@ -69,116 +72,110 @@ class _EditPickTimerSheetState extends ConsumerState<EditPickTimerSheet> {
   String _mmss(int m, int s) =>
       '${m.toString()}:${s.toString().padLeft(2, '0')}';
 
-  Future<void> _save(WidgetRef ref) async {
-    final m = _minCtrl.selectedItem;
-    final s = _secCtrl.selectedItem;
-    final total = m * 60 + s;
+  Future<void> _save() async {
+    final total = _min * 60 + _sec; // <-- use local state
     if (total <= 0) return; // ignore zero-length timer
-    await ref.read(draftSettingsActionsProvider).setTimePerPick(
-          widget.leagueId,
-          total,
-        );
+    await ref
+        .read(draftSettingsActionsProvider)
+        .setTimePerPick(widget.leagueId, total);
   }
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final wheelText = text.titleLarge?.copyWith(color: Colors.white);
-    final labelText =
-        text.labelMedium?.copyWith(color: Colors.white70, fontWeight: FontWeight.w600);
+    final labelText = text.labelMedium?.copyWith(
+      color: Colors.white70,
+      fontWeight: FontWeight.w600,
+    );
 
-    return Consumer(builder: (context, ref, _) {
-      return SafeArea(
-        top: false,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-          decoration: const BoxDecoration(
-            color: AppColors.black100,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Grab handle
-              Container(
-                width: 36,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white24,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        decoration: const BoxDecoration(
+          color: AppColors.black100,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Grab handle
+            Container(
+              width: 36,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(2),
               ),
-              // Header row
-              Row(
+            ),
+            // Header row
+            Row(
+              children: [
+                const Spacer(),
+                TextButton(
+                  onPressed: () async {
+                    await _save();
+                    if (mounted) Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Done',
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            // Live preview — uses _min/_sec, not controller.selectedItem
+            Text(
+              _mmss(_min, _sec),
+              style: text.displaySmall?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // Wheels
+            SizedBox(
+              height: 180,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Pick Timer', style: text.titleMedium?.copyWith(
-                    color: Colors.white, fontWeight: FontWeight.w700)),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () async {
-                      await _save(ref);
-                      if (mounted) Navigator.pop(context);
+                  _Wheel(
+                    controller: _minCtrl,
+                    itemCount: widget.maxMinutes + 1,
+                    itemLabelBuilder: (i) => '$i',
+                    onChanged: (i) {
+                      HapticFeedback.selectionClick();
+                      setState(() => _min = i);
                     },
-                    child: const Text('Done'),
+                    textStyle: wheelText!,
+                    label: 'min',
+                    labelStyle: labelText!,
+                  ),
+                  const SizedBox(width: 12),
+                  _Wheel(
+                    controller: _secCtrl,
+                    itemCount: 60,
+                    itemLabelBuilder: (i) => i.toString().padLeft(2, '0'),
+                    onChanged: (i) {
+                      HapticFeedback.selectionClick();
+                      setState(() => _sec = i);
+                    },
+                    textStyle: wheelText,
+                    label: 'sec',
+                    labelStyle: labelText,
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-
-              // Preview of current value
-              Builder(builder: (_) {
-                final m = _minCtrl.selectedItem;
-                final s = _secCtrl.selectedItem;
-                return Text(
-                  _mmss(m, s),
-                  style: text.displaySmall?.copyWith(
-                    color: Colors.white, fontWeight: FontWeight.w900),
-                );
-              }),
-              const SizedBox(height: 8),
-
-              // Wheels
-              SizedBox(
-                height: 180,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _Wheel(
-                      controller: _minCtrl,
-                      itemCount: widget.maxMinutes + 1,
-                      itemLabelBuilder: (i) => '$i',
-                      onChanged: (_) => HapticFeedback.selectionClick(),
-                      textStyle: wheelText!,
-                      label: 'min',
-                      labelStyle: labelText!,
-                    ),
-                    const SizedBox(width: 12),
-                    _Wheel(
-                      controller: _secCtrl,
-                      itemCount: 60,
-                      itemLabelBuilder: (i) => i.toString().padLeft(2, '0'),
-                      onChanged: (_) => HapticFeedback.selectionClick(),
-                      textStyle: wheelText,
-                      label: 'sec',
-                      labelStyle: labelText,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              // Tip / zero guard
-              Text(
-                'Tip: swipe down to dismiss — it auto-saves.',
-                style: text.bodySmall?.copyWith(color: Colors.white38),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
@@ -225,11 +222,9 @@ class _Wheel extends StatelessWidget {
               magnification: 1.10,
               childDelegate: ListWheelChildBuilderDelegate(
                 childCount: itemCount,
-                builder: (context, index) {
-                  return Center(
-                    child: Text(itemLabelBuilder(index), style: textStyle),
-                  );
-                },
+                builder: (context, index) => Center(
+                  child: Text(itemLabelBuilder(index), style: textStyle),
+                ),
               ),
             ),
           ),

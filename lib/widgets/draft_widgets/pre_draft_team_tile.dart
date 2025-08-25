@@ -8,16 +8,18 @@ class TeamTile extends StatelessWidget {
     super.key,
     required this.team,
     required this.index,
-    this.accentColor,
+    this.accentColor,          // optional override for glow/logo color
+    this.logoImage,            // optional ImageProvider for team image
   });
 
   final FantasyTeam team;
   final int index;
   final Color? accentColor;
+  final ImageProvider? logoImage;
 
   Color _colorForIndex(int i) {
     const palette = [
-      Color(0xFFFFD166),
+      Color(0xFFF8BD00), // Yellow-300 (Figma fallback)
       Color(0xFF66A3FF),
       Color(0xFFFF8B66),
       Color(0xFFFF66D4),
@@ -29,17 +31,18 @@ class TeamTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = accentColor ?? _colorForIndex(index);
-    final aka = team.akaName;
+    final aka = team.akaName ?? '';
+
 
     const double tileRadius = 12;
     const double pad = 10;
-    const double avatar = 40;
 
-    final double glowDiameter = 250;
+ 
+    const double avatar = 40;   
+    const double avatarRadius = 5;
 
-    
-    final double glowLeft = pad + (avatar / 2) - (glowDiameter / 2);
-    final double glowTop = pad + (avatar / 2) - (glowDiameter / 2);
+    const double glowBlur = 61.2;
+    const double glowSpread = 3.0;
 
     return Container(
       margin: const EdgeInsets.only(top: 9),
@@ -55,51 +58,63 @@ class TeamTile extends StatelessWidget {
               ),
             ),
 
-          
-            Positioned(
-              left: glowLeft,
-              top: glowTop,
-              width: glowDiameter,
-              height: glowDiameter,
-              child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                
-                    gradient: RadialGradient(
-                      radius:
-                          0.8, 
-                      colors: [
-                        color.withOpacity(0.5), 
-                        color.withOpacity(0.3),
-                        color.withOpacity(0.15),
-                        color.withOpacity(0.0)
-                      ],
-                      stops: const [0.0, 0.075, 0.15, 0.4],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // 3) Content row
+            
             Padding(
               padding: const EdgeInsets.all(pad),
               child: Row(
                 children: [
-                  Container(
-                    width: avatar,
+             
+                  SizedBox(
+                    width: avatar,  
                     height: avatar,
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: const Icon(
-                      Icons.sports_cricket,
-                      color: Colors.white,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                    
+                        Container(
+                          width: avatar,
+                          height: avatar,
+                          decoration: BoxDecoration(
+                            color: color.withOpacity(0.01),    
+                            borderRadius: BorderRadius.circular(avatarRadius),
+                            boxShadow: [
+                              BoxShadow(
+                                color: color.withOpacity(0.70),
+                                blurRadius: glowBlur,
+                                spreadRadius: glowSpread,
+                                offset: Offset.zero,
+                              ),
+                            ],
+                          ),
+                        ),
+
+            
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(avatarRadius),
+                          child: Container(
+                            width: avatar,
+                            height: avatar,
+                            decoration: BoxDecoration(
+                              color: color, 
+                              image: logoImage != null
+                                  ? DecorationImage(
+                                      image: logoImage!,
+                                      fit: BoxFit.cover, 
+                                    )
+                                  : null,
+                            ),
+                            child: logoImage == null
+                                ? const Icon(Icons.sports_cricket, color: Colors.white)
+                                : null,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+
                   const SizedBox(width: 16),
+
+                  // ===== Team name + AKA =====
                   Expanded(
                     child: RichText(
                       maxLines: 1,
@@ -108,19 +123,17 @@ class TeamTile extends StatelessWidget {
                         children: [
                           TextSpan(
                             text: '${team.teamName}  ',
-                            style: Theme.of(context).textTheme.headlineSmall
-                                ?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
                           ),
                           TextSpan(
                             text: 'AKA $aka',
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  color: Colors.white70,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall
+                                ?.copyWith(color: Colors.white70, fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),
