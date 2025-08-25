@@ -11,6 +11,7 @@ import 'package:sixers/backend/tournament/tournament_provider.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/widgets/create_league_widgets/header.dart';
 import 'package:sixers/widgets/create_league_widgets/scoring_section.dart';
+import 'package:sixers/widgets/draft_tabs/pre_draft_board.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CreateLeagueScreen extends ConsumerStatefulWidget {
@@ -188,7 +189,7 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
             onPressed: (_nameCtrl.text.trim().isEmpty || _tournamentId == null)
                 ? null
                 : () async {
-                    // TODO: call create league with rules
+                    
                     final league = League(
                       id: '-1',
                       name: _nameCtrl.text,
@@ -198,8 +199,13 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
                       maxTeams: 10,
                       joinCode: '000000',
                     );
-                    final res = leaguesA.createLeagueWithRules(league, _rules);
-                    debugPrint(res.toString());
+                    final res = await leaguesA.createLeagueWithRules(league, _rules);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => PreDraftLobby(leagueId: res!),
+                      ),
+                    );
+                    
                   },
             child:  Text('Create', style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: AppColors.black100)),
           ),

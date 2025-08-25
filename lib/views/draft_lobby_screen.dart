@@ -134,23 +134,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
               .toList();
 
       return PreDraftLobby(
-        league: widget.league,
-        teams: teams,
-        secondsPerPick: settings!.timePerPick,
-        canStart: widget.league.creatorId == uid,
-        onStartDraft: () async {
-          await ref
-              .read(leagueActionsProvider.notifier)
-              .startDraft(widget.league.id);
-          if (context.mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('Draft starting…')));
-          }
-        },
-        onEditTimer: () {
-          // TODO: open timer edit UI
-        },
+        leagueId: widget.league.id,
       );
     }
 

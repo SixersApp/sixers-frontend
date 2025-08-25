@@ -53,7 +53,7 @@ class LeagueService {
         ? <Map<String, dynamic>>[] // null/empty => use DB defaults
         : rules.map((r) => r.toRpcJson()).toList();
 
-    final res = await Supabase.instance.client.rpc(
+    final id = await Supabase.instance.client.rpc(
       'create_league_with_rules',
       params: {
         'p_league': payload,
@@ -61,7 +61,7 @@ class LeagueService {
         'p_rules': rulesJson,
       },
     );
-    return res as String;
+    return id as String;
   }
 
   Future<void> createLeague(League league, String userId) async {
