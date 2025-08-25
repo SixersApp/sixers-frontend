@@ -6,13 +6,12 @@ import 'package:sixers/backend/real_team/real_team_provider.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/widgets/draft_widgets/draft_tab_draft_widgets/player_draft_tile.dart';
 
-/// Roster tab: list of MY team's draft picks (ordered by pickNumber).
 class DraftTabRoster extends ConsumerWidget {
   const DraftTabRoster({
     super.key,
     required this.myTeamId,
-    required this.allPicks, // List<DraftPick>
-    required this.playersById, // Map<String, Player>
+    required this.allPicks, 
+    required this.playersById, 
     required this.tournamentId,
   });
 
@@ -25,16 +24,16 @@ class DraftTabRoster extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final text = Theme.of(context).textTheme;
 
-    // Load real teams for this tournament
+
     final realTeamsA = ref.watch(realTeamsProvider(tournamentId: tournamentId));
 
-    // Build a lookup map id -> team name
+
     final Map<String, String> teamNameById = realTeamsA.maybeWhen(
       data: (teams) => {for (final t in teams) t.id: t.name},
       orElse: () => const {},
     );
 
-    // Filter to my team's picks and keep draft order
+  
     final myPicks = allPicks.where((p) => p.teamId == myTeamId).toList()
       ..sort((a, b) => a.pickNumber.compareTo(b.pickNumber));
 
@@ -95,7 +94,7 @@ class DraftTabRoster extends ConsumerWidget {
 
               final realTeamName = teamNameById[player.realTeamId] ?? '—';
 
-              // Role-aware stat labels to match the mock
+          
               final isBowler = player.role == 'Bowler';
               final stat1Label = isBowler ? 'Econ' : 'Avg';
               final stat2Label = isBowler ? 'Wkts' : 'SR';
@@ -112,7 +111,7 @@ class DraftTabRoster extends ConsumerWidget {
                 enabled: false,
                 onAdd: () {},
                 isRoster: true,
-                draftNumber: '1.1', // or any precomputed string
+                draftNumber: '1.1', 
               );
             },
           ),

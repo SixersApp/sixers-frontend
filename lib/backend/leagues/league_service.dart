@@ -41,7 +41,7 @@ class LeagueService {
   Future<String> createLeagueWithRules({
     required League league,
     required String ownerUserId,
-    List<ScoringRule>? rules, // <- accept model objects
+    List<ScoringRule>? rules,
   }) async {
     final payload = Map<String, dynamic>.from(league.toJson())
       ..remove('id')
@@ -50,7 +50,7 @@ class LeagueService {
       ..remove('updated_at');
 
     final rulesJson = (rules == null)
-        ? <Map<String, dynamic>>[] // null/empty => use DB defaults
+        ? <Map<String, dynamic>>[] 
         : rules.map((r) => r.toRpcJson()).toList();
 
     final id = await Supabase.instance.client.rpc(

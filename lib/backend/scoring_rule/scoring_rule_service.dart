@@ -1,4 +1,4 @@
-// lib/backend/scoring_rule/scoring_rule_service.dart
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'scoring_rule_model.dart';
 
@@ -46,14 +46,12 @@ class ScoringRuleService {
 
   Future<void> replaceAllForLeague(String leagueId, List<ScoringRule> rules) async {
     final payload = rules.map((r) => r.toRpcJson()).toList();
-    // toRpcJson should produce keys: category, stat, mode, per_unit_points, flat_points,
-    // threshold, band (string OR {lower,upper,bounds}), multiplier
 
     await _client.rpc(
       'replace_league_scoring_rules',
       params: {
         'p_league': leagueId,
-        'p_rules': payload, // Supabase sends this as JSONB[]
+        'p_rules': payload, 
       },
     );
   }

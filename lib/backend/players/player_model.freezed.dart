@@ -15,12 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Player {
 
- String get id; String get name;/// One of: 'Batsman', 'Bowler', 'All-Rounder', 'Wicket-Keeper'
-@JsonKey(name: 'role') String get role;/// FK -> tournaments.id
-@JsonKey(name: 'tournament_id') String get tournamentId;/// FK -> real_teams.id
-@JsonKey(name: 'real_team_id') String get realTeamId;/// Server-generated timestamp (NOT NULL DEFAULT now())
-@JsonKey(name: 'created_at') DateTime get createdAt;/// Nullable FK -> profiles.user_id (when a player is tied to a user)
-@JsonKey(name: 'user_id') String? get userId;
+ String get id; String get name;@JsonKey(name: 'role') String get role;@JsonKey(name: 'tournament_id') String get tournamentId;@JsonKey(name: 'real_team_id') String get realTeamId;@JsonKey(name: 'created_at') DateTime get createdAt;@JsonKey(name: 'user_id') String? get userId;
 /// Create a copy of Player
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -219,15 +214,10 @@ class _Player implements Player {
 
 @override final  String id;
 @override final  String name;
-/// One of: 'Batsman', 'Bowler', 'All-Rounder', 'Wicket-Keeper'
 @override@JsonKey(name: 'role') final  String role;
-/// FK -> tournaments.id
 @override@JsonKey(name: 'tournament_id') final  String tournamentId;
-/// FK -> real_teams.id
 @override@JsonKey(name: 'real_team_id') final  String realTeamId;
-/// Server-generated timestamp (NOT NULL DEFAULT now())
 @override@JsonKey(name: 'created_at') final  DateTime createdAt;
-/// Nullable FK -> profiles.user_id (when a player is tied to a user)
 @override@JsonKey(name: 'user_id') final  String? userId;
 
 /// Create a copy of Player

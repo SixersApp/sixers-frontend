@@ -1,20 +1,18 @@
-// lib/backend/scoring/scoring_rule_model.dart
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'scoring_rule_model.g.dart';
 
-/// Matches Postgres enum rule_mode: 'per_unit' | 'flat' | 'threshold' | 'band' | 'multiplier'
 @JsonEnum(fieldRename: FieldRename.snake)
 enum RuleMode { perUnit, flat, threshold, band, multiplier }
 
-/// Postgres numrange <-> text, e.g. "[0,30)", "(-infinity,10]"
 class NumRange {
-  final num? lower; // null => -infinity
-  final num? upper; // null => +infinity
-  final bool lowerInclusive; // '[' vs '('
-  final bool upperInclusive; // ']' vs ')'
-  final bool lowerInfinite; // -infinity
-  final bool upperInfinite; // +infinity
+  final num? lower; 
+  final num? upper;
+  final bool lowerInclusive; 
+  final bool upperInclusive;
+  final bool lowerInfinite;
+  final bool upperInfinite; 
 
   const NumRange({
     this.lower,
@@ -74,7 +72,7 @@ class NumRange {
   String toString() => toPostgresText();
 }
 
-/// numrange <-> text converter for json_serializable
+
 class PgNumRangeConverter implements JsonConverter<NumRange?, String?> {
   const PgNumRangeConverter();
   @override
@@ -84,24 +82,22 @@ class PgNumRangeConverter implements JsonConverter<NumRange?, String?> {
   String? toJson(NumRange? object) => object?.toPostgresText();
 }
 
-/// One scoring rule row. For defaults/templates, `leagueId` is null.
-/// DB uniqueness/exclusion constraints are enforced server-side.
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class ScoringRule {
-  final String? id; // uuid PK
-  final String? leagueId; // null => global default/template
-  final String stat; // e.g., "points_per_run", "catch_bonus"
-  final String category; // e.g., "batting", "fielding", "leadership"
+  final String? id; 
+  final String? leagueId;
+  final String stat;
+  final String category; 
   @JsonKey(unknownEnumValue: RuleMode.perUnit)
   final RuleMode mode;
 
-  // Only one of these sets is valid at a time, depending on `mode`.
-  final num? perUnitPoints; // mode = per_unit
-  final num? flatPoints; // mode = flat, threshold, band
-  final int? threshold; // mode = threshold
+
+  final num? perUnitPoints; 
+  final num? flatPoints;
+  final int? threshold; 
   @PgNumRangeConverter()
-  final NumRange? band; // mode = band (no overlaps per league/category/stat)
-  final num? multiplier; // mode = multiplier
+  final NumRange? band; 
+  final num? multiplier; 
 
   final DateTime? createdAt;
 
@@ -119,8 +115,6 @@ class ScoringRule {
     this.createdAt,
   });
 
-  /// Stable identity for updates in lists (independent of DB id).
-  /// Mirrors DB uniqueness rules (adds threshold or band text for those modes).
   String key() {
     final base = '${category}|${stat}|${mode.name}';
     switch (mode) {
@@ -133,12 +127,10 @@ class ScoringRule {
     }
   }
 
-  /// Prepare for bulk insert: drop id, set leagueId.
+
   ScoringRule copyForLeague(String leagueId) =>
       copyWith(id: null, leagueId: leagueId);
 
-  /// Clear fields that are not allowed for the current mode,
-  /// so outgoing JSON always satisfies the DB CHECK constraint.
   ScoringRule normalizedForMode() {
     switch (mode) {
       case RuleMode.perUnit:
@@ -169,7 +161,6 @@ class ScoringRule {
     }
   }
 
-  /// Debug-time mirror of the DB CHECK.
   void assertValid() {
     switch (mode) {
       case RuleMode.perUnit:
@@ -253,7 +244,6 @@ class ScoringRule {
     );
   }
 
-  // Equality based on stable key (so list updates work even before insert)
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -279,7 +269,7 @@ extension ScoringRuleRpc on ScoringRule {
   };
 
   Map<String, dynamic> toRpcJson() {
-    final norm = normalizedForMode(); // ensures only valid fields per mode
+    final norm = normalizedForMode(); 
     Map<String, dynamic> out = {
       'category': norm.category,
       'stat': norm.stat,

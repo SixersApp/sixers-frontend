@@ -29,28 +29,16 @@ class _SystemHash {
   }
 }
 
-/// Stream that yields an initial snapshot (can be null) and then live updates.
-/// Nullable so "no active draft yet" is a first-class state.
-///
-/// Copied from [draftStateStream].
+/// See also [draftStateStream].
 @ProviderFor(draftStateStream)
 const draftStateStreamProvider = DraftStateStreamFamily();
 
-/// Stream that yields an initial snapshot (can be null) and then live updates.
-/// Nullable so "no active draft yet" is a first-class state.
-///
-/// Copied from [draftStateStream].
+/// See also [draftStateStream].
 class DraftStateStreamFamily extends Family<AsyncValue<DraftState?>> {
-  /// Stream that yields an initial snapshot (can be null) and then live updates.
-  /// Nullable so "no active draft yet" is a first-class state.
-  ///
-  /// Copied from [draftStateStream].
+  /// See also [draftStateStream].
   const DraftStateStreamFamily();
 
-  /// Stream that yields an initial snapshot (can be null) and then live updates.
-  /// Nullable so "no active draft yet" is a first-class state.
-  ///
-  /// Copied from [draftStateStream].
+  /// See also [draftStateStream].
   DraftStateStreamProvider call(String leagueId) {
     return DraftStateStreamProvider(leagueId);
   }
@@ -77,15 +65,9 @@ class DraftStateStreamFamily extends Family<AsyncValue<DraftState?>> {
   String? get name => r'draftStateStreamProvider';
 }
 
-/// Stream that yields an initial snapshot (can be null) and then live updates.
-/// Nullable so "no active draft yet" is a first-class state.
-///
-/// Copied from [draftStateStream].
+/// See also [draftStateStream].
 class DraftStateStreamProvider extends StreamProvider<DraftState?> {
-  /// Stream that yields an initial snapshot (can be null) and then live updates.
-  /// Nullable so "no active draft yet" is a first-class state.
-  ///
-  /// Copied from [draftStateStream].
+  /// See also [draftStateStream].
   DraftStateStreamProvider(String leagueId)
     : this._internal(
         (ref) => draftStateStream(ref as DraftStateStreamRef, leagueId),

@@ -1,4 +1,4 @@
-// lib/widgets/draft_widgets/pre_draft_team_tile.dart
+
 import 'package:flutter/material.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/backend/fantasy_team/fantasy_team_model.dart';
@@ -8,8 +8,8 @@ class TeamTile extends StatelessWidget {
     super.key,
     required this.team,
     required this.index,
-    this.accentColor,          // optional override for glow/logo color
-    this.logoImage,            // optional ImageProvider for team image
+    this.accentColor,         
+    this.logoImage,          
   });
 
   final FantasyTeam team;
@@ -19,7 +19,7 @@ class TeamTile extends StatelessWidget {
 
   Color _colorForIndex(int i) {
     const palette = [
-      Color(0xFFF8BD00), // Yellow-300 (Figma fallback)
+      Color(0xFFF8BD00), 
       Color(0xFF66A3FF),
       Color(0xFFFF8B66),
       Color(0xFFFF66D4),

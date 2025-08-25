@@ -7,12 +7,12 @@ import 'draft_settings_service.dart';
 
 part 'draft_settings_provider.g.dart';
 
-/// Service provider so both the family and actions can access the same service.
+
 final draftSettingsServiceProvider = Provider<DraftSettingsService>(
   (ref) => DraftSettingsService(),
 );
 
-/// Family provider: fetches draft settings for a given league.
+
 @riverpod
 class DraftSettings extends _$DraftSettings {
   @override
@@ -34,7 +34,7 @@ class DraftSettings extends _$DraftSettings {
   }
 }
 
-/// Actions (mutations) for draft settings.
+
 final draftSettingsActionsProvider = Provider<DraftSettingsActions>(
   (ref) => DraftSettingsActions(ref),
 );
@@ -45,7 +45,7 @@ class DraftSettingsActions {
 
   DraftSettingsService get _svc => ref.read(draftSettingsServiceProvider);
 
-  /// Update the time_per_pick (in seconds) for a league and refresh the family.
+
   Future<void> setTimePerPick(String leagueId, int seconds) async {
     assert(seconds > 0);
     await _svc.updateTimePerPick(leagueId: leagueId, seconds: seconds);

@@ -36,24 +36,16 @@ abstract class _$DraftSettings
   FutureOr<model.DraftSettings?> build(String leagueId);
 }
 
-/// Family provider: fetches draft settings for a given league.
-///
-/// Copied from [DraftSettings].
+/// See also [DraftSettings].
 @ProviderFor(DraftSettings)
 const draftSettingsProvider = DraftSettingsFamily();
 
-/// Family provider: fetches draft settings for a given league.
-///
-/// Copied from [DraftSettings].
+/// See also [DraftSettings].
 class DraftSettingsFamily extends Family<AsyncValue<model.DraftSettings?>> {
-  /// Family provider: fetches draft settings for a given league.
-  ///
-  /// Copied from [DraftSettings].
+  /// See also [DraftSettings].
   const DraftSettingsFamily();
 
-  /// Family provider: fetches draft settings for a given league.
-  ///
-  /// Copied from [DraftSettings].
+  /// See also [DraftSettings].
   DraftSettingsProvider call(String leagueId) {
     return DraftSettingsProvider(leagueId);
   }
@@ -80,18 +72,14 @@ class DraftSettingsFamily extends Family<AsyncValue<model.DraftSettings?>> {
   String? get name => r'draftSettingsProvider';
 }
 
-/// Family provider: fetches draft settings for a given league.
-///
-/// Copied from [DraftSettings].
+/// See also [DraftSettings].
 class DraftSettingsProvider
     extends
         AutoDisposeAsyncNotifierProviderImpl<
           DraftSettings,
           model.DraftSettings?
         > {
-  /// Family provider: fetches draft settings for a given league.
-  ///
-  /// Copied from [DraftSettings].
+  /// See also [DraftSettings].
   DraftSettingsProvider(String leagueId)
     : this._internal(
         () => DraftSettings()..leagueId = leagueId,

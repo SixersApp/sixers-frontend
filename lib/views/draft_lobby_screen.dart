@@ -1,4 +1,4 @@
-// lib/ui/draft/draft_lobby.dart
+
 import 'dart:async';
 
 import 'package:collection/collection.dart';
@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:sixers/backend/draft_pick/draft_pick_provider.dart';
-import 'package:sixers/backend/draft_state/draft_state_model.dart'; // <-- add
+import 'package:sixers/backend/draft_state/draft_state_model.dart'; 
 import 'package:sixers/backend/draft_state/draft_state_provider.dart';
 import 'package:sixers/backend/fantasy_team/fantasy_team_provider.dart';
 import 'package:sixers/backend/players/player_model.dart';
@@ -79,14 +79,14 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
   Widget build(BuildContext context) {
     final uid = Supabase.instance.client.auth.currentUser!.id;
 
-    // Strongly type the AsyncValue to avoid any “dynamic” inference:
-    final AsyncValue<DraftState?> stateAv =
-        ref.watch(draftStateStreamProvider(widget.league.id));
+
+    final AsyncValue<DraftState?> stateAv = ref.watch(
+      draftStateStreamProvider(widget.league.id),
+    );
 
     return stateAv.when(
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => _err(e),
       data: (state) {
         if (state == null) {
@@ -94,12 +94,20 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
         }
 
         final picksAv = ref.watch(draftPicksProvider(widget.league.id));
-        final teamsAv =
-            ref.watch(fantasyTeamsProvider(leagueId: widget.league.id));
-        final playersAv =
-            ref.watch(allPlayersProvider(widget.league.tournamentId));
+        final teamsAv = ref.watch(
+          fantasyTeamsProvider(leagueId: widget.league.id),
+        );
+        final playersAv = ref.watch(
+          allPlayersProvider(widget.league.tournamentId),
+        );
 
-        if (picksAv.isLoading || teamsAv.isLoading || playersAv.isLoading) {
+       
+        final initialLoading = [
+          picksAv,
+          teamsAv,
+          playersAv,
+        ].any((a) => a.isLoading && !a.hasValue);
+        if (initialLoading) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
@@ -118,18 +126,22 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
         );
 
         final now = DateTime.now();
-        final secsLeft =
-            state.pickDeadline.difference(now).inSeconds.clamp(0, 9999);
+        final secsLeft = state.pickDeadline
+            .difference(now)
+            .inSeconds
+            .clamp(0, 9999);
 
         final myTeam = teams.firstWhereOrNull(
           (t) => t.leagueId == widget.league.id && t.userId == uid,
         );
-        final currentOwnerUid =
-            teams.firstWhereOrNull((t) => t.id == state.currentTeamId)?.userId;
+        final currentOwnerUid = teams
+            .firstWhereOrNull((t) => t.id == state.currentTeamId)
+            ?.userId;
         final myTurn = currentOwnerUid == uid;
 
-        final leagueTeams =
-            teams.where((t) => t.leagueId == widget.league.id).toList();
+        final leagueTeams = teams
+            .where((t) => t.leagueId == widget.league.id)
+            .toList();
         final teamCount = leagueTeams.isEmpty ? 1 : leagueTeams.length;
 
         final availablePlayers = players
@@ -160,10 +172,12 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
                   separatorBuilder: (_, __) => const SizedBox(width: 12),
                   itemBuilder: (_, i) {
                     final p = picks[i];
-                    final player =
-                        players.firstWhereOrNull((pl) => pl.id == p.playerId);
-                    final team =
-                        teams.firstWhereOrNull((t) => t.id == p.teamId);
+                    final player = players.firstWhereOrNull(
+                      (pl) => pl.id == p.playerId,
+                    );
+                    final team = teams.firstWhereOrNull(
+                      (t) => t.id == p.teamId,
+                    );
 
                     final round = ((p.pickNumber - 1) ~/ teamCount) + 1;
                     final pickInRound = ((p.pickNumber - 1) % teamCount) + 1;
@@ -198,18 +212,20 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
                             isScrollable: false,
                             dividerColor: Colors.transparent,
                             indicatorSize: TabBarIndicatorSize.tab,
-                            labelPadding:
-                                const EdgeInsets.symmetric(horizontal: 24),
-                            labelStyle:
-                                const TextStyle(fontWeight: FontWeight.w700),
+                            labelPadding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                            ),
+                            labelStyle: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                            ),
                             labelColor: Colors.white,
-                            unselectedLabelColor:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            unselectedLabelColor: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                             indicator: const ShapeDecoration(
                               color: AppColors.black400,
                               shape: StadiumBorder(
-                                side:
-                                    BorderSide(color: Colors.white, width: 2),
+                                side: BorderSide(color: Colors.white, width: 2),
                               ),
                             ),
                             tabs: const [
@@ -231,9 +247,9 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
                               myTeamId: (myTeam as dynamic)?.id,
                               tournamentId: widget.league.tournamentId,
                               selectedFilter: ref.watch(posFilterProvider),
-                              onFilterChanged: (v) => ref
-                                  .read(posFilterProvider.notifier)
-                                  .state = v,
+                              onFilterChanged: (v) =>
+                                  ref.read(posFilterProvider.notifier).state =
+                                      v,
                               onPick: (playerId, teamId) =>
                                   _pickPlayer(playerId, teamId),
                             ),
@@ -244,9 +260,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
                             DraftTabRoster(
                               myTeamId: (myTeam as dynamic)?.id ?? '',
                               allPicks: picks,
-                              playersById: {
-                                for (final p in players) p.id: p
-                              },
+                              playersById: {for (final p in players) p.id: p},
                               tournamentId: widget.league.tournamentId,
                             ),
                           ],
@@ -271,18 +285,20 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
       return;
     }
     try {
-      await ref.read(draftPickActionsProvider.notifier).makePick(
+      await ref
+          .read(draftPickActionsProvider.notifier)
+          .makePick(
             leagueId: widget.league.id,
             teamId: myTeamId,
             playerId: playerId,
           );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Pick failed: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Pick failed: $e')));
     }
   }
 
-  Scaffold _err(Object? e) =>
-      Scaffold(body: Center(child: Text('Error: $e')));
+  Scaffold _err(Object? e) => Scaffold(body: Center(child: Text('Error: $e')));
 }

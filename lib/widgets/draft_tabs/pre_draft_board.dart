@@ -1,4 +1,4 @@
-// lib/ui/draft/lobby/pre_draft_board.dart
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,7 +17,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PreDraftLobby extends ConsumerWidget {
   const PreDraftLobby({super.key, required this.leagueId});
-
   final String leagueId;
 
   String _mmss(int seconds) {
@@ -77,7 +76,7 @@ class PreDraftLobby extends ConsumerWidget {
 
     final secondsPerPick = settingsAv.requireValue!.timePerPick;
     final uid = Supabase.instance.client.auth.currentUser?.id;
-    final canStart = uid != null && league.creatorId == uid;
+    final isCommissioner = uid != null && league.creatorId == uid;
 
     return Scaffold(
       backgroundColor: AppColors.black100,
@@ -87,9 +86,9 @@ class PreDraftLobby extends ConsumerWidget {
           league.name.toUpperCase(),
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w800,
-          ),
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+              ),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -98,14 +97,14 @@ class PreDraftLobby extends ConsumerWidget {
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.only(right: 8),
             child: IconButton(
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => LeagueScoringPage(leagueId: leagueId),
                 ),
               ),
-              icon: Icon(Icons.settings, color: Colors.white),
+              icon: const Icon(Icons.settings, color: Colors.white),
             ),
           ),
         ],
@@ -135,6 +134,7 @@ class PreDraftLobby extends ConsumerWidget {
               children: [
                 Row(
                   children: [
+                    // ── Draft Timer card (edit only for commissioner)
                     Expanded(
                       child: DraftInfoCard(
                         title: 'Draft Timer',
@@ -147,32 +147,32 @@ class PreDraftLobby extends ConsumerWidget {
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   _mmss(secondsPerPick),
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.headlineMedium,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium,
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            const Icon(
-                              Icons.edit,
-                              size: 20,
-                              color: Colors.white,
-                            ),
+                            if (isCommissioner) ...[
+                              const SizedBox(width: 8),
+                              const Icon(Icons.edit, size: 20, color: Colors.white),
+                            ],
                           ],
                         ),
-                        onTapValue: () async {
-                          await EditPickTimerSheet.show(
-                            context,
-                            leagueId: leagueId,
-                            initialSeconds: secondsPerPick,
-                          );
-                          // The sheet saves via actions + invalidates settings provider,
-                          // so this screen will reflect updated timer automatically.
-                        },
+                        onTapValue: isCommissioner
+                            ? () async {
+                                await EditPickTimerSheet.show(
+                                  context,
+                                  leagueId: leagueId,
+                                  initialSeconds: secondsPerPick,
+                                );
+                              }
+                            : null,
                       ),
                     ),
                     const SizedBox(width: 10),
+
+                    // ── Invite Code
                     Expanded(
                       child: DraftInfoCard(
                         title: 'Invite Code',
@@ -185,18 +185,14 @@ class PreDraftLobby extends ConsumerWidget {
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   league.joinCode,
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.headlineMedium,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium,
                                 ),
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(
-                              Icons.copy,
-                              size: 20,
-                              color: Colors.white,
-                            ),
+                            const Icon(Icons.copy, size: 20, color: Colors.white),
                           ],
                         ),
                         onTapValue: () async {
@@ -205,9 +201,7 @@ class PreDraftLobby extends ConsumerWidget {
                           );
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Invite code copied'),
-                              ),
+                              const SnackBar(content: Text('Invite code copied')),
                             );
                           }
                         },
@@ -217,38 +211,44 @@ class PreDraftLobby extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Begin Draft button
+                // ── Begin Draft / Waiting for commissioner (always white fill + black text)
                 SizedBox(
                   height: 52,
                   width: double.infinity,
                   child: FilledButton(
-                    style: FilledButton.styleFrom(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                    style: ButtonStyle(
+                      // force white background for all states (even when disabled)
+                      backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                        (_) => isCommissioner ? AppColors.black800 : AppColors.black300,
                       ),
-                      backgroundColor: AppColors.black800,
+                      elevation: const WidgetStatePropertyAll(0),
+                      shape: WidgetStatePropertyAll(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                     ),
-                    onPressed: canStart
+                    onPressed: isCommissioner
                         ? () async {
                             await ref
                                 .read(leagueActionsProvider.notifier)
                                 .startDraft(leagueId);
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Draft starting…'),
-                                ),
+                                const SnackBar(content: Text('Draft starting…')),
                               );
                             }
                           }
                         : null,
                     child: Text(
-                      canStart ? 'Begin Draft' : 'Waiting for commissioner…',
+                      isCommissioner
+                          ? 'Begin Draft'
+                          : 'Waiting for commissioner…',
+                      // keep text black regardless of state
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.black100,
-                      ),
+                            fontWeight: FontWeight.w800,
+                            color: isCommissioner ? AppColors.black100 : AppColors.black800,
+                          ),
                     ),
                   ),
                 ),
@@ -260,8 +260,8 @@ class PreDraftLobby extends ConsumerWidget {
     );
   }
 
-  Scaffold _err(String msg) => Scaffold(
-    backgroundColor: AppColors.black100,
-    body: Center(child: Text(msg)),
-  );
+  Scaffold _err(String msg) => const Scaffold(
+        backgroundColor: AppColors.black100,
+        body: Center(child: Text('Error loading pre-draft lobby')),
+      );
 }

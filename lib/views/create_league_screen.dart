@@ -1,5 +1,3 @@
-// lib/ui/create_league/create_league_screen.dart
-
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,7 +23,7 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
   final TextEditingController _nameCtrl = TextEditingController();
   String? _tournamentId;
   bool _showScoring = false;
-  List<ScoringRule> _rules = []; // full, editable copy
+  List<ScoringRule> _rules = []; 
   final uid = Supabase.instance.client.auth.currentUser?.id;
 
   @override

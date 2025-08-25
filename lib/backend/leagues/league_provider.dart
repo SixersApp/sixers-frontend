@@ -1,4 +1,4 @@
-// lib/providers/leagues_provider.dart
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/leagues/league_service.dart';
@@ -21,10 +21,10 @@ class Leagues extends _$Leagues {
     return _service.fetchLeaguesForUser(uid);
   }
 
-  /* ---------- CRUD helpers ---------- */
+ 
 
   Future<void> refresh() async {
-    // AsyncLoading(previous) keeps old list while refetching → no blank frame
+
     state = const AsyncLoading();
     final uid = Supabase.instance.client.auth.currentUser?.id;
     if (uid == null) {
@@ -43,7 +43,7 @@ class Leagues extends _$Leagues {
     final id = await _service.createLeagueWithRules(
       league: league,
       ownerUserId: uid,
-      rules: rules, // pass models; service maps to JSON
+      rules: rules, 
     );
     await refresh();
     return id;
@@ -72,7 +72,7 @@ class Leagues extends _$Leagues {
 
   Future<void> startDraft(String leagueId) async {
     await _service.startDraft(leagueId);
-    await refresh(); // refresh provider state
+    await refresh(); 
   }
 
   Future<League?> getLeagueById(String id) => _service.getLeagueById(id);
@@ -87,11 +87,10 @@ class LeagueActions extends _$LeagueActions {
 
   Future<void> startDraft(String leagueId) async {
     await _svc.startDraft(leagueId);
-    // Invalidate all draft-related providers to trigger immediate refresh
+    
     ref.invalidate(draftStateStreamProvider(leagueId));
     ref.invalidate(leaguesProvider);
 
-    // Also invalidate players provider for this league's tournament
     try {
       final league = await _svc.getLeagueById(leagueId);
       if (league != null) {

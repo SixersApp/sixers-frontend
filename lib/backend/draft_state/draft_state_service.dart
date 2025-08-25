@@ -18,18 +18,17 @@ class DraftStateService {
           if (row != null) ctrl.add(DraftState.fromJson(row));
         });
 
-    // Create a unique channel name for this league
     final channelName = 'draft_state_$leagueId';
 
     final channel = _c.channel(channelName);
 
-    // Listen to all changes on the league_draft_state table
+    
     channel.onPostgresChanges(
       event: PostgresChangeEvent.all,
       schema: 'public',
       table: 'league_draft_state',
       callback: (payload) {
-        // Check if the change affects this league
+        
         if (payload.newRecord != null &&
             payload.newRecord['league_id'] == leagueId) {
           debugPrint(
@@ -53,7 +52,7 @@ class DraftStateService {
           .from('league_draft_state')
           .select('*')
           .eq('league_id', leagueId)
-          .maybeSingle(); // returns Map<String, dynamic>? or null
+          .maybeSingle();
 
       if (res == null) return null;
       return DraftState.fromJson(res);

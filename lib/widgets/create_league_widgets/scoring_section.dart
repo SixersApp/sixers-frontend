@@ -11,7 +11,7 @@ class ScoringSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // group by category
+
     final byCat = <String, List<ScoringRule>>{};
     for (final r in rules) {
       (byCat[r.category] ??= []).add(r);
