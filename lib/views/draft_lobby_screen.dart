@@ -104,6 +104,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
     final settingsA = ref.watch(draftSettingsProvider(widget.league.id));
     final teamsA = ref.watch(fantasyTeamsProvider(leagueId: widget.league.id));
     final playersA = ref.watch(allPlayersProvider(widget.league.tournamentId));
+    final draftSettingsA = ref.watch(draftSettingsProvider(widget.league.id));
 
     if ([settingsA, teamsA, playersA].any((a) => a.isLoading)) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -135,7 +136,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
       return PreDraftLobby(
         league: widget.league,
         teams: teams,
-        secondsPerPick: 120,
+        secondsPerPick: settings!.timePerPick,
         canStart: widget.league.creatorId == uid,
         onStartDraft: () async {
           await ref

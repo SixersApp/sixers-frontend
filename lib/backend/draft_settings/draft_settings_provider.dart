@@ -28,4 +28,9 @@ class DraftSettings extends _$DraftSettings {
     await _service.update(newSettings);
     state = AsyncData(newSettings);
   }
+
+  Future<void> setTimePerPick(String leagueId, int seconds) async {
+    await _service.updateTimePerPick(leagueId: leagueId, seconds: seconds);
+    ref.invalidate(draftSettingsProvider(leagueId));
+  }
 }

@@ -19,4 +19,18 @@ class DraftSettingsService {
         .update(settings.toJson())
         .eq('league_id', settings.leagueId);
   }
+
+  Future<Map<String, dynamic>> updateTimePerPick({
+    required String leagueId,
+    required int seconds,
+  }) async {
+    assert(seconds > 0, 'time_per_pick must be > 0');
+    final row = await _client
+        .from('league_draft_settings')
+        .update({'time_per_pick': seconds})
+        .eq('league_id', leagueId)
+        .select()
+        .single(); // get the updated row back
+    return row as Map<String, dynamic>;
+  }
 }
