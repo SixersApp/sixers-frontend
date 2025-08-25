@@ -12,6 +12,7 @@ import 'package:sixers/backend/players/player_model.dart';
 import 'package:sixers/backend/players/player_provider.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/theme/brand_tokens.dart';
+import 'package:sixers/widgets/draft_tabs/pre_draft_board.dart';
 import 'package:sixers/widgets/draft_widgets/draft_app_bar.dart';
 import 'package:sixers/widgets/draft_tabs/draft_tab_board.dart';
 import 'package:sixers/widgets/draft_tabs/draft_tab_draft.dart';
@@ -118,21 +119,37 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
     if (picksA.hasError) return _err(picksA.error);
 
     final state = stateA.valueOrNull;
+
     if (state == null) {
-      return Scaffold(
-        appBar: AppBar(title: Text('Draft • ${widget.league.name}')),
-        body: Center(
-          child: widget.league.creatorId == uid
-              ? ElevatedButton(
-                  onPressed: () async {
-                    await ref
-                        .read(leagueActionsProvider.notifier)
-                        .startDraft(widget.league.id);
-                  },
-                  child: const Text('Start Draft'),
-                )
-              : const Text('Waiting for commissioner to start the draft…'),
-        ),
+      final settings = settingsA.requireValue;
+      final teams =
+          (teamsA.requireValue..sort((a, b) {
+                final ao = (a.draftOrder ?? 1 << 20);
+                final bo = (b.draftOrder ?? 1 << 20);
+                if (ao != bo) return ao.compareTo(bo);
+                return a.teamName.compareTo(b.teamName);
+              }))
+              .where((t) => t.leagueId == widget.league.id)
+              .toList();
+
+      return PreDraftLobby(
+        league: widget.league,
+        teams: teams,
+        secondsPerPick: 120,
+        canStart: widget.league.creatorId == uid,
+        onStartDraft: () async {
+          await ref
+              .read(leagueActionsProvider.notifier)
+              .startDraft(widget.league.id);
+          if (context.mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Draft starting…')));
+          }
+        },
+        onEditTimer: () {
+          // TODO: open timer edit UI
+        },
       );
     }
 
@@ -153,7 +170,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
     );
 
     final now = DateTime.now();
-    final secsLeft = state.pickDeadline
+    final secsLeft = state!.pickDeadline
         .difference(now)
         .inSeconds
         .clamp(0, 9999);
@@ -181,8 +198,6 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
     final filteredPlayers = role == null
         ? availablePlayers
         : availablePlayers.where((pl) => pl.role == role).toList();
-
-
 
     return Scaffold(
       appBar: DraftAppBar(
@@ -299,14 +314,16 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
                           leagueId: widget.league.id,
                           tournamentId: widget.league.tournamentId,
                         ),
-                        
-                        DraftTabRoster(
-                          myTeamId: (myTeam as dynamic)?.id ?? '', // safe if user isn’t on a team yet
-                          allPicks: picks,                         // full draft_picks list
-                          playersById: { for (final p in players) p.id: p }, 
-                          tournamentId: widget.league.tournamentId,               // id -> Player
-                        ),
 
+                        DraftTabRoster(
+                          myTeamId:
+                              (myTeam as dynamic)?.id ??
+                              '', // safe if user isn’t on a team yet
+                          allPicks: picks, // full draft_picks list
+                          playersById: {for (final p in players) p.id: p},
+                          tournamentId:
+                              widget.league.tournamentId, // id -> Player
+                        ),
                       ],
                     ),
                   ),

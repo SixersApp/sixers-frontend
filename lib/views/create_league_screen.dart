@@ -1,5 +1,5 @@
 // lib/ui/create_league/create_league_screen.dart
-import 'dart:js_interop';
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +11,6 @@ import 'package:sixers/backend/tournament/tournament_provider.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/widgets/create_league_widgets/header.dart';
 import 'package:sixers/widgets/create_league_widgets/scoring_section.dart';
-import 'package:sixers/widgets/create_league_widgets/shimmer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CreateLeagueScreen extends ConsumerStatefulWidget {
