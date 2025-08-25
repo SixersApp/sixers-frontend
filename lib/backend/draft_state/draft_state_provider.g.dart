@@ -6,7 +6,7 @@ part of 'draft_state_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$draftStateStreamHash() => r'36c552cd60509f5fbfb92b047ada51195d8128c9';
+String _$draftStateStreamHash() => r'97aac7e8ebac0d765fd9b1fcebc1454af3804593';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,16 +29,28 @@ class _SystemHash {
   }
 }
 
-/// See also [draftStateStream].
+/// Stream that yields an initial snapshot (can be null) and then live updates.
+/// Nullable so "no active draft yet" is a first-class state.
+///
+/// Copied from [draftStateStream].
 @ProviderFor(draftStateStream)
 const draftStateStreamProvider = DraftStateStreamFamily();
 
-/// See also [draftStateStream].
-class DraftStateStreamFamily extends Family<AsyncValue<DraftState>> {
-  /// See also [draftStateStream].
+/// Stream that yields an initial snapshot (can be null) and then live updates.
+/// Nullable so "no active draft yet" is a first-class state.
+///
+/// Copied from [draftStateStream].
+class DraftStateStreamFamily extends Family<AsyncValue<DraftState?>> {
+  /// Stream that yields an initial snapshot (can be null) and then live updates.
+  /// Nullable so "no active draft yet" is a first-class state.
+  ///
+  /// Copied from [draftStateStream].
   const DraftStateStreamFamily();
 
-  /// See also [draftStateStream].
+  /// Stream that yields an initial snapshot (can be null) and then live updates.
+  /// Nullable so "no active draft yet" is a first-class state.
+  ///
+  /// Copied from [draftStateStream].
   DraftStateStreamProvider call(String leagueId) {
     return DraftStateStreamProvider(leagueId);
   }
@@ -65,9 +77,15 @@ class DraftStateStreamFamily extends Family<AsyncValue<DraftState>> {
   String? get name => r'draftStateStreamProvider';
 }
 
-/// See also [draftStateStream].
-class DraftStateStreamProvider extends AutoDisposeStreamProvider<DraftState> {
-  /// See also [draftStateStream].
+/// Stream that yields an initial snapshot (can be null) and then live updates.
+/// Nullable so "no active draft yet" is a first-class state.
+///
+/// Copied from [draftStateStream].
+class DraftStateStreamProvider extends StreamProvider<DraftState?> {
+  /// Stream that yields an initial snapshot (can be null) and then live updates.
+  /// Nullable so "no active draft yet" is a first-class state.
+  ///
+  /// Copied from [draftStateStream].
   DraftStateStreamProvider(String leagueId)
     : this._internal(
         (ref) => draftStateStream(ref as DraftStateStreamRef, leagueId),
@@ -96,7 +114,7 @@ class DraftStateStreamProvider extends AutoDisposeStreamProvider<DraftState> {
 
   @override
   Override overrideWith(
-    Stream<DraftState> Function(DraftStateStreamRef provider) create,
+    Stream<DraftState?> Function(DraftStateStreamRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -113,7 +131,7 @@ class DraftStateStreamProvider extends AutoDisposeStreamProvider<DraftState> {
   }
 
   @override
-  AutoDisposeStreamProviderElement<DraftState> createElement() {
+  StreamProviderElement<DraftState?> createElement() {
     return _DraftStateStreamProviderElement(this);
   }
 
@@ -133,13 +151,13 @@ class DraftStateStreamProvider extends AutoDisposeStreamProvider<DraftState> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin DraftStateStreamRef on AutoDisposeStreamProviderRef<DraftState> {
+mixin DraftStateStreamRef on StreamProviderRef<DraftState?> {
   /// The parameter `leagueId` of this provider.
   String get leagueId;
 }
 
 class _DraftStateStreamProviderElement
-    extends AutoDisposeStreamProviderElement<DraftState>
+    extends StreamProviderElement<DraftState?>
     with DraftStateStreamRef {
   _DraftStateStreamProviderElement(super.provider);
 

@@ -105,3 +105,18 @@ class PositionFilterButton extends StatelessWidget {
     );
   }
 }
+
+String labelForFilter(PositionFilter f) {
+  switch (f) {
+    case PositionFilter.all:
+      return 'Position';
+    case PositionFilter.batsman:
+      return 'Batsman';
+    case PositionFilter.bowler:
+      return 'Bowler';
+    case PositionFilter.wicketKeeper:
+      return 'Wicket Keeper';
+    case PositionFilter.allRounder:
+      return 'All Rounder';
+  }
+}

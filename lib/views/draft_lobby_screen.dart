@@ -1,14 +1,14 @@
+// lib/ui/draft/draft_lobby.dart
 import 'dart:async';
-import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:sixers/backend/draft_pick/draft_pick_provider.dart';
-import 'package:sixers/backend/draft_settings/draft_settings_provider.dart';
+import 'package:sixers/backend/draft_state/draft_state_model.dart'; // <-- add
 import 'package:sixers/backend/draft_state/draft_state_provider.dart';
 import 'package:sixers/backend/fantasy_team/fantasy_team_provider.dart';
-import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/backend/players/player_model.dart';
 import 'package:sixers/backend/players/player_provider.dart';
 import 'package:sixers/theme/colors.dart';
@@ -31,30 +31,9 @@ class DraftLobby extends ConsumerStatefulWidget {
   ConsumerState<DraftLobby> createState() => _DraftLobbyState();
 }
 
-/* ───────────────────────────────────────────────
-   RIVERPOD GLOBAL STATE (keep only position filter)
-─────────────────────────────────────────────── */
-
 final posFilterProvider = StateProvider<PositionFilter>(
   (_) => PositionFilter.all,
 );
-
-/* ───────────────────────────────────────────── */
-
-String labelForFilter(PositionFilter f) {
-  switch (f) {
-    case PositionFilter.all:
-      return 'Position';
-    case PositionFilter.batsman:
-      return 'Batsman';
-    case PositionFilter.bowler:
-      return 'Bowler';
-    case PositionFilter.wicketKeeper:
-      return 'Wicket Keeper';
-    case PositionFilter.allRounder:
-      return 'All Rounder';
-  }
-}
 
 String? roleValue(PositionFilter f) {
   switch (f) {
@@ -74,8 +53,6 @@ String? roleValue(PositionFilter f) {
 class _DraftLobbyState extends ConsumerState<DraftLobby>
     with SingleTickerProviderStateMixin {
   Timer? _ticker;
-
-  // Local TabController for slide animation between tabs
   late final TabController _segController;
 
   Color _black100(BuildContext c) =>
@@ -102,213 +79,187 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
   Widget build(BuildContext context) {
     final uid = Supabase.instance.client.auth.currentUser!.id;
 
-    final settingsA = ref.watch(draftSettingsProvider(widget.league.id));
-    final teamsA = ref.watch(fantasyTeamsProvider(leagueId: widget.league.id));
-    final playersA = ref.watch(allPlayersProvider(widget.league.tournamentId));
+    // Strongly type the AsyncValue to avoid any “dynamic” inference:
+    final AsyncValue<DraftState?> stateAv =
+        ref.watch(draftStateStreamProvider(widget.league.id));
 
-
-    if ([settingsA, teamsA, playersA].any((a) => a.isLoading)) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-    for (final a in [settingsA, teamsA, playersA]) {
-      if (a.hasError) return _err(a.error);
-    }
-
-    final stateA = ref.watch(draftStateStreamProvider(widget.league.id));
-    final picksA = ref.watch(draftPicksProvider(widget.league.id));
-
-    if (stateA.hasError) return _err(stateA.error);
-    if (picksA.hasError) return _err(picksA.error);
-
-    final state = stateA.valueOrNull;
-
-    if (state == null) {
-
-      return PreDraftLobby(
-        leagueId: widget.league.id,
-      );
-    }
-
-    final picks = picksA.valueOrNull;
-    if (picks == null) {
-      return Scaffold(
-        appBar: AppBar(title: Text('Draft • ${widget.league.name}')),
-        body: const Center(child: Text('Preparing draft room…')),
-      );
-    }
-
-    final teams = teamsA.requireValue;
-    final players = playersA.requireValue;
-
-    _ticker ??= Timer.periodic(
-      const Duration(seconds: 1),
-      (_) => setState(() {}),
-    );
-
-    final now = DateTime.now();
-    final secsLeft = state!.pickDeadline
-        .difference(now)
-        .inSeconds
-        .clamp(0, 9999);
-
-    final myTeam = teams.firstWhereOrNull(
-      (t) => t.leagueId == widget.league.id && t.userId == uid,
-    );
-    final currentOwnerUid = teams
-        .firstWhereOrNull((t) => t.id == state.currentTeamId)
-        ?.userId;
-    final myTurn = currentOwnerUid == uid;
-
-    final availablePlayers = players
-        .where((pl) => picks.every((p) => p.playerId != pl.id))
-        .toList();
-
-    final leagueTeams = teams
-        .where((t) => t.leagueId == widget.league.id)
-        .toList();
-    final teamCount = leagueTeams.isEmpty ? 1 : leagueTeams.length;
-
-    // position filtering
-    final pos = ref.watch(posFilterProvider);
-    final role = roleValue(pos);
-    final filteredPlayers = role == null
-        ? availablePlayers
-        : availablePlayers.where((pl) => pl.role == role).toList();
-
-    return Scaffold(
-      appBar: DraftAppBar(
-        secsLeft: secsLeft,
-        roundNumber: state.roundNumber,
-        pickNumber: state.pickNumber,
+    return stateAv.when(
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 32),
+      error: (e, _) => _err(e),
+      data: (state) {
+        if (state == null) {
+          return PreDraftLobby(leagueId: widget.league.id);
+        }
 
-          // ─── Drafted picks carousel ──────────────────────────
-          SizedBox(
-            height: 117,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: picks.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (_, i) {
-                final p = picks[i];
-                final player = players.firstWhereOrNull(
-                  (pl) => pl.id == p.playerId,
-                );
-                final team = teams.firstWhereOrNull((t) => t.id == p.teamId);
+        final picksAv = ref.watch(draftPicksProvider(widget.league.id));
+        final teamsAv =
+            ref.watch(fantasyTeamsProvider(leagueId: widget.league.id));
+        final playersAv =
+            ref.watch(allPlayersProvider(widget.league.tournamentId));
 
-                final round = ((p.pickNumber - 1) ~/ teamCount) + 1;
-                final pickInRound = ((p.pickNumber - 1) % teamCount) + 1;
+        if (picksAv.isLoading || teamsAv.isLoading || playersAv.isLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (picksAv.hasError) return _err(picksAv.error);
+        if (teamsAv.hasError) return _err(teamsAv.error);
+        if (playersAv.hasError) return _err(playersAv.error);
 
-                return DraftedPickCard(
-                  playerName: player?.name ?? 'Player',
-                  fantasyTeamName: team?.teamName ?? 'Team',
-                  roundNumber: round,
-                  pickNumber: pickInRound,
-                  role: player?.role,
-                );
-              },
-            ),
+        final picks = picksAv.requireValue;
+        final teams = teamsAv.requireValue;
+        final players = playersAv.requireValue;
+
+        _ticker ??= Timer.periodic(
+          const Duration(seconds: 1),
+          (_) => mounted ? setState(() {}) : null,
+        );
+
+        final now = DateTime.now();
+        final secsLeft =
+            state.pickDeadline.difference(now).inSeconds.clamp(0, 9999);
+
+        final myTeam = teams.firstWhereOrNull(
+          (t) => t.leagueId == widget.league.id && t.userId == uid,
+        );
+        final currentOwnerUid =
+            teams.firstWhereOrNull((t) => t.id == state.currentTeamId)?.userId;
+        final myTurn = currentOwnerUid == uid;
+
+        final leagueTeams =
+            teams.where((t) => t.leagueId == widget.league.id).toList();
+        final teamCount = leagueTeams.isEmpty ? 1 : leagueTeams.length;
+
+        final availablePlayers = players
+            .where((pl) => picks.every((p) => p.playerId != pl.id))
+            .toList();
+
+        final pos = ref.watch(posFilterProvider);
+        final role = roleValue(pos);
+        final filteredPlayers = role == null
+            ? availablePlayers
+            : availablePlayers.where((pl) => pl.role == role).toList();
+
+        return Scaffold(
+          appBar: DraftAppBar(
+            secsLeft: secsLeft,
+            roundNumber: state.roundNumber,
+            pickNumber: state.pickNumber,
           ),
+          body: Column(
+            children: [
+              const SizedBox(height: 32),
+              SizedBox(
+                height: 117,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: picks.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemBuilder: (_, i) {
+                    final p = picks[i];
+                    final player =
+                        players.firstWhereOrNull((pl) => pl.id == p.playerId);
+                    final team =
+                        teams.firstWhereOrNull((t) => t.id == p.teamId);
 
-          const SizedBox(height: 12),
+                    final round = ((p.pickNumber - 1) ~/ teamCount) + 1;
+                    final pickInRound = ((p.pickNumber - 1) % teamCount) + 1;
 
-          // ─── Light-gray container with slider + tab body ──────
-          Expanded(
-            child: Container(
-              color: Theme.of(context).colorScheme.surface, // black200
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: Column(
-                children: [
-                  // ─── Slider (pill) — 46px tall, snappy, black400 selected ──
-                  SizedBox(
-                    height: 40,
-                    width: 344,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: _black100(context), // dark track
-                          borderRadius: BorderRadius.circular(90), // 46/2
-                        ),
-                        child: TabBar(
-                          controller: _segController,
-                          onTap: (i) {
-                            // Just animate locally; no global provider needed.
-                            _segController.animateTo(i);
-                          },
-                          isScrollable: false,
-                          dividerColor: Colors.transparent,
-                          indicatorSize: TabBarIndicatorSize.tab,
-                          labelPadding: const EdgeInsets.symmetric(
-                            horizontal: 24,
+                    return DraftedPickCard(
+                      playerName: player?.name ?? 'Player',
+                      fantasyTeamName: team?.teamName ?? 'Team',
+                      roundNumber: round,
+                      pickNumber: pickInRound,
+                      role: player?.role,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: Container(
+                  color: Theme.of(context).colorScheme.surface,
+                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 40,
+                        width: 344,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: _black100(context),
+                            borderRadius: BorderRadius.circular(90),
                           ),
-                          labelStyle: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                          ),
-                          labelColor: Colors.white,
-                          unselectedLabelColor: Theme.of(
-                            context,
-                          ).colorScheme.onSurfaceVariant,
-                          indicator: const ShapeDecoration(
-                            color: AppColors.black400, // selected bg
-                            shape: StadiumBorder(
-                              side: BorderSide(color: Colors.white, width: 2),
+                          child: TabBar(
+                            controller: _segController,
+                            isScrollable: false,
+                            dividerColor: Colors.transparent,
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            labelPadding:
+                                const EdgeInsets.symmetric(horizontal: 24),
+                            labelStyle:
+                                const TextStyle(fontWeight: FontWeight.w700),
+                            labelColor: Colors.white,
+                            unselectedLabelColor:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            indicator: const ShapeDecoration(
+                              color: AppColors.black400,
+                              shape: StadiumBorder(
+                                side:
+                                    BorderSide(color: Colors.white, width: 2),
+                              ),
                             ),
+                            tabs: const [
+                              Tab(text: 'Draft'),
+                              Tab(text: 'Board'),
+                              Tab(text: 'Roster'),
+                            ],
                           ),
-                          tabs: const [
-                            Tab(text: 'Draft'),
-                            Tab(text: 'Board'),
-                            Tab(text: 'Roster'),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Expanded(
+                        child: TabBarView(
+                          controller: _segController,
+                          children: [
+                            DraftTabDraft(
+                              availablePlayers: filteredPlayers,
+                              myTurn: myTurn,
+                              myTeamId: (myTeam as dynamic)?.id,
+                              tournamentId: widget.league.tournamentId,
+                              selectedFilter: ref.watch(posFilterProvider),
+                              onFilterChanged: (v) => ref
+                                  .read(posFilterProvider.notifier)
+                                  .state = v,
+                              onPick: (playerId, teamId) =>
+                                  _pickPlayer(playerId, teamId),
+                            ),
+                            DraftTabBoard(
+                              leagueId: widget.league.id,
+                              tournamentId: widget.league.tournamentId,
+                            ),
+                            DraftTabRoster(
+                              myTeamId: (myTeam as dynamic)?.id ?? '',
+                              allPicks: picks,
+                              playersById: {
+                                for (final p in players) p.id: p
+                              },
+                              tournamentId: widget.league.tournamentId,
+                            ),
                           ],
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(height: 10),
-
-                  // ─── Animated tab body (slides) ─────────────────
-                  Expanded(
-                    child: TabBarView(
-                      controller: _segController,
-                      children: [
-                        DraftTabDraft(
-                          availablePlayers: filteredPlayers,
-                          myTurn: myTurn,
-                          myTeamId: (myTeam as dynamic)?.id,
-                          tournamentId: widget.league.tournamentId,
-                          selectedFilter: ref.watch(posFilterProvider),
-                          onFilterChanged: (v) =>
-                              ref.read(posFilterProvider.notifier).state = v,
-                          onPick: (playerId, teamId) =>
-                              _pickPlayer(playerId, teamId),
-                        ),
-                        DraftTabBoard(
-                          leagueId: widget.league.id,
-                          tournamentId: widget.league.tournamentId,
-                        ),
-
-                        DraftTabRoster(
-                          myTeamId:
-                              (myTeam as dynamic)?.id ??
-                              '', // safe if user isn’t on a team yet
-                          allPicks: picks, // full draft_picks list
-                          playersById: {for (final p in players) p.id: p},
-                          tournamentId:
-                              widget.league.tournamentId, // id -> Player
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -320,19 +271,18 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
       return;
     }
     try {
-      await ref
-          .read(draftPickActionsProvider.notifier)
-          .makePick(
+      await ref.read(draftPickActionsProvider.notifier).makePick(
             leagueId: widget.league.id,
             teamId: myTeamId,
             playerId: playerId,
           );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Pick failed: $e')));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Pick failed: $e')));
     }
   }
 
-  Scaffold _err(Object? e) => Scaffold(body: Center(child: Text('Error: $e')));
+  Scaffold _err(Object? e) =>
+      Scaffold(body: Center(child: Text('Error: $e')));
 }
