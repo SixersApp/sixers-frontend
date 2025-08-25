@@ -1,4 +1,6 @@
 // lib/ui/create_league/create_league_screen.dart
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
@@ -6,11 +8,11 @@ import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/backend/scoring_rule/scoring_rule_model.dart';
 import 'package:sixers/backend/scoring_rule/scoring_rule_provider.dart';
 import 'package:sixers/backend/tournament/tournament_provider.dart';
+import 'package:sixers/theme/colors.dart';
 import 'package:sixers/widgets/create_league_widgets/header.dart';
 import 'package:sixers/widgets/create_league_widgets/scoring_section.dart';
 import 'package:sixers/widgets/create_league_widgets/shimmer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 
 class CreateLeagueScreen extends ConsumerStatefulWidget {
   const CreateLeagueScreen({super.key});
@@ -35,7 +37,10 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
   @override
   Widget build(BuildContext context) {
     // Hydrate defaults (league_id IS NULL) exactly once
-    ref.listen<AsyncValue<List<ScoringRule>>>(scoringRulesProvider(), (prev, next) {
+    ref.listen<AsyncValue<List<ScoringRule>>>(scoringRulesProvider(), (
+      prev,
+      next,
+    ) {
       next.whenData((rs) {
         if (mounted && _rules.isEmpty && rs.isNotEmpty) {
           setState(() => _rules = rs);
@@ -44,7 +49,7 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
     });
 
     final tournamentsAv = ref.watch(tournamentsProvider);
-    final defaultsAv = ref.watch(scoringRulesProvider()); 
+    final defaultsAv = ref.watch(scoringRulesProvider());
     final leaguesA = ref.read(leaguesProvider.notifier);
 
     return Scaffold(
@@ -54,60 +59,94 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
             const SliverToBoxAdapter(child: CreateLeagueHeader()),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // League name
                     const SizedBox(height: 8),
-                    Text('League Name', style: Theme.of(context).textTheme.labelLarge),
+                    Text(
+                      'League Name',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: _nameCtrl,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                         hintText: 'Awesome People League',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        hintStyle: Theme.of(context).textTheme.bodyLarge!
+                            .copyWith(color: AppColors.black500),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         filled: true,
                       ),
                     ),
 
                     // Tournament dropdown
-                    const SizedBox(height: 16),
-                    Text('Tournament', style: Theme.of(context).textTheme.labelLarge),
+                    const SizedBox(height: 13),
+                    Text(
+                      'Tournament',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
                     const SizedBox(height: 6),
                     tournamentsAv.when(
-                      loading: () => const GreyShimmer(height: 56),
                       error: (e, _) => Text('Failed to load tournaments: $e'),
                       data: (items) => DropdownButtonFormField<String>(
                         value: _tournamentId,
                         isExpanded: true,
                         items: items
-                            .map((t) => DropdownMenuItem<String>(
-                                  value: t.id,
-                                  child: Text('${t.name} (S${t.season})'),
-                                ))
+                            .map(
+                              (t) => DropdownMenuItem<String>(
+                                value: t.id,
+                                child: Text('${t.name} (S${t.season})'),
+                              ),
+                            )
                             .toList(),
                         onChanged: (v) => setState(() => _tournamentId = v),
                         decoration: InputDecoration(
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           filled: true,
                         ),
                       ),
+                      loading: () {
+                        debugPrint('loading');
+                        return const Center(child: CircularProgressIndicator());
+                      },
                     ),
 
                     // Scoring section
-                    const SizedBox(height: 24),
-                    Text('Scoring', style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 27),
+                    Text(
+                      'Scoring',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                    const SizedBox(height: 13),
                     if (!_showScoring)
                       SizedBox(
-                        height: 48,
+                        height: 52,
                         width: double.infinity,
                         child: FilledButton.icon(
-                          onPressed: defaultsAv.isLoading ? null : () => setState(() => _showScoring = true),
-                          icon: const Icon(Icons.tune),
-                          label: const Text('Customize Scoring'),
+                          onPressed: defaultsAv.isLoading
+                              ? null
+                              : () => setState(() => _showScoring = true),
+                          icon: const Icon(Icons.tune, color: AppColors.black800,size: 20,),
+                          label: Text('Customize Scoring', style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold)),
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all(AppColors.black300),
+                            shape: WidgetStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              
+                            ),
+                          ),
                         ),
                       )
                     else ...[
@@ -138,15 +177,32 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
         child: SizedBox(
           height: 52,
           child: ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all(AppColors.black800),
+              shape: WidgetStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              
+                            ),
+            ),
             onPressed: (_nameCtrl.text.trim().isEmpty || _tournamentId == null)
                 ? null
                 : () async {
                     // TODO: call create league with rules
-                    final league = League(id: '-1', name: _nameCtrl.text, tournamentId: _tournamentId!, creatorId: uid!, status: LeagueStatus.draft_pending, maxTeams: 10, joinCode: '000000');
+                    final league = League(
+                      id: '-1',
+                      name: _nameCtrl.text,
+                      tournamentId: _tournamentId!,
+                      creatorId: uid!,
+                      status: LeagueStatus.draft_pending,
+                      maxTeams: 10,
+                      joinCode: '000000',
+                    );
                     final res = leaguesA.createLeagueWithRules(league, _rules);
                     debugPrint(res.toString());
                   },
-            child: const Text('Create'),
+            child:  Text('Create', style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: AppColors.black100)),
           ),
         ),
       ),
