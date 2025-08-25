@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -122,17 +123,7 @@ class _DraftLobbyState extends ConsumerState<DraftLobby>
     final state = stateA.valueOrNull;
 
     if (state == null) {
-      final settings = settingsA.requireValue;
-      final teams =
-          (teamsA.requireValue..sort((a, b) {
-                final ao = (a.draftOrder ?? 1 << 20);
-                final bo = (b.draftOrder ?? 1 << 20);
-                if (ao != bo) return ao.compareTo(bo);
-                return a.teamName.compareTo(b.teamName);
-              }))
-              .where((t) => t.leagueId == widget.league.id)
-              .toList();
-
+      
       return PreDraftLobby(
         leagueId: widget.league.id,
       );
