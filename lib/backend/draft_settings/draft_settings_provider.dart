@@ -29,8 +29,24 @@ class DraftSettings extends _$DraftSettings {
     state = AsyncData(newSettings);
   }
 
+
+
+}
+
+final draftSettingsActionsProvider = Provider<DraftSettingsActions>(
+  (ref) => DraftSettingsActions(ref),
+);
+
+class DraftSettingsActions {
+  DraftSettingsActions(this.ref);
+  final ref;
+
+  DraftSettingsService get _svc => ref.read(draftSettingsProvider);
+
   Future<void> setTimePerPick(String leagueId, int seconds) async {
-    await _service.updateTimePerPick(leagueId: leagueId, seconds: seconds);
+    assert(seconds > 0);
+    await _svc.updateTimePerPick(leagueId: leagueId, seconds: seconds);
+    // refresh cached data so UI updates
     ref.invalidate(draftSettingsProvider(leagueId));
   }
 }

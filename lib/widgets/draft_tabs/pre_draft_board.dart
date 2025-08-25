@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/fantasy_team/fantasy_team_model.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/theme/colors.dart';
+import 'package:sixers/widgets/draft_widgets/edit_pick_timer_sheet.dart';
 import 'package:sixers/widgets/draft_widgets/pre_draft_info_tile.dart';
 import 'package:sixers/widgets/draft_widgets/pre_draft_team_tile.dart';
 
@@ -103,9 +104,9 @@ class PreDraftLobby extends ConsumerWidget {
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   _mmss(secondsPerPick),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.headlineMedium,
                                 ),
                               ),
                             ),
@@ -117,7 +118,15 @@ class PreDraftLobby extends ConsumerWidget {
                             ),
                           ],
                         ),
-                        onTapValue: canStart ? onEditTimer : null,
+                        onTapValue: () async {
+                          await EditPickTimerSheet.show(
+                            context,
+                            leagueId: league.id,
+                            initialSeconds:
+                                secondsPerPick, // or secondsPerPick in your model
+                            maxMinutes: 20,
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -133,9 +142,9 @@ class PreDraftLobby extends ConsumerWidget {
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   league.joinCode,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.headlineMedium,
                                 ),
                               ),
                             ),
