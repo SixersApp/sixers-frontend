@@ -12,13 +12,11 @@ import 'package:sixers/theme/colors.dart';
 import 'package:sixers/widgets/draft_widgets/edit_pick_timer_sheet.dart';
 import 'package:sixers/widgets/draft_widgets/pre_draft_info_tile.dart';
 import 'package:sixers/widgets/draft_widgets/pre_draft_team_tile.dart';
+import 'package:sixers/widgets/league_widgets/league_scoring_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PreDraftLobby extends ConsumerWidget {
-  const PreDraftLobby({
-    super.key,
-    required this.leagueId,
-  });
+  const PreDraftLobby({super.key, required this.leagueId});
 
   final String leagueId;
 
@@ -67,10 +65,8 @@ class PreDraftLobby extends ConsumerWidget {
 
     // Data
     final leagues = leagueAv.requireValue;
-    final league = leagues.firstWhere(
-                  (t) => t.id == leagueId,
-                );
-    
+    final league = leagues.firstWhere((t) => t.id == leagueId);
+
     final List<FantasyTeam> teams = List.of(teamsAv.requireValue)
       ..sort((a, b) {
         final ao = (a.draftOrder ?? 1 << 20);
@@ -91,19 +87,26 @@ class PreDraftLobby extends ConsumerWidget {
           league.name.toUpperCase(),
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-              ),
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+          ),
         ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
-        actions: const [
+        actions: [
           Padding(
             padding: EdgeInsets.only(right: 8),
-            child: Icon(Icons.settings, color: Colors.white),
+            child: IconButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => LeagueScoringPage(leagueId: leagueId),
+                ),
+              ),
+              icon: Icon(Icons.settings, color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -116,8 +119,11 @@ class PreDraftLobby extends ConsumerWidget {
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               itemCount: teams.length,
-              itemBuilder: (_, i) =>
-                  TeamTile(team: teams[i], index: i, accentColor: _colorForIndex(i)),
+              itemBuilder: (_, i) => TeamTile(
+                team: teams[i],
+                index: i,
+                accentColor: _colorForIndex(i),
+              ),
             ),
           ),
 
@@ -141,14 +147,18 @@ class PreDraftLobby extends ConsumerWidget {
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   _mmss(secondsPerPick),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.headlineMedium,
                                 ),
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(Icons.edit, size: 20, color: Colors.white),
+                            const Icon(
+                              Icons.edit,
+                              size: 20,
+                              color: Colors.white,
+                            ),
                           ],
                         ),
                         onTapValue: () async {
@@ -175,14 +185,18 @@ class PreDraftLobby extends ConsumerWidget {
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   league.joinCode,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.headlineMedium,
                                 ),
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(Icons.copy, size: 20, color: Colors.white),
+                            const Icon(
+                              Icons.copy,
+                              size: 20,
+                              color: Colors.white,
+                            ),
                           ],
                         ),
                         onTapValue: () async {
@@ -191,7 +205,9 @@ class PreDraftLobby extends ConsumerWidget {
                           );
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Invite code copied')),
+                              const SnackBar(
+                                content: Text('Invite code copied'),
+                              ),
                             );
                           }
                         },
@@ -220,7 +236,9 @@ class PreDraftLobby extends ConsumerWidget {
                                 .startDraft(leagueId);
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Draft starting…')),
+                                const SnackBar(
+                                  content: Text('Draft starting…'),
+                                ),
                               );
                             }
                           }
@@ -228,9 +246,9 @@ class PreDraftLobby extends ConsumerWidget {
                     child: Text(
                       canStart ? 'Begin Draft' : 'Waiting for commissioner…',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.black100,
-                          ),
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.black100,
+                      ),
                     ),
                   ),
                 ),
@@ -242,6 +260,8 @@ class PreDraftLobby extends ConsumerWidget {
     );
   }
 
-  Scaffold _err(String msg) =>
-      Scaffold(backgroundColor: AppColors.black100, body: Center(child: Text(msg)));
+  Scaffold _err(String msg) => Scaffold(
+    backgroundColor: AppColors.black100,
+    body: Center(child: Text(msg)),
+  );
 }

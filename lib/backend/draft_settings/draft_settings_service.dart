@@ -1,3 +1,4 @@
+import 'package:sixers/backend/scoring_rule/scoring_rule_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'draft_settings_model.dart';
 
@@ -18,6 +19,23 @@ class DraftSettingsService {
         .from('league_draft_settings')
         .update(settings.toJson())
         .eq('league_id', settings.leagueId);
+  }
+
+  Future<void> saveForLeague(String leagueId, List<ScoringRule> rules) async {
+    // delete existing
+    await _client
+        .from('league_draft_settings')
+        .delete()
+        .eq('league_id', leagueId);
+
+    if (rules.isEmpty) return;
+    // insert new
+    final rows = rules.map((r) {
+      final m = Map<String, dynamic>.from(r.toRpcJson());
+      m['league_id'] = leagueId;
+      return m;
+    }).toList();
+    await _client.from('league_draft_settings').insert(rows);
   }
 
   Future<Map<String, dynamic>> updateTimePerPick({

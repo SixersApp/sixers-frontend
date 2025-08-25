@@ -6,7 +6,7 @@ part of 'scoring_rule_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$scoringRulesHash() => r'6a5f0df49699c2a536f7d8533f7d6b3ee584a61e';
+String _$scoringRulesHash() => r'6c5435f61b40950eb48ca0e5cc4362bb80c094a9';
 
 /// Copied from Dart SDK
 class _SystemHash {

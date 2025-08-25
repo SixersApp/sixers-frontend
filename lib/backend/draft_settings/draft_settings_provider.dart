@@ -7,7 +7,7 @@ import 'draft_settings_service.dart';
 
 part 'draft_settings_provider.g.dart';
 
-/// Expose the service as a plain provider so both the family and actions can use it.
+/// Service provider so both the family and actions can access the same service.
 final draftSettingsServiceProvider = Provider<DraftSettingsService>(
   (ref) => DraftSettingsService(),
 );
@@ -49,8 +49,8 @@ class DraftSettingsActions {
   Future<void> setTimePerPick(String leagueId, int seconds) async {
     assert(seconds > 0);
     await _svc.updateTimePerPick(leagueId: leagueId, seconds: seconds);
-    // Refresh the cached data so UI updates
+    // Refresh cached data so UI updates
     ref.invalidate(draftSettingsProvider(leagueId));
-    // or: await ref.read(draftSettingsProvider(leagueId).notifier).refresh();
+
   }
 }

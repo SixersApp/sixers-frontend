@@ -7,6 +7,8 @@ class ScoringSection extends StatelessWidget {
   final ValueChanged<ScoringRule> onChanged;
   const ScoringSection({super.key, required this.rules, required this.onChanged});
 
+  
+
   @override
   Widget build(BuildContext context) {
     // group by category

@@ -36,7 +36,7 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Hydrate defaults (league_id IS NULL) exactly once
+    
     ref.listen<AsyncValue<List<ScoringRule>>>(scoringRulesProvider(), (
       prev,
       next,

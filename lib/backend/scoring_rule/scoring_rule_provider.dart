@@ -1,38 +1,58 @@
-// lib/backend/scoring_rule/scoring_rule_provider.dart
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'scoring_rule_model.dart';
-import 'scoring_rule_service.dart';
+import 'scoring_rule_service.dart';      // defaults: league_id IS NULL
 
 part 'scoring_rule_provider.g.dart';
 
 @riverpod
 class ScoringRules extends _$ScoringRules {
-  final _service = ScoringRuleService();
-  String? _leagueId; // remember current scope for refresh()
+  // Services
+  final _defaultsSvc = ScoringRuleService();
+  final _leagueSvc = ScoringRuleService();
+
+  // Track the scope used to build this notifier so refresh() knows what to refetch
+  String? _scopeLeagueId;
 
   @override
   Future<List<ScoringRule>> build({String? leagueId}) async {
-    _leagueId = leagueId;
+    _scopeLeagueId = leagueId;
+
     if (leagueId == null) {
-      // league_id IS NULL -> default rules
-      return _service.fetchDefaults();
+      // Defaults (league_id IS NULL)
+      return _defaultsSvc.fetchDefaults();
     }
-    return _service.fetchByLeagueId(leagueId);
+
+    // League-specific; fall back to defaults if none exist yet
+    final leagueRules = await _leagueSvc.fetchByLeagueId(leagueId);
+    if (leagueRules.isNotEmpty) return leagueRules;
+
+    return _defaultsSvc.fetchDefaults();
   }
 
   Future<void> refresh() async {
+    final id = _scopeLeagueId;
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final id = _leagueId;
-      return id == null
-          ? _service.fetchDefaults()
-          : _service.fetchByLeagueId(id);
+      if (id == null) {
+        return _defaultsSvc.fetchDefaults();
+      } else {
+        final leagueRules = await _leagueSvc.fetchByLeagueId(id);
+        return leagueRules.isNotEmpty
+            ? leagueRules
+            : _defaultsSvc.fetchDefaults();
+      }
     });
   }
 
-  // /// Optional helper when you want to replace all rules for a league then refresh.
-  // Future<void> replaceAll(String leagueId, List<ScoringRule> rules) async {
-  //   await _service.replaceAllForLeague(leagueId, rules);
-  //   await refresh();
-  // }
+  /// Replace all rules for a league (delete + insert) then refresh if we're
+  /// currently scoped to that same league.
+  Future<void> replaceAllForLeague(
+    String leagueId,
+    List<ScoringRule> rules,
+  ) async {
+    await _leagueSvc.replaceAllForLeague(leagueId, rules);
+    if (_scopeLeagueId == leagueId) {
+      await refresh();
+    }
+  }
 }
