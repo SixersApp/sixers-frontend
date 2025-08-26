@@ -9,23 +9,28 @@ class DraftStateService {
   Stream<DraftState> stream(String leagueId) {
     final ctrl = StreamController<DraftState>.broadcast();
 
-    _c.from('league_draft_state').select().eq('league_id', leagueId).maybeSingle().then((row) {
-      if (row != null) ctrl.add(DraftState.fromJson(row));
-    });
+    _c
+        .from('league_draft_state')
+        .select()
+        .eq('league_id', leagueId)
+        .maybeSingle()
+        .then((row) {
+          if (row != null) ctrl.add(DraftState.fromJson(row));
+        });
 
-    // Create a unique channel name for this league
     final channelName = 'draft_state_$leagueId';
 
     final channel = _c.channel(channelName);
 
-    // Listen to all changes on the league_draft_state table
+    
     channel.onPostgresChanges(
       event: PostgresChangeEvent.all,
       schema: 'public',
       table: 'league_draft_state',
       callback: (payload) {
-        // Check if the change affects this league
-        if (payload.newRecord != null && payload.newRecord['league_id'] == leagueId) {
+        
+        if (payload.newRecord != null &&
+            payload.newRecord['league_id'] == leagueId) {
           debugPrint(
             'RT ► ${payload.eventType}'
             ' pick# ${payload.newRecord['current_pick_number']}',
@@ -39,5 +44,22 @@ class DraftStateService {
 
     ctrl.onCancel = () => _c.removeChannel(channel);
     return ctrl.stream;
+  }
+
+  Future<DraftState?> fetch(String leagueId) async {
+    try {
+      final res = await _c
+          .from('league_draft_state')
+          .select('*')
+          .eq('league_id', leagueId)
+          .maybeSingle();
+
+      if (res == null) return null;
+      return DraftState.fromJson(res);
+    } on PostgrestException catch (e) {
+      rethrow;
+    } catch (e) {
+      throw Exception('Failed to fetch draft state: $e');
+    }
   }
 }

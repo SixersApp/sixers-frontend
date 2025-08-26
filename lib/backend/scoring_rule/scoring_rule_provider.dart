@@ -1,29 +1,54 @@
-// lib/providers/scoring_rule_providers.dart
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:sixers/backend/scoring_rule/scoring_rule_model.dart';
-import 'package:sixers/backend/scoring_rule/scoring_rule_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'scoring_rule_model.dart';
+import 'scoring_rule_service.dart';
 
 part 'scoring_rule_provider.g.dart';
 
-@Riverpod(keepAlive: true)
-ScoringRuleService scoringRuleService(ref) {
-  return ScoringRuleService();
-}
-
-/// Defaults (league_id IS NULL)
 @riverpod
-Future<List<ScoringRule>> defaultScoringRules(ref) async {
-  final ScoringRuleService svc = ref.read(scoringRuleServiceProvider);
-  return svc.fetchDefaults();
-}
+class ScoringRules extends _$ScoringRules {
 
-/// Full league rules (materialized copy)
-@riverpod
-Future<List<ScoringRule>> scoringRulesByLeague(
-  ref,
-  String leagueId,
-) async {
-  final ScoringRuleService svc = ref.read(scoringRuleServiceProvider);
-  return svc.fetchByLeagueId(leagueId);
+  final _defaultsSvc = ScoringRuleService();
+  final _leagueSvc = ScoringRuleService();
+
+  String? _scopeLeagueId;
+
+  @override
+  Future<List<ScoringRule>> build({String? leagueId}) async {
+    _scopeLeagueId = leagueId;
+
+    if (leagueId == null) {
+   
+      return _defaultsSvc.fetchDefaults();
+    }
+
+    final leagueRules = await _leagueSvc.fetchByLeagueId(leagueId);
+    if (leagueRules.isNotEmpty) return leagueRules;
+
+    return _defaultsSvc.fetchDefaults();
+  }
+
+  Future<void> refresh() async {
+    final id = _scopeLeagueId;
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      if (id == null) {
+        return _defaultsSvc.fetchDefaults();
+      } else {
+        final leagueRules = await _leagueSvc.fetchByLeagueId(id);
+        return leagueRules.isNotEmpty
+            ? leagueRules
+            : _defaultsSvc.fetchDefaults();
+      }
+    });
+  }
+
+  Future<void> replaceAllForLeague(
+    String leagueId,
+    List<ScoringRule> rules,
+  ) async {
+    await _leagueSvc.replaceAllForLeague(leagueId, rules);
+    if (_scopeLeagueId == leagueId) {
+      await refresh();
+    }
+  }
 }

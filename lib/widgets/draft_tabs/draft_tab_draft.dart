@@ -5,12 +5,11 @@ import 'package:sixers/theme/colors.dart';
 import 'package:sixers/widgets/draft_widgets/draft_tab_draft_widgets/player_draft_tile.dart';
 import 'package:sixers/widgets/draft_widgets/draft_tab_draft_widgets/position_filter_button.dart';
 
-// add these:
+
 import 'package:sixers/backend/real_team/real_team_model.dart';
 import 'package:sixers/backend/real_team/real_team_provider.dart';
 
-/// The Draft tab content only (no outer background).
-/// Parent provides: available players, whose turn, team id, and filter state.
+
 class DraftTabDraft extends ConsumerWidget {
   const DraftTabDraft({
     super.key,
@@ -31,14 +30,12 @@ class DraftTabDraft extends ConsumerWidget {
   final PositionFilter selectedFilter;
   final ValueChanged<PositionFilter> onFilterChanged;
 
-  /// onPick(playerId, myTeamId)
+  
   final void Function(String, String?) onPick;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Figure out which tournament to load real teams for
 
-    // Fetch real teams for that tournament (empty if we don't know yet)
     final AsyncValue<List<RealTeam>> realTeamsA = ref.watch(
       realTeamsProvider(tournamentId: tournamentId),
     );
@@ -48,7 +45,6 @@ class DraftTabDraft extends ConsumerWidget {
         ? availablePlayers
         : availablePlayers.where((p) => p.role == role).toList();
 
-    // Build a map id -> name (fallback to empty map while loading/error)
     final Map<String, String> teamNameById = realTeamsA.maybeWhen(
       data: (teams) => {for (final t in teams) t.id: t.name},
       orElse: () => const {},
@@ -137,7 +133,6 @@ class DraftTabDraft extends ConsumerWidget {
     );
   }
 
-  // Map PositionFilter -> DB role string (matches your schema)
   String? _roleValue(PositionFilter f) {
     switch (f) {
       case PositionFilter.batsman:

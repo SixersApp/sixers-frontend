@@ -11,7 +11,11 @@ ScoringRule _$ScoringRuleFromJson(Map<String, dynamic> json) => ScoringRule(
   leagueId: json['league_id'] as String?,
   stat: json['stat'] as String,
   category: json['category'] as String,
-  mode: $enumDecode(_$RuleModeEnumMap, json['mode']),
+  mode: $enumDecode(
+    _$RuleModeEnumMap,
+    json['mode'],
+    unknownValue: RuleMode.perUnit,
+  ),
   perUnitPoints: json['per_unit_points'] as num?,
   flatPoints: json['flat_points'] as num?,
   threshold: (json['threshold'] as num?)?.toInt(),

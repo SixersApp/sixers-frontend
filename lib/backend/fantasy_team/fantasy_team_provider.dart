@@ -9,7 +9,7 @@ part 'fantasy_team_provider.g.dart';
 @riverpod
 class FantasyTeams extends _$FantasyTeams {
   final _service = FantasyTeamService();
-  String? _leagueId; // remember current scope for refresh()
+  String? _leagueId; 
 
   @override
   Future<List<FantasyTeam>> build({String? leagueId}) async {

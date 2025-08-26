@@ -18,7 +18,7 @@ class NavBar extends StatelessWidget {
           icon: Icon(Icons.sports_cricket),
           label: 'Drafts',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Players'),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'League'),
       ],
     );
   }
