@@ -22,7 +22,9 @@ class Auth extends _$Auth {
   }
 
   Future<void> signUp(String email, String password) async {
-    await _service.signUp(email, password);
+    print("Signing up with $email");
+    final response = await _service.signUp(email, password);
+    print("SignUp response: ${response.user}, ${response.session}");
   }
 
   Future<void> signOut() async {
