@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sixers/theme/colors.dart';
+import 'package:sixers/views/components/league_dropdown/league_dropdown.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -18,7 +19,7 @@ class HomeScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(Icons.menu, color: AppColors.black800, size: 25),
+                  LeagueDropdown(onSelected: (league) => GoRouter.of(context).push('/league/${league.id}')),
                   SizedBox(
                     width: 40,
                     height: 40,
