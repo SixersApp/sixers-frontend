@@ -3,10 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sixers/theme/colors.dart';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import 'package:sixers/views/components/league_dropdown/league_dropdown.dart';
 import 'package:sixers/views/components/matchup_card/matchup_card.dart';
 =======
 >>>>>>> c129498 (feat: refactor into actual mvvm)
+=======
+import 'package:sixers/views/components/league_dropdown/league_dropdown.dart';
+>>>>>>> 2c299b2 (feat: league_dropdown)
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -114,7 +118,7 @@ class HomeScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(Icons.menu, color: AppColors.black800, size: 25),
+                  LeagueDropdown(onSelected: (league) => GoRouter.of(context).push('/league/${league.id}')),
                   SizedBox(
                     width: 40,
                     height: 40,
