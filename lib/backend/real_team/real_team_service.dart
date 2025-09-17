@@ -29,7 +29,7 @@ class RealTeamService {
         .select()
         .eq('id', id)
         .maybeSingle();
-    return row == null ? null : RealTeam.fromJson(row as Map<String, dynamic>);
+    return row == null ? null : RealTeam.fromJson(row);
   }
 
   Future<void> createTeam(RealTeam team) async {

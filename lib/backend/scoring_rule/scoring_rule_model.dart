@@ -116,7 +116,7 @@ class ScoringRule {
   });
 
   String key() {
-    final base = '${category}|${stat}|${mode.name}';
+    final base = '$category|$stat|${mode.name}';
     switch (mode) {
       case RuleMode.threshold:
         return '$base|thr=${threshold ?? ''}';

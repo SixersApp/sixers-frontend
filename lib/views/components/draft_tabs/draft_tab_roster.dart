@@ -4,14 +4,14 @@ import 'package:sixers/backend/draft_pick/draft_pick_model.dart';
 import 'package:sixers/backend/players/player_model.dart';
 import 'package:sixers/backend/real_team/real_team_provider.dart';
 import 'package:sixers/theme/colors.dart';
-import 'package:sixers/widgets/draft_widgets/draft_tab_draft_widgets/player_draft_tile.dart';
+import 'package:sixers/views/components/draft_widgets/draft_tab_draft_widgets/player_draft_tile.dart';
 
 class DraftTabRoster extends ConsumerWidget {
   const DraftTabRoster({
     super.key,
     required this.myTeamId,
-    required this.allPicks, 
-    required this.playersById, 
+    required this.allPicks,
+    required this.playersById,
     required this.tournamentId,
   });
 
@@ -24,18 +24,14 @@ class DraftTabRoster extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final text = Theme.of(context).textTheme;
 
-
     final realTeamsA = ref.watch(realTeamsProvider(tournamentId: tournamentId));
-
 
     final Map<String, String> teamNameById = realTeamsA.maybeWhen(
       data: (teams) => {for (final t in teams) t.id: t.name},
       orElse: () => const {},
     );
 
-  
-    final myPicks = allPicks.where((p) => p.teamId == myTeamId).toList()
-      ..sort((a, b) => a.pickNumber.compareTo(b.pickNumber));
+    final myPicks = allPicks.where((p) => p.teamId == myTeamId).toList()..sort((a, b) => a.pickNumber.compareTo(b.pickNumber));
 
     if (myPicks.isEmpty) {
       return const Center(child: Text('No picks yet.'));
@@ -47,10 +43,7 @@ class DraftTabRoster extends ConsumerWidget {
         // Section title like the mock ("Your Roster")
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 6, 16, 8),
-          child: Text(
-            'Your Roster',
-            style: text.titleLarge?.copyWith(color: AppColors.black700),
-          ),
+          child: Text('Your Roster', style: text.titleLarge?.copyWith(color: AppColors.black700)),
         ),
 
         // Header row ("Rank"  |  "Stats")
@@ -59,22 +52,12 @@ class DraftTabRoster extends ConsumerWidget {
           child: Row(
             children: [
               Expanded(
-                child: Text(
-                  'Rank',
-                  style: text.labelMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
+                child: Text('Rank', style: text.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
               ),
               Expanded(
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: Text(
-                    'Stats',
-                    style: text.labelMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
+                  child: Text('Stats', style: text.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 ),
               ),
             ],
@@ -94,7 +77,6 @@ class DraftTabRoster extends ConsumerWidget {
 
               final realTeamName = teamNameById[player.realTeamId] ?? '—';
 
-          
               final isBowler = player.role == 'Bowler';
               final stat1Label = isBowler ? 'Econ' : 'Avg';
               final stat2Label = isBowler ? 'Wkts' : 'SR';
@@ -111,7 +93,7 @@ class DraftTabRoster extends ConsumerWidget {
                 enabled: false,
                 onAdd: () {},
                 isRoster: true,
-                draftNumber: '1.1', 
+                draftNumber: '1.1',
               );
             },
           ),

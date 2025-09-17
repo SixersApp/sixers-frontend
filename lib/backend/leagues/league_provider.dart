@@ -5,7 +5,6 @@ import 'package:sixers/backend/leagues/league_service.dart';
 import 'package:sixers/backend/scoring_rule/scoring_rule_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sixers/backend/draft_state/draft_state_provider.dart';
-import 'package:sixers/backend/draft_pick/draft_pick_provider.dart';
 import 'package:sixers/backend/players/player_provider.dart';
 
 part 'league_provider.g.dart';

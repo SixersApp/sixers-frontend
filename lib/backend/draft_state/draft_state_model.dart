@@ -17,6 +17,5 @@ sealed class DraftState with _$DraftState {
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _DraftState;
 
-  factory DraftState.fromJson(Map<String, dynamic> json) =>
-      _$DraftStateFromJson(json);
+  factory DraftState.fromJson(Map<String, dynamic> json) => _$DraftStateFromJson(json);
 }

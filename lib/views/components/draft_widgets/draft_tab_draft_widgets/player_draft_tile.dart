@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sixers/theme/colors.dart';
-import 'package:sixers/widgets/helpers.dart';
+import 'package:sixers/views/components/helpers.dart';
 
 /// Visual-only tile for an available player row.
 /// If [isRoster] is true, the trailing + button is replaced by [draftNumber].
@@ -19,10 +19,7 @@ class PlayerDraftTile extends StatelessWidget {
     this.role,
     this.isRoster = false,
     this.draftNumber, // e.g., "1.1"
-  }) : assert(
-         isRoster == false || draftNumber != null,
-         'When isRoster is true, draftNumber must be provided',
-       );
+  }) : assert(isRoster == false || draftNumber != null, 'When isRoster is true, draftNumber must be provided');
 
   final int rank;
   final String playerName;
@@ -57,10 +54,7 @@ class PlayerDraftTile extends StatelessWidget {
       child: Row(
         children: [
           // Rank (left column)
-          Text(
-            '$rank',
-            style: text.labelLarge?.copyWith(color: scheme.onSurfaceVariant),
-          ),
+          Text('$rank', style: text.labelLarge?.copyWith(color: scheme.onSurfaceVariant)),
 
           const SizedBox(width: 10),
 
@@ -81,12 +75,7 @@ class PlayerDraftTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  playerName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: text.titleMedium,
-                ),
+                Text(playerName, maxLines: 1, overflow: TextOverflow.ellipsis, style: text.titleMedium),
                 const SizedBox(height: 2),
                 Row(
                   children: [
@@ -94,25 +83,16 @@ class PlayerDraftTile extends StatelessWidget {
                       realTeamName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: text.labelMedium?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
+                      style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant),
                     ),
                     const SizedBox(width: 5),
                     Container(
                       width: 20,
                       height: 20,
                       padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: r.color,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
+                      decoration: BoxDecoration(color: r.color, borderRadius: BorderRadius.circular(5)),
                       alignment: Alignment.center,
-                      child: Icon(
-                        r.icon as IconData?,
-                        size: 12,
-                        color: AppColors.black800,
-                      ),
+                      child: Icon(r.icon as IconData?, size: 12, color: AppColors.black800),
                     ),
                   ],
                 ),
@@ -125,18 +105,8 @@ class PlayerDraftTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                '$stat1Label: $stat1Value',
-                style: text.labelMedium?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-              Text(
-                '$stat2Label: $stat2Value',
-                style: text.labelMedium?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
+              Text('$stat1Label: $stat1Value', style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
+              Text('$stat2Label: $stat2Value', style: text.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
             ],
           ),
           const SizedBox(width: 10),
@@ -150,10 +120,7 @@ class PlayerDraftTile extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: Text(
                   draftNumber!,
-                  style: text.labelMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: scheme.onSurfaceVariant,
-                  ),
+                  style: text.labelMedium?.copyWith(fontWeight: FontWeight.w600, color: scheme.onSurfaceVariant),
                 ),
               ),
             )

@@ -11,6 +11,5 @@ sealed class RealTeam with _$RealTeam {
     required String name,
   }) = _RealTeam;
 
-  factory RealTeam.fromJson(Map<String, dynamic> json) =>
-      _$RealTeamFromJson(json);
+  factory RealTeam.fromJson(Map<String, dynamic> json) => _$RealTeamFromJson(json);
 }

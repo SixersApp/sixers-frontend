@@ -13,6 +13,5 @@ sealed class DraftPick with _$DraftPick {
     @JsonKey(name: 'pick_time') DateTime? pickTime,
   }) = _DraftPick;
 
-  factory DraftPick.fromJson(Map<String, dynamic> json) =>
-      _$DraftPickFromJson(json);
+  factory DraftPick.fromJson(Map<String, dynamic> json) => _$DraftPickFromJson(json);
 }

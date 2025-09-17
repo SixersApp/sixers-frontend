@@ -1,8 +1,7 @@
-
 import 'package:flutter/material.dart';
-import 'package:sixers/views/create_league_screen.dart';
-import 'package:sixers/views/draft_screen.dart';
-import 'package:sixers/views/home_screen.dart';
+import 'package:sixers/views/create_league/create_league_screen.dart';
+import 'package:sixers/views/home/draft_screen.dart';
+import 'package:sixers/views/home/home_screen.dart';
 import 'navbar.dart';
 
 class MainScaffold extends StatefulWidget {

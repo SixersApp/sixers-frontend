@@ -1,16 +1,16 @@
 # 1. skip generated/build files entirely
 analyzer:
-  exclude:
-    - build/**
-    - .dart_tool/**
-    - .pub/**
-    - ios/**/Flutter/**
-    - android/**/build/**
-    - '**/*.g.dart'
-    - '**/*.freezed.dart'
-    - '**/*.mocks.dart'
+    errors:
+        invalid_annotation_target: ignore
+    exclude:
+        - build/**
+        - .dart_tool/**
+        - .pub/**
+        - ios/**/Flutter/**
+        - android/**/build/**
+        - "**/*.g.dart"
+        - "**/*.freezed.dart"
+        - "**/*.mocks.dart"
 
 # 2. keep the base Flutter lints
 include: package:flutter_lints/flutter.yaml
-
-

@@ -1,11 +1,10 @@
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../backend/leagues/league_provider.dart';
-import '../backend/fantasy_team/fantasy_team_provider.dart';
-import 'draft_lobby_screen.dart'; 
+import '../../backend/leagues/league_provider.dart';
+import '../../backend/fantasy_team/fantasy_team_provider.dart';
+import 'draft_lobby_screen.dart';
 
 class DraftScreen extends ConsumerWidget {
   const DraftScreen({super.key});
@@ -37,24 +36,14 @@ class DraftScreen extends ConsumerWidget {
               itemCount: leagues.length,
               itemBuilder: (_, i) {
                 final league = leagues[i];
-                final myTeam = teams.firstWhereOrNull(
-                  (t) => t.leagueId == league.id,
-                );
+                final myTeam = teams.firstWhereOrNull((t) => t.leagueId == league.id);
 
                 return ListTile(
                   title: Text(league.name),
-                  subtitle: Text(
-                    myTeam != null
-                        ? 'Your Team: ${myTeam.teamName}'
-                        : 'No team yet',
-                  ),
+                  subtitle: Text(myTeam != null ? 'Your Team: ${myTeam.teamName}' : 'No team yet'),
                   trailing: Text('Status: ${league.status.name}'),
                   onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => DraftLobby(league: league),
-                      ),
-                    );
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => DraftLobby(league: league)));
                   },
                 );
               },
@@ -62,6 +51,5 @@ class DraftScreen extends ConsumerWidget {
     );
   }
 
-  Scaffold _err(String which, Object? err) =>
-      Scaffold(body: Center(child: Text('$which error: $err')));
+  Scaffold _err(String which, Object? err) => Scaffold(body: Center(child: Text('$which error: $err')));
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sixers/backend/players/player_model.dart';
-import 'package:sixers/widgets/draft_widgets/draft_tab_board_widgets/pick_cell.dart';
-import 'package:sixers/widgets/draft_widgets/draft_tab_board_widgets/team_header.dart';
+import 'package:sixers/views/components/draft_widgets/draft_tab_board_widgets/pick_cell.dart';
+import 'package:sixers/views/components/draft_widgets/draft_tab_board_widgets/team_header.dart';
 
 class BoardGrid extends StatelessWidget {
   const BoardGrid({
@@ -26,8 +26,7 @@ class BoardGrid extends StatelessWidget {
   static const double _gap = 10;
 
   int _roundOf(dynamic p) => (((p.pickNumber as int) - 1) ~/ teamCount) + 1;
-  int _pickInRoundOf(dynamic p) =>
-      (((p.pickNumber as int) - 1) % teamCount) + 1;
+  int _pickInRoundOf(dynamic p) => (((p.pickNumber as int) - 1) % teamCount) + 1;
 
   @override
   Widget build(BuildContext context) {
@@ -46,11 +45,7 @@ class BoardGrid extends StatelessWidget {
     Widget buildHeader() => Row(
       children: [
         for (var i = 0; i < teams.length; i++) ...[
-          TeamHeader(
-            size: _tileSize,
-            name: ((teams[i] as dynamic).teamName ?? 'Team') as String,
-            scheme: scheme,
-          ),
+          TeamHeader(size: _tileSize, name: ((teams[i] as dynamic).teamName ?? 'Team') as String, scheme: scheme),
           if (i != teams.length - 1) const SizedBox(width: _gap),
         ],
       ],
@@ -84,23 +79,19 @@ class BoardGrid extends StatelessWidget {
                           final label = pick == null
                               ? '$r.' // defensive; usually shouldn't happen for older rounds
                               : '$r.${_pickInRoundOf(pick)}';
-                          final player = pick == null
-                              ? null
-                              : playersById[pick.playerId as String];
+                          final player = pick == null ? null : playersById[pick.playerId as String];
 
                           final shortTeam = () {
-                            final realTeamId =
-                                (player as Player).realTeamId as String?;
+                            final realTeamId = (player as Player).realTeamId as String?;
                             return toInitials(realTeamNameById[realTeamId]!);
                           }();
-
 
                           return PickCell(
                             size: _tileSize,
                             scheme: scheme,
                             label: label,
                             player: player,
-                            shortTeamName: shortTeam!,
+                            shortTeamName: shortTeam,
                           );
                         },
                       ),
@@ -122,9 +113,7 @@ class BoardGrid extends StatelessWidget {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minWidth: MediaQuery.of(context).size.width,
-          ),
+          constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
           child: Scrollbar(
             thumbVisibility: true,
             child: SingleChildScrollView(
@@ -143,7 +132,6 @@ class BoardGrid extends StatelessWidget {
     );
   }
 }
-
 
 String toInitials(String input) {
   final noNumbers = input.replaceAll(RegExp(r'\d'), '');

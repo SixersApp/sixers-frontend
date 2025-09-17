@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sixers/backend/players/player_model.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sixers/theme/colors.dart';
-import 'package:sixers/widgets/helpers.dart';
+import 'package:sixers/views/components/helpers.dart';
 
 /// Drafted player card for the horizontal carousel.
 /// Pure UI: plug real avatar/badge later via [avatarUrl]/[trailing].
@@ -47,27 +45,15 @@ class DraftedPickCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                child: Text(
-                  playerName.toUpperCase(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: t.labelLarge,
-                ),
+                child: Text(playerName.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: t.labelLarge),
               ),
               Container(
                 width: 20,
                 height: 20,
                 padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: r.color,
-                  borderRadius: BorderRadius.circular(5),
-                ),
+                decoration: BoxDecoration(color: r.color, borderRadius: BorderRadius.circular(5)),
                 alignment: Alignment.center,
-                child: Icon(
-                  r.icon as IconData?,
-                  size: 12,
-                  color: AppColors.black800,
-                ),
+                child: Icon(r.icon as IconData?, size: 12, color: AppColors.black800),
               ),
             ],
           ),
@@ -97,19 +83,9 @@ class DraftedPickCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Fantasy team name (can wrap to 2 lines)
-                    Text(
-                      fantasyTeamName.toUpperCase(),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: t.bodySmall,
-                    ),
+                    Text(fantasyTeamName.toUpperCase(), maxLines: 2, overflow: TextOverflow.ellipsis, style: t.bodySmall),
                     const SizedBox(height: 6),
-                    Text(
-                      'Round $roundNumber, Pick $pickNumber',
-                      style: t.labelMedium?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
+                    Text('Round $roundNumber, Pick $pickNumber', style: t.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
                   ],
                 ),
               ),

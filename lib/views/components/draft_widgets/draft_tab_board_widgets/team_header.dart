@@ -1,6 +1,5 @@
 // lib/widgets/board/team_header.dart
 import 'package:flutter/material.dart';
-import 'package:sixers/theme/colors.dart';
 
 class TeamHeader extends StatelessWidget {
   const TeamHeader({

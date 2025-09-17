@@ -29,8 +29,7 @@ class DraftStateService {
       table: 'league_draft_state',
       callback: (payload) {
         
-        if (payload.newRecord != null &&
-            payload.newRecord['league_id'] == leagueId) {
+        if (payload.newRecord['league_id'] == leagueId) {
           debugPrint(
             'RT ► ${payload.eventType}'
             ' pick# ${payload.newRecord['current_pick_number']}',
@@ -56,7 +55,7 @@ class DraftStateService {
 
       if (res == null) return null;
       return DraftState.fromJson(res);
-    } on PostgrestException catch (e) {
+    } on PostgrestException {
       rethrow;
     } catch (e) {
       throw Exception('Failed to fetch draft state: $e');

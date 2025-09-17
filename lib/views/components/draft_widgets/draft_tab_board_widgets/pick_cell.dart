@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sixers/widgets/helpers.dart';
+import 'package:sixers/views/components/helpers.dart';
 
 class PickCell extends StatelessWidget {
   const PickCell({
@@ -16,19 +16,15 @@ class PickCell extends StatelessWidget {
   final String label; // e.g. "1.1"
   final dynamic player; // Player?
   final String shortTeamName;
-  
 
   @override
   Widget build(BuildContext context) {
-
     const double pad = 10;
 
     final String? role = player?.role as String?;
     final rc = (role == null || role.isEmpty) ? null : roleIconAndColor(role);
     final Color border = rc?.color ?? scheme.outlineVariant;
-    final Color fill = rc == null
-        ? scheme.surfaceContainerHighest
-        : border.withOpacity(0.20);
+    final Color fill = rc == null ? scheme.surfaceContainerHighest : border.withOpacity(0.20);
 
     return SizedBox(
       width: size,
@@ -51,9 +47,7 @@ class PickCell extends StatelessWidget {
               player?.name ?? '—',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 5),
             // team short/name
@@ -61,9 +55,7 @@ class PickCell extends StatelessWidget {
               shortTeamName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(
-                context,
-              ).textTheme.labelLarge?.copyWith(color: scheme.onSurfaceVariant),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: scheme.onSurfaceVariant),
             ),
           ],
         ),

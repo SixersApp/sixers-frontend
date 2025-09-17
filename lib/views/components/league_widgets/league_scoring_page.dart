@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/scoring_rule/scoring_rule_model.dart';
 import 'package:sixers/backend/scoring_rule/scoring_rule_provider.dart';
 import 'package:sixers/theme/colors.dart';
-import 'package:sixers/widgets/create_league_widgets/scoring_section.dart';
+import 'package:sixers/views/components/create_league_widgets/scoring_section.dart';
 
 class LeagueScoringPage extends ConsumerStatefulWidget {
   const LeagueScoringPage({super.key, required this.leagueId});
@@ -23,20 +23,14 @@ class _LeagueScoringPageState extends ConsumerState<LeagueScoringPage> {
     if (_saving) return;
     setState(() => _saving = true);
     try {
-      await ref
-          .read(scoringRulesProvider(leagueId: widget.leagueId).notifier)
-          .replaceAllForLeague(widget.leagueId, _rules);
+      await ref.read(scoringRulesProvider(leagueId: widget.leagueId).notifier).replaceAllForLeague(widget.leagueId, _rules);
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Scoring rules saved')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Scoring rules saved')));
       Navigator.of(context).maybePop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Save failed: $e')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Save failed: $e')));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -46,19 +40,16 @@ class _LeagueScoringPageState extends ConsumerState<LeagueScoringPage> {
   @override
   Widget build(BuildContext context) {
     // hydrate local editable copy once when provider yields data
-    ref.listen<AsyncValue<List<ScoringRule>>>(
-      scoringRulesProvider(leagueId: widget.leagueId),
-      (prev, next) {
-        next.whenData((rules) {
-          if (!_hydrated) {
-            setState(() {
-              _rules = List<ScoringRule>.of(rules);
-              _hydrated = true;
-            });
-          }
-        });
-      },
-    );
+    ref.listen<AsyncValue<List<ScoringRule>>>(scoringRulesProvider(leagueId: widget.leagueId), (prev, next) {
+      next.whenData((rules) {
+        if (!_hydrated) {
+          setState(() {
+            _rules = List<ScoringRule>.of(rules);
+            _hydrated = true;
+          });
+        }
+      });
+    });
 
     final rulesAv = ref.watch(scoringRulesProvider(leagueId: widget.leagueId));
     final extraBottomPad = 120.0; // keep last item clear of the bottom bar
@@ -67,20 +58,14 @@ class _LeagueScoringPageState extends ConsumerState<LeagueScoringPage> {
       backgroundColor: AppColors.black100,
       appBar: AppBar(
         backgroundColor: AppColors.black100,
-        title: Text('Scoring', style: Theme.of(context).textTheme.headlineMedium,),
-      
+        title: Text('Scoring', style: Theme.of(context).textTheme.headlineMedium),
       ),
       body: rulesAv.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (_) => SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(
-            16,
-            8,
-            16,
-            extraBottomPad + MediaQuery.of(context).padding.bottom,
-          ),
+          padding: EdgeInsets.fromLTRB(16, 8, 16, extraBottomPad + MediaQuery.of(context).padding.bottom),
           child: ScoringSection(
             rules: _rules,
             onChanged: (next) {
@@ -99,17 +84,12 @@ class _LeagueScoringPageState extends ConsumerState<LeagueScoringPage> {
           child: FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.black800,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             onPressed: rulesAv.isLoading || !_hydrated || _saving ? null : _save,
             child: Text(
               _saving ? 'Saving…' : 'Save',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: AppColors.black100, fontWeight: FontWeight.w800),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.black100, fontWeight: FontWeight.w800),
             ),
           ),
         ),
