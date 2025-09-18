@@ -2,15 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sixers/theme/colors.dart';
-<<<<<<< HEAD
-<<<<<<< HEAD
 import 'package:sixers/views/components/league_dropdown/league_dropdown.dart';
 import 'package:sixers/views/components/matchup_card/matchup_card.dart';
-=======
->>>>>>> c129498 (feat: refactor into actual mvvm)
-=======
-import 'package:sixers/views/components/league_dropdown/league_dropdown.dart';
->>>>>>> 2c299b2 (feat: league_dropdown)
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -18,7 +11,6 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-<<<<<<< HEAD
       body: Container(
         color: Colors.black,
         child: SafeArea(
@@ -108,42 +100,10 @@ class HomeScreen extends ConsumerWidget {
               ],
             ),
           ),
-=======
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  LeagueDropdown(onSelected: (league) => GoRouter.of(context).push('/league/${league.id}')),
-                  SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: FilledButton(
-                      onPressed: () => GoRouter.of(context).push('/settings'),
-                      style: FilledButton.styleFrom(
-                        minimumSize: Size.zero,
-                        padding: EdgeInsets.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        backgroundColor: AppColors.black400,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      child: Icon(Icons.settings, color: AppColors.black800, size: 25),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
->>>>>>> c129498 (feat: refactor into actual mvvm)
         ),
       ),
     );
   }
-<<<<<<< HEAD
 
   Widget _buildMatchupCard(int index) {
     switch (index) {
@@ -205,6 +165,4 @@ class HomeScreen extends ConsumerWidget {
         return const SizedBox.shrink();
     }
   }
-=======
->>>>>>> c129498 (feat: refactor into actual mvvm)
 }

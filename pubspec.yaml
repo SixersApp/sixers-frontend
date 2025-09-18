@@ -74,13 +74,8 @@ flutter:
     # To add assets to your application, add an assets section, like this:
     assets:
         - .env
-<<<<<<< HEAD
         - assets/sixers_logo.png
         - assets/matchup_pattern.png
-=======
-        - assets/images/
-        - assets/sixers_logo.png
->>>>>>> 2c299b2 (feat: league_dropdown)
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/to/resolution-aware-images
