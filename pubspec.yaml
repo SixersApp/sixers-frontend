@@ -75,6 +75,7 @@ flutter:
     assets:
         - .env
         - assets/sixers_logo.png
+        - assets/matchup_pattern.png
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/to/resolution-aware-images

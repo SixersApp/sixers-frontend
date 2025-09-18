@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:sixers/backend/fantasy_team/fantasy_team_provider.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:collection/collection.dart';
 
 /// A compact header dropdown that shows the current app section title
 /// and opens a popup listing a user's leagues fetched from Supabase.
@@ -13,7 +16,7 @@ import 'package:go_router/go_router.dart';
 /// Usage:
 ///   Place inside any `AppBar` title or header row.
 class LeagueDropdown extends ConsumerWidget {
-  const LeagueDropdown({super.key, this.onSelected, this.label = 'SIXERS'});
+  const LeagueDropdown({super.key, this.onSelected, this.label = 'SIXERS', this.width = 'auto', this.selectedLeague});
 
   /// Callback when a league is selected from the menu
   final ValueChanged<League>? onSelected;
@@ -21,9 +24,14 @@ class LeagueDropdown extends ConsumerWidget {
   /// Initial label to display on the button before selection
   final String label;
 
+  final String width;
+
+  final League? selectedLeague;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final leaguesAv = ref.watch(leaguesProvider);
+    final currentUserId = Supabase.instance.client.auth.currentUser?.id;
 
     // Button look
     final textStyle = Theme.of(context).textTheme.headlineMedium?.copyWith(color: AppColors.black800);
@@ -31,7 +39,7 @@ class LeagueDropdown extends ConsumerWidget {
     return Theme(
       data: Theme.of(context).copyWith(
         popupMenuTheme: PopupMenuThemeData(
-          color: AppColors.black100,
+          color: AppColors.black200,
           surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           elevation: 8,
@@ -80,19 +88,19 @@ class LeagueDropdown extends ConsumerWidget {
                   .map(
                     (l) => PopupMenuItem<League?>(
                       value: l,
-                      child: Row(
-                        children: [
-                          _LeagueAvatar(name: l.name),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(l.name, style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
-                              ],
-                            ),
-                          ),
-                        ],
+                      child: Consumer(
+                        builder: (context, ref, child) {
+                          final teamsAv = ref.watch(fantasyTeamsProvider(leagueId: l.id));
+                          return teamsAv.when(
+                            data: (teams) {
+                              final userTeam = teams.firstWhereOrNull((team) => team.userId == currentUserId);
+                              final teamName = userTeam?.teamName ?? 'No Team';
+                              return LeagueItem(league: l, teamName: teamName);
+                            },
+                            loading: () => LeagueItem(league: l, teamName: 'Loading...'),
+                            error: (_, __) => LeagueItem(league: l, teamName: 'Error'),
+                          );
+                        },
                       ),
                     ),
                   )
@@ -110,15 +118,37 @@ class LeagueDropdown extends ConsumerWidget {
           return [...leagueItems, ...entries];
         },
         child: Container(
-          decoration: BoxDecoration(color: AppColors.black100, borderRadius: BorderRadius.circular(6)),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(6)),
+          padding: EdgeInsets.only(right: 20),
           child: Row(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: width == "auto" ? MainAxisSize.min : MainAxisSize.max,
+            mainAxisAlignment: width == "fill" ? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
             children: [
-              Image.asset('assets/sixers_logo.png', width: 24, height: 24),
-              const SizedBox(width: 8),
-              Text(label, style: textStyle),
-              const SizedBox(width: 8),
-              Icon(PhosphorIcons.caretDown(), color: AppColors.black800, size: 18),
+              selectedLeague != null
+                  ? Expanded(
+                      child: Consumer(
+                        builder: (context, ref, child) {
+                          final teamsAv = ref.watch(fantasyTeamsProvider(leagueId: selectedLeague!.id));
+                          return teamsAv.when(
+                            data: (teams) {
+                              final userTeam = teams.firstWhereOrNull((team) => team.userId == currentUserId);
+                              final teamName = userTeam?.teamName ?? 'No Team';
+                              return LeagueItem(league: selectedLeague!, teamName: teamName);
+                            },
+                            loading: () => LeagueItem(league: selectedLeague!, teamName: 'Loading...'),
+                            error: (_, __) => LeagueItem(league: selectedLeague!, teamName: 'Error'),
+                          );
+                        },
+                      ),
+                    )
+                  : Row(
+                      children: [
+                        Image.asset('assets/sixers_logo.png', width: 24, height: 24),
+                        const SizedBox(width: 8),
+                        Text(label, style: textStyle),
+                      ],
+                    ),
+              Icon(PhosphorIcons.caretDown(PhosphorIconsStyle.fill), color: AppColors.black800, size: 18),
             ],
           ),
         ),
@@ -147,6 +177,43 @@ class _LeagueAvatar extends StatelessWidget {
         initials,
         style: Theme.of(context).textTheme.labelMedium?.copyWith(color: fg, fontWeight: FontWeight.w700),
       ),
+    );
+  }
+}
+
+class LeagueItem extends StatelessWidget {
+  const LeagueItem({super.key, required this.league, required this.teamName});
+  final League league;
+  final String teamName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _LeagueAvatar(name: league.name),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                league.name,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  height: 1.0,
+                  // Remove extra letter spacing or padding if present
+                ),
+              ),
+              SizedBox(height: 2),
+              Text(
+                teamName,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 12, fontWeight: FontWeight.w400, height: 1.0),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
