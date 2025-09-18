@@ -49,7 +49,7 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> with TickerProvider
     return TabBarView(
       controller: _tabController,
       children: [
-        const Center(child: Text('Team content goes here')),
+        TeamContent(league: league!),
         const Center(child: Text('Matchups content goes here')),
         const Center(child: Text('Transactions content goes here')),
       ],
@@ -90,5 +90,40 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> with TickerProvider
       ),
       body: _buildBody(),
     );
+  }
+}
+
+class TeamContent extends ConsumerWidget {
+  const TeamContent({super.key, required this.league});
+
+  final League league;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (league.status == LeagueStatus.draft_pending || league.status == LeagueStatus.draft_in_progress) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(league.status == LeagueStatus.draft_pending ? "Your league hasn't drafted yet" : "Your league is drafting"),
+            TextButton(
+              onPressed: () => GoRouter.of(context).push('/draft', extra: league),
+              style: TextButton.styleFrom(
+                backgroundColor: AppColors.black200,
+                foregroundColor: AppColors.black800,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              child: const Text('Draft Now'),
+            ),
+          ],
+        ),
+      );
+    } else if (league.status == LeagueStatus.active) {
+      return const Center(child: Text('Draft completed'));
+    } else if (league.status == LeagueStatus.completed) {
+      return const Center(child: Text('League completed'));
+    }
+    return const Center(child: Text('League not found'));
   }
 }

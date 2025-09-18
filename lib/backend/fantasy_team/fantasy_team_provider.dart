@@ -1,4 +1,3 @@
-
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'fantasy_team_model.dart';
@@ -9,7 +8,7 @@ part 'fantasy_team_provider.g.dart';
 @riverpod
 class FantasyTeams extends _$FantasyTeams {
   final _service = FantasyTeamService();
-  String? _leagueId; 
+  String? _leagueId;
 
   @override
   Future<List<FantasyTeam>> build({String? leagueId}) async {
@@ -21,8 +20,6 @@ class FantasyTeams extends _$FantasyTeams {
     if (uid == null) return [];
     return _service.fetchTeamsForUser(uid);
   }
-
-  
 
   Future<void> refresh() async {
     state = const AsyncLoading();
