@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'experience_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Basic Info Screen - First onboarding step
 /// Collects user's name, date of birth, and country
@@ -71,10 +72,20 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Save basic info to your backend/Supabase
-      // For now, we'll just navigate to experience screen
-      await Future.delayed(const Duration(milliseconds: 500)); // Simulate API call
-      
+      final userId = Supabase.instance.client.auth.currentUser!.id;
+
+      // Write to  `profiles` table
+      await Supabase.instance.client.from('profiles').upsert({
+        'user_id': userId, 
+        'full_name': _nameController.text.trim(),
+        'country': _selectedCountry,
+        'dob': DateTime(
+          _selectedYear,
+          _months.indexOf(_selectedMonth) + 1,
+          _selectedDay,
+        ).toIso8601String()
+      });
+
       if (mounted) {
         Navigator.of(context).push(
           MaterialPageRoute(builder: (context) => const ExperienceScreen()),
@@ -89,7 +100,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         setState(() => _isLoading = false);
       }
     }
-  }
+}
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(

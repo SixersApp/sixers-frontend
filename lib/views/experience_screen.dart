@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Experience Screen - Second onboarding step
 /// Allows users to select their cricket experience level
@@ -54,8 +55,14 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Save experience to your backend/Supabase and complete onboarding
-      await Future.delayed(const Duration(milliseconds: 500)); // Simulate API call
+      final userId = Supabase.instance.client.auth.currentUser!.id;
+
+      // Write to  `profiles` table
+      await Supabase.instance.client.from('profiles').upsert({
+        'user_id': userId, 
+        'experience': {'new_to_cricket': 0, 'casual_fan': 1, 'die_hard_fan': 2}[_selectedExperience] ?? 0,
+        'onboarding_done': true
+      });
       
       if (mounted) {
         // Navigate to main app - you'll need to handle this in your AuthGate
