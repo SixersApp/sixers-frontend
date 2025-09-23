@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sixers/navbar/main_scaffold.dart';
+import 'package:sixers/views/home_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Experience Screen - Second onboarding step
@@ -60,10 +62,10 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
       // Write to  `profiles` table
       await Supabase.instance.client.from('profiles').upsert({
         'user_id': userId, 
-        'experience': {'new_to_cricket': 0, 'casual_fan': 1, 'die_hard_fan': 2}[_selectedExperience] ?? 0,
+        'experience': {'new_to_cricket': 1, 'casual_fan': 2, 'die_hard_fan': 3}[_selectedExperience],
         'onboarding_done': true
       });
-      
+      await Supabase.instance.client.auth.refreshSession();
       if (mounted) {
         // Navigate to main app - you'll need to handle this in your AuthGate
         // For now, just show success message
@@ -73,8 +75,11 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
           ),
+          
         );
-        
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const MainScaffold()),
+        );
         // In a real app, you'd navigate to your main scaffold or trigger auth refresh
         // Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
       }
