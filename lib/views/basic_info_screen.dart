@@ -15,33 +15,20 @@ class BasicInfoScreen extends ConsumerStatefulWidget {
 class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  
-  // Date components
+
   int _selectedDay = 1;
   String _selectedMonth = 'January';
   int _selectedYear = 2000;
-  
-  // Country selection
+
   String? _selectedCountry;
   bool _isLoading = false;
 
-  // Country list - you can expand this
   final List<String> _countries = [
-    'United States',
-    'India',
-    'Australia',
-    'United Kingdom',
-    'Canada',
-    'Pakistan',
-    'Bangladesh',
-    'South Africa',
-    'New Zealand',
-    'Sri Lanka',
-    'Afghanistan',
-    'West Indies',
+    'United States', 'India', 'Australia', 'United Kingdom', 'Canada',
+    'Pakistan', 'Bangladesh', 'South Africa', 'New Zealand', 'Sri Lanka',
+    'Afghanistan', 'West Indies',
   ];
 
-  // Month names
   final List<String> _months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -50,9 +37,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   @override
   void initState() {
     super.initState();
-    // Set default country to United States (matching design)
     _selectedCountry = 'United States';
-    // Set default date to reasonable age (e.g., 25 years old)
     final defaultDate = DateTime.now().subtract(const Duration(days: 365 * 25));
     _selectedDay = defaultDate.day;
     _selectedMonth = _months[defaultDate.month - 1];
@@ -65,7 +50,6 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     super.dispose();
   }
 
-  /// Handle next button press
   Future<void> _handleNext() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -74,16 +58,15 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     try {
       final userId = Supabase.instance.client.auth.currentUser!.id;
 
-      // Write to  `profiles` table
       await Supabase.instance.client.from('profiles').upsert({
-        'user_id': userId, 
+        'user_id': userId,
         'full_name': _nameController.text.trim(),
         'country': _selectedCountry,
         'dob': DateTime(
           _selectedYear,
           _months.indexOf(_selectedMonth) + 1,
           _selectedDay,
-        ).toIso8601String()
+        ).toIso8601String(),
       });
 
       if (mounted) {
@@ -92,15 +75,11 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         );
       }
     } catch (e) {
-      if (mounted) {
-        _showErrorSnackBar('Failed to save information. Please try again.');
-      }
+      if (mounted) _showErrorSnackBar('Failed to save information. Please try again.');
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
-}
+  }
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -122,53 +101,36 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header with progress indicator
               _buildHeader(),
-              
               const SizedBox(height: 32),
-              
-              // Title
-              const Text(
+              Text(
                 'BASIC INFO',
-                style: TextStyle(
-                  fontSize: 32,
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
-                  letterSpacing: 1,
+                  letterSpacing: 1.5,
+                  fontSize: 36,
                 ),
               ),
-              
-              const SizedBox(height: 40),
-              
-              // Form content
+              const SizedBox(height: 32),
               Expanded(
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Name field
                       _buildFieldLabel('Name'),
                       const SizedBox(height: 12),
                       _buildNameField(),
-                      
                       const SizedBox(height: 32),
-                      
-                      // Date of Birth
                       _buildFieldLabel('Date of Birth'),
                       const SizedBox(height: 12),
                       _buildDateSelectors(),
-                      
                       const SizedBox(height: 32),
-                      
-                      // Country
                       _buildFieldLabel('Country'),
                       const SizedBox(height: 12),
                       _buildCountryDropdown(),
-                      
                       const Spacer(),
-                      
-                      // Next Button
                       _buildNextButton(),
                     ],
                   ),
@@ -182,65 +144,45 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   }
 
   Widget _buildHeader() {
-    return Row(
+    return Column(
       children: [
-        // Back arrow (disabled for first screen)
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.grey,
-            size: 20,
-          ),
+        Row(
+          children: [
+            const Spacer(),
+            Text(
+              '1 of 2',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+              ),
+            ),
+          ],
         ),
-        
-        const Spacer(),
-        
-        // Progress indicator
+        const SizedBox(height: 8),
         Container(
-          child: Column(
+          width: double.infinity,
+          height: 6,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(3),
+            color: Colors.grey.withOpacity(0.3),
+          ),
+          child: Row(
             children: [
-              const Text(
-                '1 of 2',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.horizontal(left: Radius.circular(3)),
+                    color: const Color(0xFF4CAF50),
+                  ),
                 ),
               ),
-              const SizedBox(height: 8),
-              // Progress bar
-              Container(
-                width: 60,
-                height: 4,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(2),
-                  color: Colors.grey.withOpacity(0.3),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(2),
-                          color: const Color(0xFF4CAF50),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(2),
-                          color: Colors.grey.withOpacity(0.3),
-                        ),
-                      ),
-                    ),
-                  ],
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.horizontal(right: Radius.circular(3)),
+                    color: Colors.grey.withOpacity(0.3),
+                  ),
                 ),
               ),
             ],
@@ -253,10 +195,10 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   Widget _buildFieldLabel(String label) {
     return Text(
       label,
-      style: const TextStyle(
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(
         color: Colors.white,
-        fontSize: 16,
         fontWeight: FontWeight.w500,
+        fontSize: 18,
       ),
     );
   }
@@ -264,31 +206,21 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   Widget _buildNameField() {
     return TextFormField(
       controller: _nameController,
-      style: const TextStyle(color: Colors.white, fontSize: 16),
+      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white, fontSize: 16),
       decoration: InputDecoration(
         hintText: 'John Doe',
-        hintStyle: TextStyle(
-          color: Colors.white.withOpacity(0.6),
-          fontSize: 16,
-        ),
+        hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white.withOpacity(0.6)),
         filled: true,
-        fillColor: Colors.black.withOpacity(0.4),
+        fillColor: const Color(0xFF2C2C2C),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       ),
       validator: (value) {
-        if (value == null || value.trim().isEmpty) {
-          return 'Name is required';
-        }
-        if (value.trim().length < 2) {
-          return 'Name must be at least 2 characters';
-        }
+        if (value == null || value.trim().isEmpty) return 'Name is required';
+        if (value.trim().length < 2) return 'Name must be at least 2 characters';
         return null;
       },
     );
@@ -301,45 +233,30 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         Expanded(
           flex: 2,
           child: _buildDropdownField(
-            value: _selectedDay.toString().padLeft(2, '0'),
-            items: List.generate(31, (index) => (index + 1).toString().padLeft(2, '0')),
-            onChanged: (value) {
-              setState(() {
-                _selectedDay = int.parse(value!);
-              });
-            },
+            value: _selectedDay.toString(),
+            items: List.generate(31, (i) => (i + 1).toString()),
+            onChanged: (value) => setState(() => _selectedDay = int.parse(value!)),
+            fontSize: 14, // slightly smaller for day
           ),
         ),
-        
         const SizedBox(width: 12),
-        
         // Month dropdown
         Expanded(
-          flex: 3,
+          flex: 4,
           child: _buildDropdownField(
             value: _selectedMonth,
             items: _months,
-            onChanged: (value) {
-              setState(() {
-                _selectedMonth = value!;
-              });
-            },
+            onChanged: (value) => setState(() => _selectedMonth = value!),
           ),
         ),
-        
         const SizedBox(width: 12),
-        
         // Year dropdown
         Expanded(
           flex: 3,
           child: _buildDropdownField(
             value: _selectedYear.toString(),
-            items: List.generate(80, (index) => (DateTime.now().year - index).toString()),
-            onChanged: (value) {
-              setState(() {
-                _selectedYear = int.parse(value!);
-              });
-            },
+            items: List.generate(80, (i) => (DateTime.now().year - i).toString()),
+            onChanged: (value) => setState(() => _selectedYear = int.parse(value!)),
           ),
         ),
       ],
@@ -349,33 +266,20 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   Widget _buildCountryDropdown() {
     return DropdownButtonFormField<String>(
       value: _selectedCountry,
-      items: _countries.map((country) {
-        return DropdownMenuItem<String>(
-          value: country,
-          child: Text(
-            country,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-          ),
+      items: _countries.map((c) {
+        return DropdownMenuItem(
+          value: c,
+          child: Text(c, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white)),
         );
       }).toList(),
-      onChanged: (value) {
-        setState(() {
-          _selectedCountry = value;
-        });
-      },
-      style: const TextStyle(color: Colors.white, fontSize: 16),
+      onChanged: (value) => setState(() => _selectedCountry = value),
+      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white),
       dropdownColor: const Color(0xFF2C2C2C),
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.black.withOpacity(0.4),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
+        fillColor: const Color(0xFF2C2C2C),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       ),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
     );
@@ -385,32 +289,28 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     required String value,
     required List<String> items,
     required void Function(String?) onChanged,
+    double fontSize = 16,
   }) {
     return DropdownButtonFormField<String>(
       value: value,
       items: items.map((item) {
-        return DropdownMenuItem<String>(
+        return DropdownMenuItem(
           value: item,
           child: Text(
             item,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white, fontSize: fontSize),
+            overflow: TextOverflow.ellipsis,
           ),
         );
       }).toList(),
       onChanged: onChanged,
-      style: const TextStyle(color: Colors.white, fontSize: 16),
+      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white, fontSize: fontSize),
       dropdownColor: const Color(0xFF2C2C2C),
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.black.withOpacity(0.4),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 18,
-        ),
+        fillColor: const Color(0xFF2C2C2C),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       ),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
     );
@@ -423,27 +323,22 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
       child: ElevatedButton(
         onPressed: _isLoading ? null : _handleNext,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4CAF50),
+          backgroundColor: Colors.white,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 0,
         ),
         child: _isLoading
             ? const SizedBox(
                 width: 24,
                 height: 24,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
+                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
               )
-            : const Text(
+            : Text(
                 'Next',
-                style: TextStyle(
-                  fontSize: 16,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
+                  color: Colors.black,
                 ),
               ),
       ),

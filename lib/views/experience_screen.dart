@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/navbar/main_scaffold.dart';
-import 'package:sixers/views/home_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Experience Screen - Second onboarding step
@@ -17,7 +16,6 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
   String? _selectedExperience;
   bool _isLoading = false;
 
-  // Experience options matching the design
   final List<Map<String, dynamic>> _experiences = [
     {
       'id': 'new_to_cricket',
@@ -42,12 +40,10 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
     },
   ];
 
-  /// Handle back navigation
   void _handleBack() {
     Navigator.of(context).pop();
   }
 
-  /// Handle next button - complete onboarding
   Future<void> _handleNext() async {
     if (_selectedExperience == null) {
       _showErrorSnackBar('Please select your cricket experience level');
@@ -59,38 +55,37 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
     try {
       final userId = Supabase.instance.client.auth.currentUser!.id;
 
-      // Write to  `profiles` table
       await Supabase.instance.client.from('profiles').upsert({
-        'user_id': userId, 
-        'experience': {'new_to_cricket': 1, 'casual_fan': 2, 'die_hard_fan': 3}[_selectedExperience],
+        'user_id': userId,
+        'experience': {
+          'new_to_cricket': 1,
+          'casual_fan': 2,
+          'die_hard_fan': 3
+        }[_selectedExperience],
         'onboarding_done': true
       });
+
       await Supabase.instance.client.auth.refreshSession();
+
       if (mounted) {
-        // Navigate to main app - you'll need to handle this in your AuthGate
-        // For now, just show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Onboarding completed! Welcome to the app!'),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
           ),
-          
         );
+
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const MainScaffold()),
         );
-        // In a real app, you'd navigate to your main scaffold or trigger auth refresh
-        // Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
       }
     } catch (e) {
       if (mounted) {
         _showErrorSnackBar('Failed to complete setup. Please try again.');
       }
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -114,50 +109,45 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header with progress
               _buildHeader(),
-              
               const SizedBox(height: 32),
-              
+
               // Title and subtitle
-              const Text(
+              Text(
                 'EXPERIENCE',
-                style: TextStyle(
-                  fontSize: 32,
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
-                  letterSpacing: 1,
+                  letterSpacing: 1.5,
+                  fontSize: 36,
                 ),
               ),
-              
               const SizedBox(height: 8),
-              
-              const Text(
+              Text(
                 'How much cricket do you know?',
-                style: TextStyle(
-                  fontSize: 16,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Colors.white70,
                   fontWeight: FontWeight.w400,
+                  fontSize: 18,
                 ),
               ),
-              
-              const SizedBox(height: 40),
-              
-              // Experience options
-              Expanded(
-                child: Column(
-                  children: [
-                    ..._experiences.map((experience) => 
-                      _buildExperienceOption(experience)
-                    ).expand((widget) => [widget, const SizedBox(height: 16)]).take(_experiences.length * 2 - 1),
-                    
-                    const Spacer(),
-                    
-                    // Navigation buttons
-                    _buildNavigationButtons(),
-                  ],
-                ),
+              const SizedBox(height: 32),
+
+              // Experience options (compact)
+              Column(
+                children: _experiences.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final experience = entry.value;
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: index < _experiences.length - 1 ? 12 : 0),
+                    child: _buildExperienceOption(experience),
+                  );
+                }).toList(),
               ),
+
+              const Spacer(),
+
+              _buildNavigationButtons(),
             ],
           ),
         ),
@@ -166,50 +156,41 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
   }
 
   Widget _buildHeader() {
-    return Row(
+    return Column(
       children: [
-        // Back button
-        GestureDetector(
-          onTap: _handleBack,
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Icon(
-              Icons.arrow_back_ios,
-              color: Colors.white,
-              size: 20,
-            ),
-          ),
-        ),
-        
-        const Spacer(),
-        
-        // Progress indicator
-        Column(
+        Row(
           children: [
-            const Text(
-              '2 of 2',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+            GestureDetector(
+              onTap: _handleBack,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
               ),
             ),
-            const SizedBox(height: 8),
-            // Progress bar
-            Container(
-              width: 60,
-              height: 4,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(2),
-                color: const Color(0xFF4CAF50),
+            const Spacer(),
+            Text(
+              '2 of 2',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          height: 6,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(3),
+            color: const Color(0xFF4CAF50),
+          ),
         ),
       ],
     );
@@ -217,80 +198,58 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
 
   Widget _buildExperienceOption(Map<String, dynamic> experience) {
     final isSelected = _selectedExperience == experience['id'];
-    
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedExperience = experience['id'];
-        });
-      },
+      onTap: () => setState(() => _selectedExperience = experience['id']),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected 
-              ? const Color(0xFF4CAF50).withOpacity(0.15)
-              : Colors.black.withOpacity(0.4),
+          color: const Color(0xFF2C2C2C),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected 
-                ? const Color(0xFF4CAF50)
-                : Colors.transparent,
+            color: isSelected ? const Color(0xFF4CAF50) : Colors.transparent,
             width: 2,
           ),
         ),
         child: Row(
           children: [
-            // Icon container
             Container(
-              width: 48,
-              height: 48,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 color: (experience['color'] as Color).withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 experience['icon'] as IconData,
                 color: experience['color'] as Color,
-                size: 24,
+                size: 20,
               ),
             ),
-            
-            const SizedBox(width: 16),
-            
-            // Content
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     experience['title'] as String,
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: Colors.white,
-                      fontSize: 18,
                       fontWeight: FontWeight.w600,
+                      fontSize: 18,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     experience['description'] as String,
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Colors.white.withOpacity(0.7),
-                      fontSize: 14,
                       fontWeight: FontWeight.w400,
+                      fontSize: 14,
                     ),
                   ),
                 ],
               ),
-            ),
-            
-            // Selection indicator
-            Icon(
-              isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-              color: isSelected 
-                  ? const Color(0xFF4CAF50)
-                  : Colors.white.withOpacity(0.3),
-              size: 24,
             ),
           ],
         ),
@@ -309,24 +268,17 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
               onPressed: _isLoading ? null : _handleBack,
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Colors.white, width: 1.5),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                backgroundColor: Colors.black,
               ),
               child: const Text(
                 'Back',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
               ),
             ),
           ),
         ),
-        
         const SizedBox(width: 16),
-        
         // Next Button
         Expanded(
           child: SizedBox(
@@ -334,11 +286,9 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _handleNext,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4CAF50),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 elevation: 0,
               ),
               child: _isLoading
@@ -346,16 +296,13 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
-                        color: Colors.white,
+                        color: Colors.black,
                         strokeWidth: 2,
                       ),
                     )
                   : const Text(
                       'Next',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
             ),
           ),
