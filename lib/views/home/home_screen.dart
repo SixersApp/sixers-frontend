@@ -96,7 +96,7 @@ class HomeScreen extends ConsumerWidget {
                             // Pre-draft leagues
                             final pendingLeagues = leagues.where((l) => l.status == LeagueStatus.draft_pending).toList();
 
-                            // Combine: show pending leagues first, then matchups
+                            // Show pending leagues first, then matchups
                             final itemCount = pendingLeagues.length + matchups.length;
                             if (itemCount == 0) {
                               return const Center(child: Text('No matchups yet'));
