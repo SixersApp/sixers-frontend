@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sixers/views/sign_in_screen.dart';
 
 import '../backend/auth/auth_provider.dart';
 
@@ -17,7 +18,6 @@ class HomeScreen extends ConsumerWidget {
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await ref.read(authProvider.notifier).signOut();
-           
             },
           ),
         ],
