@@ -15,14 +15,22 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authProvider);
+    final leaguesAsync = ref.watch(leaguesProvider);
+    final matchupsAsync = user != null ? ref.watch(userMatchupsProvider(userId: user.id)) : const AsyncValue.data([]);
 
     return Scaffold(
       body: Container(
         color: Colors.black,
         child: SafeArea(
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: Column(
+          child: RefreshIndicator(
+            onRefresh: () async {
+              await ref.read(leaguesProvider.notifier).refresh();
+              if (user != null) {
+                await ref.read(userMatchupsProvider(userId: user.id).notifier).refresh();
+              }
+            },
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
               children: [
                 Container(
                   color: Colors.black,
@@ -74,103 +82,97 @@ class HomeScreen extends ConsumerWidget {
                     height: 155,
                     child: user == null
                         ? const Center(child: Text('Sign in to view your matchups'))
-                        : Consumer(
-                            builder: (context, ref, _) {
-                              final matchupsAsync = ref.watch(userMatchupsProvider(userId: user.id));
-                              final leaguesAsync = ref.watch(leaguesProvider);
-                              if (matchupsAsync.isLoading || leaguesAsync.isLoading) {
-                                return const Center(child: CircularProgressIndicator());
-                              }
-                              if (matchupsAsync.hasError || leaguesAsync.hasError) {
-                                final err = matchupsAsync.error ?? leaguesAsync.error;
-                                return Center(child: Text('Failed to load matchups: $err'));
-                              }
-                              final matchups = matchupsAsync.value ?? [];
-                              final leagues = leaguesAsync.value ?? [];
+                        : () {
+                            if (matchupsAsync.isLoading || leaguesAsync.isLoading) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                            if (matchupsAsync.hasError || leaguesAsync.hasError) {
+                              final err = matchupsAsync.error ?? leaguesAsync.error;
+                              return Center(child: Text('Failed to load matchups: $err'));
+                            }
+                            final matchups = matchupsAsync.value ?? [];
+                            final leagues = leaguesAsync.value ?? [];
 
-                              // Pre-draft leagues
-                              final pendingLeagues = leagues.where((l) => l.status == LeagueStatus.draft_pending).toList();
+                            // Pre-draft leagues
+                            final pendingLeagues = leagues.where((l) => l.status == LeagueStatus.draft_pending).toList();
 
-                              // Combine: show pending leagues first, then matchups
-                              final itemCount = pendingLeagues.length + matchups.length;
-                              if (itemCount == 0) {
-                                return const Center(child: Text('No matchups yet'));
-                              }
+                            // Combine: show pending leagues first, then matchups
+                            final itemCount = pendingLeagues.length + matchups.length;
+                            if (itemCount == 0) {
+                              return const Center(child: Text('No matchups yet'));
+                            }
 
-                              return ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: itemCount,
-                                itemBuilder: (context, index) {
-                                  final pad = EdgeInsets.only(left: index == 0 ? 10 : 0, right: 10);
-                                  if (index < pendingLeagues.length) {
-                                    final league = pendingLeagues[index];
-                                    return Padding(
-                                      padding: pad,
-                                      child: PreDraftCard(league: league),
-                                    );
-                                  }
-                                  final m = matchups[index - pendingLeagues.length];
-                                  final team1Name = m.team1?.fantasyTeam?.teamName ?? 'Team 1';
-                                  final team2Name = m.team2?.fantasyTeam?.teamName ?? 'Team 2';
-                                  final team1Score = (m.team1Score ?? 0).toStringAsFixed(1);
-                                  final team2Score = (m.team2Score ?? 0).toStringAsFixed(1);
-
+                            return ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: itemCount,
+                              itemBuilder: (context, index) {
+                                final pad = EdgeInsets.only(left: index == 0 ? 10 : 0, right: 10);
+                                if (index < pendingLeagues.length) {
+                                  final league = pendingLeagues[index];
                                   return Padding(
                                     padding: pad,
-                                    child: MatchupCard(
-                                      team1Name: team1Name,
-                                      team1Score: team1Score,
-                                      team1PlayersLeft: 0,
-                                      team1WinProbability: 50,
-                                      team1Logo: const Icon(Icons.sports_cricket, color: Colors.white, size: 25),
-                                      team2Name: team2Name,
-                                      team2Score: team2Score,
-                                      team2PlayersLeft: 0,
-                                      team2WinProbability: 50,
-                                      team2Logo: const Icon(Icons.sports_cricket, color: Colors.white, size: 25),
-                                      leagueName: leagues
-                                          .firstWhere(
-                                            (l) => l.id == m.leagueId,
-                                            orElse: () => League(
-                                              id: m.leagueId,
-                                              name: m.leagueId,
-                                              tournamentId: '',
-                                              creatorId: '',
-                                              status: LeagueStatus.active,
-                                              maxTeams: 0,
-                                              joinCode: '',
-                                            ),
-                                          )
-                                          .name,
-                                      gameNumber: 'Game ${m.matchNum}',
-                                      isLive: false,
-                                      matchupId: m.id,
-                                      leagueId: m.leagueId,
-                                    ),
+                                    child: PreDraftCard(league: league),
                                   );
-                                },
-                              );
-                            },
-                          ),
+                                }
+                                final m = matchups[index - pendingLeagues.length];
+                                final team1Name = m.team1?.fantasyTeam?.teamName ?? 'Team 1';
+                                final team2Name = m.team2?.fantasyTeam?.teamName ?? 'Team 2';
+                                final team1Score = (m.team1Score ?? 0).toStringAsFixed(1);
+                                final team2Score = (m.team2Score ?? 0).toStringAsFixed(1);
+
+                                return Padding(
+                                  padding: pad,
+                                  child: MatchupCard(
+                                    team1Name: team1Name,
+                                    team1Score: team1Score,
+                                    team1PlayersLeft: 0,
+                                    team1WinProbability: 50,
+                                    team1Logo: const Icon(Icons.sports_cricket, color: Colors.white, size: 25),
+                                    team2Name: team2Name,
+                                    team2Score: team2Score,
+                                    team2PlayersLeft: 0,
+                                    team2WinProbability: 50,
+                                    team2Logo: const Icon(Icons.sports_cricket, color: Colors.white, size: 25),
+                                    leagueName: leagues
+                                        .firstWhere(
+                                          (l) => l.id == m.leagueId,
+                                          orElse: () => League(
+                                            id: m.leagueId,
+                                            name: m.leagueId,
+                                            tournamentId: '',
+                                            creatorId: '',
+                                            status: LeagueStatus.active,
+                                            maxTeams: 0,
+                                            joinCode: '',
+                                          ),
+                                        )
+                                        .name,
+                                    gameNumber: 'Game ${m.matchNum}',
+                                    isLive: false,
+                                    matchupId: m.id,
+                                    leagueId: m.leagueId,
+                                  ),
+                                );
+                              },
+                            );
+                          }(),
                   ),
                 ),
-                Expanded(
-                  child: Container(
-                    color: AppColors.black100,
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          'Live/Upcoming Games',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.normal, color: AppColors.black600),
-                        ),
-                        const SizedBox(height: 10),
-                        // Horizontal scrolling cards that go off-screen
-                      ],
-                    ),
+                Container(
+                  color: AppColors.black100,
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Live/Upcoming Games',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.normal, color: AppColors.black600),
+                      ),
+                      const SizedBox(height: 10),
+                      // Horizontal scrolling cards that go off-screen
+                    ],
                   ),
                 ),
               ],

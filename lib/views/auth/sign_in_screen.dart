@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
-import 'package:sixers/views/sign_up_page.dart';
+import 'package:sixers/views/auth/sign_up_page.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});

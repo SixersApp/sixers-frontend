@@ -63,7 +63,7 @@ class MatchupService {
           .order('scheduled_time');
 
       logInfo('[MatchupService.fetchMatchupsForUser] fetched ${(rows as List).length} rows');
-      return rows.map((row) => Matchup.fromJson(row as Map<String, dynamic>)).toList();
+      return rows.map((row) => Matchup.fromJson(row)).toList();
     } catch (e, st) {
       logError('[MatchupService.fetchMatchupsForUser] ERROR: $e', st);
       rethrow;
