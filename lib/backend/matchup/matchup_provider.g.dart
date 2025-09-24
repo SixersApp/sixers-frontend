@@ -156,5 +156,137 @@ class _MatchupsProviderElement
   String? get leagueId => (origin as MatchupsProvider).leagueId;
 }
 
+String _$userMatchupsHash() => r'cabde0092f557b2ee6eeca5e5739ee5d2142508a';
+
+abstract class _$UserMatchups
+    extends BuildlessAutoDisposeAsyncNotifier<List<Matchup>> {
+  late final String? userId;
+
+  FutureOr<List<Matchup>> build({String? userId});
+}
+
+/// See also [UserMatchups].
+@ProviderFor(UserMatchups)
+const userMatchupsProvider = UserMatchupsFamily();
+
+/// See also [UserMatchups].
+class UserMatchupsFamily extends Family<AsyncValue<List<Matchup>>> {
+  /// See also [UserMatchups].
+  const UserMatchupsFamily();
+
+  /// See also [UserMatchups].
+  UserMatchupsProvider call({String? userId}) {
+    return UserMatchupsProvider(userId: userId);
+  }
+
+  @override
+  UserMatchupsProvider getProviderOverride(
+    covariant UserMatchupsProvider provider,
+  ) {
+    return call(userId: provider.userId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'userMatchupsProvider';
+}
+
+/// See also [UserMatchups].
+class UserMatchupsProvider
+    extends AutoDisposeAsyncNotifierProviderImpl<UserMatchups, List<Matchup>> {
+  /// See also [UserMatchups].
+  UserMatchupsProvider({String? userId})
+    : this._internal(
+        () => UserMatchups()..userId = userId,
+        from: userMatchupsProvider,
+        name: r'userMatchupsProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$userMatchupsHash,
+        dependencies: UserMatchupsFamily._dependencies,
+        allTransitiveDependencies:
+            UserMatchupsFamily._allTransitiveDependencies,
+        userId: userId,
+      );
+
+  UserMatchupsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.userId,
+  }) : super.internal();
+
+  final String? userId;
+
+  @override
+  FutureOr<List<Matchup>> runNotifierBuild(covariant UserMatchups notifier) {
+    return notifier.build(userId: userId);
+  }
+
+  @override
+  Override overrideWith(UserMatchups Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: UserMatchupsProvider._internal(
+        () => create()..userId = userId,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        userId: userId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeAsyncNotifierProviderElement<UserMatchups, List<Matchup>>
+  createElement() {
+    return _UserMatchupsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is UserMatchupsProvider && other.userId == userId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, userId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin UserMatchupsRef on AutoDisposeAsyncNotifierProviderRef<List<Matchup>> {
+  /// The parameter `userId` of this provider.
+  String? get userId;
+}
+
+class _UserMatchupsProviderElement
+    extends AutoDisposeAsyncNotifierProviderElement<UserMatchups, List<Matchup>>
+    with UserMatchupsRef {
+  _UserMatchupsProviderElement(super.provider);
+
+  @override
+  String? get userId => (origin as UserMatchupsProvider).userId;
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

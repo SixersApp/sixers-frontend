@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/main.dart';
 import 'package:sixers/theme/colors.dart';
 
@@ -383,6 +384,46 @@ class _PatternBackgroundState extends State<PatternBackground> {
     return CustomPaint(
       painter: ImagePatternPainter(image: _image!),
       size: Size.infinite,
+    );
+  }
+}
+
+class PreDraftCard extends StatelessWidget {
+  const PreDraftCard({super.key, required this.league});
+
+  final League league;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => GoRouter.of(context).push('/draft', extra: {"leagueId": league.id}),
+      child: Container(
+        width: 341,
+        decoration: BoxDecoration(color: AppColors.black300, borderRadius: BorderRadius.circular(16)),
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  league.name,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium?.copyWith(color: AppColors.black800, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Draft hasn\'t started yet',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.black600, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+            Icon(PhosphorIcons.arrowRight(), color: AppColors.black700),
+          ],
+        ),
+      ),
     );
   }
 }

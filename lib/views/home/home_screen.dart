@@ -4,12 +4,18 @@ import 'package:go_router/go_router.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/views/components/league_dropdown/league_dropdown.dart';
 import 'package:sixers/views/components/matchup_card/matchup_card.dart';
+import 'package:sixers/backend/auth/auth_provider.dart';
+import 'package:sixers/backend/matchup/matchup_provider.dart';
+import 'package:sixers/backend/leagues/league_provider.dart';
+import 'package:sixers/backend/leagues/league_model.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authProvider);
+
     return Scaffold(
       body: Container(
         color: Colors.black,
@@ -66,16 +72,86 @@ class HomeScreen extends ConsumerWidget {
                   padding: const EdgeInsets.only(bottom: 20),
                   child: SizedBox(
                     height: 155,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 3, // Add more cards to demonstrate scrolling
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: EdgeInsets.only(left: index == 0 ? 10 : 0, right: 10),
-                          child: _buildMatchupCard(index),
-                        );
-                      },
-                    ),
+                    child: user == null
+                        ? const Center(child: Text('Sign in to view your matchups'))
+                        : Consumer(
+                            builder: (context, ref, _) {
+                              final matchupsAsync = ref.watch(userMatchupsProvider(userId: user.id));
+                              final leaguesAsync = ref.watch(leaguesProvider);
+                              if (matchupsAsync.isLoading || leaguesAsync.isLoading) {
+                                return const Center(child: CircularProgressIndicator());
+                              }
+                              if (matchupsAsync.hasError || leaguesAsync.hasError) {
+                                final err = matchupsAsync.error ?? leaguesAsync.error;
+                                return Center(child: Text('Failed to load matchups: $err'));
+                              }
+                              final matchups = matchupsAsync.value ?? [];
+                              final leagues = leaguesAsync.value ?? [];
+
+                              // Pre-draft leagues
+                              final pendingLeagues = leagues.where((l) => l.status == LeagueStatus.draft_pending).toList();
+
+                              // Combine: show pending leagues first, then matchups
+                              final itemCount = pendingLeagues.length + matchups.length;
+                              if (itemCount == 0) {
+                                return const Center(child: Text('No matchups yet'));
+                              }
+
+                              return ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: itemCount,
+                                itemBuilder: (context, index) {
+                                  final pad = EdgeInsets.only(left: index == 0 ? 10 : 0, right: 10);
+                                  if (index < pendingLeagues.length) {
+                                    final league = pendingLeagues[index];
+                                    return Padding(
+                                      padding: pad,
+                                      child: PreDraftCard(league: league),
+                                    );
+                                  }
+                                  final m = matchups[index - pendingLeagues.length];
+                                  final team1Name = m.team1?.fantasyTeam?.teamName ?? 'Team 1';
+                                  final team2Name = m.team2?.fantasyTeam?.teamName ?? 'Team 2';
+                                  final team1Score = (m.team1Score ?? 0).toStringAsFixed(1);
+                                  final team2Score = (m.team2Score ?? 0).toStringAsFixed(1);
+
+                                  return Padding(
+                                    padding: pad,
+                                    child: MatchupCard(
+                                      team1Name: team1Name,
+                                      team1Score: team1Score,
+                                      team1PlayersLeft: 0,
+                                      team1WinProbability: 50,
+                                      team1Logo: const Icon(Icons.sports_cricket, color: Colors.white, size: 25),
+                                      team2Name: team2Name,
+                                      team2Score: team2Score,
+                                      team2PlayersLeft: 0,
+                                      team2WinProbability: 50,
+                                      team2Logo: const Icon(Icons.sports_cricket, color: Colors.white, size: 25),
+                                      leagueName: leagues
+                                          .firstWhere(
+                                            (l) => l.id == m.leagueId,
+                                            orElse: () => League(
+                                              id: m.leagueId,
+                                              name: m.leagueId,
+                                              tournamentId: '',
+                                              creatorId: '',
+                                              status: LeagueStatus.active,
+                                              maxTeams: 0,
+                                              joinCode: '',
+                                            ),
+                                          )
+                                          .name,
+                                      gameNumber: 'Game ${m.matchNum}',
+                                      isLive: false,
+                                      matchupId: m.id,
+                                      leagueId: m.leagueId,
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
                   ),
                 ),
                 Expanded(
@@ -103,66 +179,5 @@ class HomeScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Widget _buildMatchupCard(int index) {
-    switch (index) {
-      case 0:
-        return MatchupCard(
-          team1Name: 'KKK',
-          team1Score: '110.3',
-          team1PlayersLeft: 3,
-          team1WinProbability: 74,
-          team1Logo: const Icon(Icons.sports_cricket, color: Colors.white, size: 25),
-          team2Name: 'CAT',
-          team2Score: '15.1',
-          team2PlayersLeft: 1,
-          team2WinProbability: 26,
-          team2Logo: const Icon(Icons.sports_cricket, color: Colors.white, size: 25),
-          leagueName: 'CRICGGAS • IPL',
-          gameNumber: 'Game 7',
-          isLive: true,
-          matchupId: '1',
-          leagueId: '1',
-        );
-      case 1:
-        return MatchupCard(
-          team1Name: 'RCB',
-          team1Score: '89.2',
-          team1PlayersLeft: 2,
-          team1WinProbability: 45,
-          team1Logo: const Icon(Icons.sports_cricket, color: Colors.white, size: 25),
-          team2Name: 'MI',
-          team2Score: '95.7',
-          team2PlayersLeft: 4,
-          team2WinProbability: 55,
-          team2Logo: const Icon(Icons.sports_cricket, color: Colors.white, size: 25),
-          leagueName: 'CRICGGAS • IPL',
-          gameNumber: 'Game 8',
-          isLive: false,
-          matchupId: '2',
-          leagueId: '1',
-        );
-      case 2:
-        return MatchupCard(
-          team1Name: 'CSK',
-          team1Score: '156.8',
-          team1PlayersLeft: 5,
-          team1WinProbability: 68,
-          team1Logo: const Icon(Icons.sports_cricket, color: Colors.white, size: 25),
-          team2Name: 'DC',
-          team2Score: '142.3',
-          team2PlayersLeft: 3,
-          team2WinProbability: 32,
-          team2Logo: const Icon(Icons.sports_cricket, color: Colors.white, size: 25),
-          leagueName: 'CRICGGAS • IPL',
-          gameNumber: 'Game 9',
-          isLive: true,
-          matchupId: '3',
-          leagueId: '1',
-        );
-      default:
-        return const SizedBox.shrink();
-    }
   }
 }

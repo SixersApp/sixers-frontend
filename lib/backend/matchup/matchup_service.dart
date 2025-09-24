@@ -24,6 +24,52 @@ class MatchupService {
     return (rows as List).map((row) => Matchup.fromJson(row as Map<String, dynamic>)).toList();
   }
 
+  Future<List<Matchup>> fetchMatchupsForUser(String userId) async {
+    try {
+      print('[MatchupService.fetchMatchupsForUser] userId=$userId');
+
+      // Resolve user's fantasy team ids first
+      final teamRows = await client.from('fantasy_teams').select('id').eq('user_id', userId);
+      final teamIds = (teamRows as List).map((e) => (e as Map<String, dynamic>)['id'] as String).toList();
+      print('[MatchupService.fetchMatchupsForUser] teamIds=${teamIds.length} -> $teamIds');
+      if (teamIds.isEmpty) return [];
+
+      // Resolve instance ids for those fantasy teams
+      final instanceRows = await client
+          .from('fantasy_team_instance')
+          .select('id,fantasy_team_id')
+          .inFilter('fantasy_team_id', teamIds);
+      final instanceIds = (instanceRows as List).map((e) => (e as Map<String, dynamic>)['id'] as String).toList();
+      print('[MatchupService.fetchMatchupsForUser] instanceIds=${instanceIds.length}');
+      if (instanceIds.isEmpty) return [];
+      final inList = 'in.(${instanceIds.join(',')})';
+      print('[MatchupService.fetchMatchupsForUser] filterExpr=team1_id.$inList OR team2_id.$inList');
+
+      final rows = await client
+          .from('matchups')
+          .select('''
+            *,
+            team1:team1_id (
+              *,
+              fantasy_team:fantasy_team_id (*)
+            ),
+            team2:team2_id (
+              *,
+              fantasy_team:fantasy_team_id (*)
+            )
+          ''')
+          .or('team1_id.$inList,team2_id.$inList')
+          .order('scheduled_time');
+
+      print('[MatchupService.fetchMatchupsForUser] fetched ${(rows as List).length} rows');
+      return rows.map((row) => Matchup.fromJson(row as Map<String, dynamic>)).toList();
+    } catch (e, st) {
+      print('[MatchupService.fetchMatchupsForUser] ERROR: $e');
+      print(st);
+      rethrow;
+    }
+  }
+
   Future<Matchup?> getMatchupById(String id) async {
     final row = await client
         .from('matchups')

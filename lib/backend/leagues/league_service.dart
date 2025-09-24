@@ -2,27 +2,28 @@ import 'package:flutter/foundation.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/scoring_rule/scoring_rule_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sixers/utils/logger.dart';
 
 class LeagueService {
   final client = Supabase.instance.client;
 
   Future<List<League>> fetchLeaguesForUser(String userId) async {
-    print('[fetchLeaguesForUser] userId = $userId');
+    logInfo('[fetchLeaguesForUser] userId = $userId');
 
     final teamRows = await client.from('fantasy_teams').select('league_id').eq('user_id', userId);
 
-    print('[fetchLeaguesForUser] teamRows: $teamRows');
+    logDebug('[fetchLeaguesForUser] teamRows: $teamRows');
 
     final ids = (teamRows as List).map((row) => row['league_id'] as String).toSet().toList();
 
     if (ids.isEmpty) {
-      print('[fetchLeaguesForUser] no league_ids found');
+      logInfo('[fetchLeaguesForUser] no league_ids found');
       return [];
     }
 
     final leagueRows = await client.from('leagues').select().inFilter('id', ids);
 
-    print('[fetchLeaguesForUser] leagueRows: $leagueRows');
+    logDebug('[fetchLeaguesForUser] leagueRows: $leagueRows');
 
     return (leagueRows as List).map((json) => League.fromJson(json as Map<String, dynamic>)).toList();
   }

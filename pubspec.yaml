@@ -46,6 +46,7 @@ dependencies:
     phosphor_flutter: ^2.1.0
     json_annotation: any
     go_router: ^16.2.1
+    logger: ^2.6.1
 dev_dependencies:
     flutter_test:
         sdk: flutter
