@@ -19,9 +19,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Future<void> _signIn() async {
     setState(() => _isLoading = true);
     try {
-      await ref
-          .read(authProvider.notifier)
-          .signIn(emailController.text.trim(), passwordController.text);
+      await ref.read(authProvider.notifier).signIn(emailController.text.trim(), passwordController.text);
     } catch (e) {
       setState(() => error = e.toString());
     } finally {
@@ -41,26 +39,20 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             child: Container(
               width: double.infinity,
               decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/cricket_stadium.jpg'),
-                  fit: BoxFit.cover,
-                ),
+                image: DecorationImage(image: AssetImage('assets/images/cricket_stadium.jpg'), fit: BoxFit.cover),
               ),
               child: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.7),
-                    ],
+                    colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)],
                   ),
                 ),
               ),
             ),
           ),
-          
+
           // Content Section - Bottom half
           Expanded(
             flex: 6,
@@ -75,24 +67,18 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     // App Title/Logo Area
                     Text(
                       'LOGIN',
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.5,
-                        color: Colors.white,
-                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.w900, letterSpacing: 1.5, color: Colors.white),
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Email Field
-                    _buildTextField(
-                      controller: emailController,
-                      hintText: 'someone@example.com',
-                      label: 'Email',
-                    ),
-                    
+                    _buildTextField(controller: emailController, hintText: 'someone@example.com', label: 'Email'),
+
                     const SizedBox(height: 12),
-                    
+
                     // Password Field
                     _buildTextField(
                       controller: passwordController,
@@ -100,7 +86,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                       label: 'Password',
                       isPassword: true,
                     ),
-                    
+
                     // Forgot Password
                     Align(
                       alignment: Alignment.centerRight,
@@ -108,19 +94,16 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         onPressed: () {
                           // Handle forgot password
                         },
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                        ),
+                        style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 4)),
                         child: Text(
                           'Forget Password',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: const Color(0xFF4CAF50),
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.copyWith(color: const Color(0xFF4CAF50), fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),
-                    
+
                     // Error Message
                     if (error != null) ...[
                       Container(
@@ -132,17 +115,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.red.withOpacity(0.3)),
                         ),
-                        child: Text(
-                          error!,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.red,
-                          ),
-                        ),
+                        child: Text(error!, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red)),
                       ),
                     ],
-                    
+
                     const Spacer(),
-                    
+
                     // Submit Button
                     SizedBox(
                       width: double.infinity,
@@ -152,32 +130,26 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF4CAF50),
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           elevation: 0,
                         ),
                         child: _isLoading
                             ? const SizedBox(
                                 width: 24,
                                 height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                               )
                             : Text(
                                 'Submit',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600, color: Colors.white),
                               ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Social Login Buttons
                     Row(
                       children: [
@@ -202,19 +174,14 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 12),
-                    
+
                     // Create Account Button
                     Center(
                       child: TextButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignUpScreen(),
-                            ),
-                          );
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const SignUpScreen()));
                         },
                         child: Text(
                           'Create an Account',
@@ -248,70 +215,44 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w500,
-          ),
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           obscureText: isPassword,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: Colors.white,
-          ),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Colors.white.withOpacity(0.6),
-            ),
+            hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white.withOpacity(0.6)),
             filled: true,
             fillColor: Colors.black.withOpacity(0.4),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 16,
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSocialButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onPressed,
-  }) {
+  Widget _buildSocialButton({required IconData icon, required String label, required VoidCallback onPressed}) {
     return Container(
       height: 44,
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
           side: BorderSide(color: Colors.white.withOpacity(0.3)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           backgroundColor: Colors.black.withOpacity(0.2),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 18,
-            ),
+            Icon(icon, color: Colors.white, size: 18),
             const SizedBox(width: 6),
             Text(
               label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w500),
             ),
           ],
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/navbar/main_scaffold.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sixers/backend/auth/onboarding_provider.dart';
 
 /// Experience Screen - Second onboarding step
 /// Allows users to select their cricket experience level
@@ -40,8 +41,32 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
     },
   ];
 
-  void _handleBack() {
-    Navigator.of(context).pop();
+  @override
+  void initState() {
+    super.initState();
+    _loadExisting();
+  }
+
+  Future<void> _loadExisting() async {
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) return;
+      final response = await Supabase.instance.client.from('profiles').select('experience').eq('user_id', userId).maybeSingle();
+      if (!mounted || response == null) return;
+      final exp = response['experience'];
+      final id = {1: 'new_to_cricket', 2: 'casual_fan', 3: 'die_hard_fan'}[exp];
+      if (id != null) {
+        setState(() => _selectedExperience = id);
+      }
+    } catch (_) {
+      // ignore errors silently for prefill
+    }
+  }
+
+  void _handleBack() async {
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) return;
+    await ref.read(onboardingStageProvider(userId).notifier).advanceTo(0);
   }
 
   Future<void> _handleNext() async {
@@ -54,18 +79,16 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
 
     try {
       final userId = Supabase.instance.client.auth.currentUser!.id;
+      final experienceValue = {'new_to_cricket': 1, 'casual_fan': 2, 'die_hard_fan': 3}[_selectedExperience]!;
 
-      await Supabase.instance.client.from('profiles').upsert({
-        'user_id': userId,
-        'experience': {
-          'new_to_cricket': 1,
-          'casual_fan': 2,
-          'die_hard_fan': 3
-        }[_selectedExperience],
-        'onboarding_done': true
-      });
+      // Write and force return to surface server errors
+      await Supabase.instance.client
+          .from('profiles')
+          .upsert({'user_id': userId, 'experience': experienceValue, 'onboarding_stage': 2})
+          .select('user_id')
+          .single();
 
-      await Supabase.instance.client.auth.refreshSession();
+      await ref.read(onboardingStageProvider(userId).notifier).complete();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -75,12 +98,15 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
             behavior: SnackBarBehavior.floating,
           ),
         );
-
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const MainScaffold()),
-        );
       }
-    } catch (e) {
+    } catch (e, st) {
+      // Log detailed error for debugging
+      // ignore: avoid_print
+      print('ExperienceScreen error: $e\n$st');
+      if (e is PostgrestException) {
+        // ignore: avoid_print
+        print('PostgrestException: ${e.code} ${e.message} ${e.details}');
+      }
       if (mounted) {
         _showErrorSnackBar('Failed to complete setup. Please try again.');
       }
@@ -90,13 +116,9 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating));
   }
 
   @override
@@ -125,11 +147,9 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
               const SizedBox(height: 8),
               Text(
                 'How much cricket do you know?',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.white70,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 18,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(color: Colors.white70, fontWeight: FontWeight.w400, fontSize: 18),
               ),
               const SizedBox(height: 32),
 
@@ -165,21 +185,16 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
               child: Container(
                 width: 40,
                 height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                ),
+                decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(20)),
                 child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
               ),
             ),
             const Spacer(),
             Text(
               '2 of 2',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 16),
             ),
           ],
         ),
@@ -187,10 +202,7 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
         Container(
           width: double.infinity,
           height: 6,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(3),
-            color: const Color(0xFF4CAF50),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: const Color(0xFF4CAF50)),
         ),
       ],
     );
@@ -206,10 +218,7 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
         decoration: BoxDecoration(
           color: const Color(0xFF2C2C2C),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF4CAF50) : Colors.transparent,
-            width: 2,
-          ),
+          border: Border.all(color: isSelected ? const Color(0xFF4CAF50) : Colors.transparent, width: 2),
         ),
         child: Row(
           children: [
@@ -220,11 +229,7 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
                 color: (experience['color'] as Color).withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(
-                experience['icon'] as IconData,
-                color: experience['color'] as Color,
-                size: 20,
-              ),
+              child: Icon(experience['icon'] as IconData, color: experience['color'] as Color, size: 20),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -233,11 +238,9 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
                 children: [
                   Text(
                     experience['title'] as String,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -292,18 +295,8 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
                 elevation: 0,
               ),
               child: _isLoading
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        color: Colors.black,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  : const Text(
-                      'Next',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
+                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
+                  : const Text('Next', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             ),
           ),
         ),
