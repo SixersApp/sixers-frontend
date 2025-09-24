@@ -396,7 +396,7 @@ class PreDraftCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => GoRouter.of(context).push('/draft', extra: {"leagueId": league.id}),
+      onTap: () => GoRouter.of(context).push('/draft', extra: league),
       child: Container(
         width: 341,
         decoration: BoxDecoration(color: AppColors.black300, borderRadius: BorderRadius.circular(16)),

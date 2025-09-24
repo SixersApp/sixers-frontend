@@ -10,6 +10,7 @@ import 'package:sixers/views/components/create_league_widgets/header.dart';
 import 'package:sixers/views/components/create_league_widgets/scoring_section.dart';
 import 'package:sixers/views/components/draft_tabs/pre_draft_board.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sixers/utils/logger.dart';
 
 class CreateLeagueScreen extends ConsumerStatefulWidget {
   const CreateLeagueScreen({super.key});
@@ -44,7 +45,7 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
     final tournamentsAv = ref.watch(tournamentsProvider);
     final defaultsAv = ref.watch(scoringRulesProvider());
     final leaguesA = ref.read(leaguesProvider.notifier);
-    print('rules: $_rules');
+    logDebug('rules: $_rules');
 
     return Scaffold(
       body: SafeArea(
@@ -91,7 +92,7 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
                         ),
                       ),
                       loading: () {
-                        debugPrint('loading');
+                        logDebug('loading');
                         return const Center(child: CircularProgressIndicator());
                       },
                     ),

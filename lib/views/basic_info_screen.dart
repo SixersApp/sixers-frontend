@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'experience_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sixers/backend/auth/onboarding_provider.dart';
+import 'package:sixers/utils/logger.dart';
 
 /// Basic Info Screen - First onboarding step
 /// Collects user's name, date of birth, and country
@@ -127,11 +128,9 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
 
       await ref.read(onboardingStageProvider(userId).notifier).advanceTo(1);
     } catch (e, st) {
-      // ignore: avoid_print
-      print('BasicInfoScreen error: $e\n$st');
+      logError('BasicInfoScreen error: $e', st);
       if (e is PostgrestException) {
-        // ignore: avoid_print
-        print('PostgrestException: ${e.code} ${e.message} ${e.details}');
+        logWarning('PostgrestException: ${e.code} ${e.message} ${e.details}');
       }
       if (mounted) _showErrorSnackBar('Failed to save information. Please try again.');
     } finally {

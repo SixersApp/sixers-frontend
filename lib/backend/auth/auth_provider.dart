@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sixers/backend/auth/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sixers/utils/logger.dart';
 
 part 'auth_provider.g.dart';
 
@@ -10,7 +11,6 @@ class Auth extends _$Auth {
 
   @override
   User? build() {
-
     _service.authStateChanges.listen((event) {
       state = event.session?.user;
     });
@@ -22,9 +22,9 @@ class Auth extends _$Auth {
   }
 
   Future<void> signUp(String email, String password) async {
-    print("Signing up with $email");
+    logInfo("Signing up with $email");
     final response = await _service.signUp(email, password);
-    print("SignUp response: ${response.user}, ${response.session}");
+    logDebug("SignUp response: ${response.user}, ${response.session}");
   }
 
   Future<void> signOut() async {

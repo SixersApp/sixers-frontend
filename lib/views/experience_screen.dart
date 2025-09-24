@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sixers/backend/auth/onboarding_provider.dart';
+import 'package:sixers/utils/logger.dart';
 
 /// Experience Screen - Second onboarding step
 /// Allows users to select their cricket experience level
@@ -100,11 +101,9 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
       }
     } catch (e, st) {
       // Log detailed error for debugging
-      // ignore: avoid_print
-      print('ExperienceScreen error: $e\n$st');
+      logError('ExperienceScreen error: $e', st);
       if (e is PostgrestException) {
-        // ignore: avoid_print
-        print('PostgrestException: ${e.code} ${e.message} ${e.details}');
+        logWarning('PostgrestException: ${e.code} ${e.message} ${e.details}');
       }
       if (mounted) {
         _showErrorSnackBar('Failed to complete setup. Please try again.');

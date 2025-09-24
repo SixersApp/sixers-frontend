@@ -79,9 +79,9 @@ class LeagueService {
       final _ = await client.from('leagues').select('id').eq('id', leagueId).maybeSingle();
 
       final _ = await client.from('leagues').update({'status': 'draft_in_progress'}).eq('id', leagueId);
-    } catch (e) {
-      debugPrint('[startDraft] Error starting draft: $e');
-      debugPrint('[startDraft] Error type: ${e.runtimeType}');
+    } catch (e, st) {
+      logError('[startDraft] Error starting draft: $e', st);
+      logDebug('[startDraft] Error type: ${e.runtimeType}');
       rethrow;
     }
   }

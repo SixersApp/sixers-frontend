@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'matchup_model.dart';
+import 'package:sixers/utils/logger.dart';
 
 class MatchupService {
   final client = Supabase.instance.client;
@@ -26,12 +27,12 @@ class MatchupService {
 
   Future<List<Matchup>> fetchMatchupsForUser(String userId) async {
     try {
-      print('[MatchupService.fetchMatchupsForUser] userId=$userId');
+      logInfo('[MatchupService.fetchMatchupsForUser] userId=$userId');
 
       // Resolve user's fantasy team ids first
       final teamRows = await client.from('fantasy_teams').select('id').eq('user_id', userId);
       final teamIds = (teamRows as List).map((e) => (e as Map<String, dynamic>)['id'] as String).toList();
-      print('[MatchupService.fetchMatchupsForUser] teamIds=${teamIds.length} -> $teamIds');
+      logDebug('[MatchupService.fetchMatchupsForUser] teamIds=${teamIds.length} -> $teamIds');
       if (teamIds.isEmpty) return [];
 
       // Resolve instance ids for those fantasy teams
@@ -40,10 +41,10 @@ class MatchupService {
           .select('id,fantasy_team_id')
           .inFilter('fantasy_team_id', teamIds);
       final instanceIds = (instanceRows as List).map((e) => (e as Map<String, dynamic>)['id'] as String).toList();
-      print('[MatchupService.fetchMatchupsForUser] instanceIds=${instanceIds.length}');
+      logDebug('[MatchupService.fetchMatchupsForUser] instanceIds=${instanceIds.length}');
       if (instanceIds.isEmpty) return [];
       final inList = 'in.(${instanceIds.join(',')})';
-      print('[MatchupService.fetchMatchupsForUser] filterExpr=team1_id.$inList OR team2_id.$inList');
+      logDebug('[MatchupService.fetchMatchupsForUser] filterExpr=team1_id.$inList OR team2_id.$inList');
 
       final rows = await client
           .from('matchups')
@@ -61,11 +62,10 @@ class MatchupService {
           .or('team1_id.$inList,team2_id.$inList')
           .order('scheduled_time');
 
-      print('[MatchupService.fetchMatchupsForUser] fetched ${(rows as List).length} rows');
+      logInfo('[MatchupService.fetchMatchupsForUser] fetched ${(rows as List).length} rows');
       return rows.map((row) => Matchup.fromJson(row as Map<String, dynamic>)).toList();
     } catch (e, st) {
-      print('[MatchupService.fetchMatchupsForUser] ERROR: $e');
-      print(st);
+      logError('[MatchupService.fetchMatchupsForUser] ERROR: $e', st);
       rethrow;
     }
   }

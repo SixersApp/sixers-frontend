@@ -1,7 +1,14 @@
 import 'package:logger/logger.dart';
 
 final Logger log = Logger(
-  printer: PrettyPrinter(methodCount: 0, errorMethodCount: 8, lineLength: 120, colors: true, printEmojis: true, printTime: false),
+  printer: PrettyPrinter(
+    methodCount: 0,
+    errorMethodCount: 8,
+    lineLength: 120,
+    colors: true,
+    printEmojis: true,
+    dateTimeFormat: DateTimeFormat.none,
+  ),
 );
 
 void logDebug(Object? message) => log.d(message);

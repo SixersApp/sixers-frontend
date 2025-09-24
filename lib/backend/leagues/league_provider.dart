@@ -1,9 +1,9 @@
-
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/leagues/league_service.dart';
 import 'package:sixers/backend/scoring_rule/scoring_rule_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sixers/utils/logger.dart';
 import 'package:sixers/backend/draft_state/draft_state_provider.dart';
 import 'package:sixers/backend/players/player_provider.dart';
 
@@ -20,10 +20,7 @@ class Leagues extends _$Leagues {
     return _service.fetchLeaguesForUser(uid);
   }
 
- 
-
   Future<void> refresh() async {
-
     state = const AsyncLoading();
     final uid = Supabase.instance.client.auth.currentUser?.id;
     if (uid == null) {
@@ -33,17 +30,10 @@ class Leagues extends _$Leagues {
     state = await AsyncValue.guard(() => _service.fetchLeaguesForUser(uid));
   }
 
-  Future<String?> createLeagueWithRules(
-    League league,
-    List<ScoringRule>? rules,
-  ) async {
+  Future<String?> createLeagueWithRules(League league, List<ScoringRule>? rules) async {
     final uid = Supabase.instance.client.auth.currentUser?.id;
     if (uid == null) return null;
-    final id = await _service.createLeagueWithRules(
-      league: league,
-      ownerUserId: uid,
-      rules: rules, 
-    );
+    final id = await _service.createLeagueWithRules(league: league, ownerUserId: uid, rules: rules);
     await refresh();
     return id;
   }
@@ -71,7 +61,7 @@ class Leagues extends _$Leagues {
 
   Future<void> startDraft(String leagueId) async {
     await _service.startDraft(leagueId);
-    await refresh(); 
+    await refresh();
   }
 
   Future<League?> getLeagueById(String id) => _service.getLeagueById(id);
@@ -86,7 +76,7 @@ class LeagueActions extends _$LeagueActions {
 
   Future<void> startDraft(String leagueId) async {
     await _svc.startDraft(leagueId);
-    
+
     ref.invalidate(draftStateStreamProvider(leagueId));
     ref.invalidate(leaguesProvider);
 
@@ -96,9 +86,7 @@ class LeagueActions extends _$LeagueActions {
         ref.invalidate(allPlayersProvider(league.tournamentId));
       }
     } catch (e) {
-      print(
-        '[LeagueActions] Error getting league for players invalidation: $e',
-      );
+      logError('[LeagueActions] Error getting league for players invalidation: $e');
     }
   }
 }
