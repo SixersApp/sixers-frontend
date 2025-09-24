@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'experience_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sixers/backend/auth/onboarding_provider.dart';
 
 /// Basic Info Screen - First onboarding step
 /// Collects user's name, date of birth, and country
@@ -24,14 +25,33 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   bool _isLoading = false;
 
   final List<String> _countries = [
-    'United States', 'India', 'Australia', 'United Kingdom', 'Canada',
-    'Pakistan', 'Bangladesh', 'South Africa', 'New Zealand', 'Sri Lanka',
-    'Afghanistan', 'West Indies',
+    'United States',
+    'India',
+    'Australia',
+    'United Kingdom',
+    'Canada',
+    'Pakistan',
+    'Bangladesh',
+    'South Africa',
+    'New Zealand',
+    'Sri Lanka',
+    'Afghanistan',
+    'West Indies',
   ];
 
   final List<String> _months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   @override
@@ -42,6 +62,41 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     _selectedDay = defaultDate.day;
     _selectedMonth = _months[defaultDate.month - 1];
     _selectedYear = defaultDate.year;
+    _loadExisting();
+  }
+
+  Future<void> _loadExisting() async {
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) return;
+      final response = await Supabase.instance.client
+          .from('profiles')
+          .select('full_name, country, dob')
+          .eq('user_id', userId)
+          .maybeSingle();
+      if (!mounted || response == null) return;
+      final fullName = response['full_name'] as String?;
+      final country = response['country'] as String?;
+      final dobStr = response['dob'] as String?;
+      if (fullName != null && fullName.isNotEmpty) {
+        _nameController.text = fullName;
+      }
+      if (country != null && country.isNotEmpty && _countries.contains(country)) {
+        setState(() => _selectedCountry = country);
+      }
+      if (dobStr != null && dobStr.isNotEmpty) {
+        final dob = DateTime.tryParse(dobStr);
+        if (dob != null) {
+          setState(() {
+            _selectedDay = dob.day;
+            _selectedMonth = _months[dob.month - 1];
+            _selectedYear = dob.year;
+          });
+        }
+      }
+    } catch (_) {
+      // ignore prefill errors
+    }
   }
 
   @override
@@ -58,23 +113,26 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     try {
       final userId = Supabase.instance.client.auth.currentUser!.id;
 
-      await Supabase.instance.client.from('profiles').upsert({
-        'user_id': userId,
-        'full_name': _nameController.text.trim(),
-        'country': _selectedCountry,
-        'dob': DateTime(
-          _selectedYear,
-          _months.indexOf(_selectedMonth) + 1,
-          _selectedDay,
-        ).toIso8601String(),
-      });
+      await Supabase.instance.client
+          .from('profiles')
+          .upsert({
+            'user_id': userId,
+            'full_name': _nameController.text.trim(),
+            'country': _selectedCountry,
+            'dob': DateTime(_selectedYear, _months.indexOf(_selectedMonth) + 1, _selectedDay).toIso8601String(),
+            'onboarding_stage': 1,
+          })
+          .select('user_id')
+          .single();
 
-      if (mounted) {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const ExperienceScreen()),
-        );
+      await ref.read(onboardingStageProvider(userId).notifier).advanceTo(1);
+    } catch (e, st) {
+      // ignore: avoid_print
+      print('BasicInfoScreen error: $e\n$st');
+      if (e is PostgrestException) {
+        // ignore: avoid_print
+        print('PostgrestException: ${e.code} ${e.message} ${e.details}');
       }
-    } catch (e) {
       if (mounted) _showErrorSnackBar('Failed to save information. Please try again.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -82,13 +140,9 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating));
   }
 
   @override
@@ -151,11 +205,9 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
             const Spacer(),
             Text(
               '1 of 2',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 16),
             ),
           ],
         ),
@@ -163,10 +215,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         Container(
           width: double.infinity,
           height: 6,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(3),
-            color: Colors.grey.withOpacity(0.3),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: Colors.grey.withValues(alpha: 0.3)),
           child: Row(
             children: [
               Expanded(
@@ -181,7 +230,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.horizontal(right: Radius.circular(3)),
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                   ),
                 ),
               ),
@@ -195,11 +244,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   Widget _buildFieldLabel(String label) {
     return Text(
       label,
-      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-        color: Colors.white,
-        fontWeight: FontWeight.w500,
-        fontSize: 18,
-      ),
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 18),
     );
   }
 
@@ -212,10 +257,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white.withOpacity(0.6)),
         filled: true,
         fillColor: const Color(0xFF2C2C2C),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       ),
       validator: (value) {
@@ -299,18 +341,16 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
           child: Text(
             item,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white, fontSize: fontSize),
-            overflow: TextOverflow.ellipsis,
           ),
         );
       }).toList(),
       onChanged: onChanged,
-      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white, fontSize: fontSize),
       dropdownColor: const Color(0xFF2C2C2C),
       decoration: InputDecoration(
         filled: true,
         fillColor: const Color(0xFF2C2C2C),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       ),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
     );
@@ -324,23 +364,13 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         onPressed: _isLoading ? null : _handleNext,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
-          foregroundColor: Colors.white,
+          foregroundColor: Colors.black,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 0,
         ),
         child: _isLoading
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-              )
-            : Text(
-                'Next',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
+            ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
+            : const Text('Next', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
       ),
     );
   }
