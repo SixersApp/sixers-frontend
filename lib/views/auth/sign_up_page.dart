@@ -259,7 +259,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   }
 
   Widget _buildSocialButton({required IconData icon, required String label, required VoidCallback onPressed}) {
-    return Container(
+    return SizedBox(
       height: 44,
       child: OutlinedButton(
         onPressed: onPressed,
