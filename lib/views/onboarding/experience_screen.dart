@@ -224,7 +224,7 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: (experience['color'] as Color).withOpacity(0.2),
+                color: (experience['color'] as Color).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(experience['icon'] as IconData, color: experience['color'] as Color, size: 20),
@@ -244,7 +244,7 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
                   Text(
                     experience['description'] as String,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontWeight: FontWeight.w400,
                       fontSize: 14,
                     ),

@@ -252,7 +252,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
       style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white, fontSize: 16),
       decoration: InputDecoration(
         hintText: 'John Doe',
-        hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white.withOpacity(0.6)),
+        hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.6)),
         filled: true,
         fillColor: const Color(0xFF2C2C2C),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),

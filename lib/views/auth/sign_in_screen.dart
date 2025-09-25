@@ -111,9 +111,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         padding: const EdgeInsets.all(12),
                         margin: const EdgeInsets.only(bottom: 8),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
+                          color: Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.red.withOpacity(0.3)),
+                          border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
                         ),
                         child: Text(error!, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red)),
                       ),
@@ -224,9 +224,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white.withOpacity(0.6)),
+            hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.6)),
             filled: true,
-            fillColor: Colors.black.withOpacity(0.4),
+            fillColor: Colors.black.withValues(alpha: 0.4),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           ),
@@ -241,9 +241,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          side: BorderSide(color: Colors.white.withOpacity(0.3)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          backgroundColor: Colors.black.withOpacity(0.2),
+          backgroundColor: Colors.black.withValues(alpha: 0.2),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

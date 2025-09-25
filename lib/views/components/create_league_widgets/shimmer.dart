@@ -8,7 +8,7 @@ class GreyShimmer extends StatelessWidget {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(.4),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: .4),
         borderRadius: BorderRadius.circular(12),
       ),
     );

@@ -24,7 +24,7 @@ class PickCell extends StatelessWidget {
     final String? role = player?.role as String?;
     final rc = (role == null || role.isEmpty) ? null : roleIconAndColor(role);
     final Color border = rc?.color ?? scheme.outlineVariant;
-    final Color fill = rc == null ? scheme.surfaceContainerHighest : border.withOpacity(0.20);
+    final Color fill = rc == null ? scheme.surfaceContainerHighest : border.withValues(alpha: 0.20);
 
     return SizedBox(
       width: size,

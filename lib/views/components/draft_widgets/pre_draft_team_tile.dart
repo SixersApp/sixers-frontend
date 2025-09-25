@@ -54,11 +54,11 @@ class TeamTile extends StatelessWidget {
                           width: avatar,
                           height: avatar,
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.01),
+                            color: color.withValues(alpha: 0.01),
                             borderRadius: BorderRadius.circular(avatarRadius),
                             boxShadow: [
                               BoxShadow(
-                                color: color.withOpacity(0.70),
+                                color: color.withValues(alpha: 0.70),
                                 blurRadius: glowBlur,
                                 spreadRadius: glowSpread,
                                 offset: Offset.zero,
