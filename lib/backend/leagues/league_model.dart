@@ -1,8 +1,7 @@
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'league_model.freezed.dart';
-part 'league_model.g.dart'; 
+part 'league_model.g.dart';
 
 enum LeagueStatus { draft_pending, draft_in_progress, active, completed }
 

@@ -13,23 +13,19 @@ class AppTheme {
   static ThemeData light = _build(brightness: Brightness.light);
 
   static ThemeData _build({required Brightness brightness}) {
-
     // Base Material scheme, then override our neutrals.
-    var scheme = ColorScheme.fromSeed(
-      seedColor: _seed,
-      brightness: brightness,
-    );
+    var scheme = ColorScheme.fromSeed(seedColor: _seed, brightness: brightness);
 
     // Map your black scale -> surfaces & “on*” text colors.
     scheme = scheme.copyWith(
-      surface: AppColors.black200,             // foreground / dark tile
-      surfaceContainerHighest: AppColors.black300,      // general tile
-      outline: AppColors.black400,        // text on bg
-      onSurface: AppColors.black800,           // text on tiles
-      onSurfaceVariant: AppColors.black600,    // muted text
-      primary: AppColors.black700,             // subtle accent
+      surface: AppColors.black200, // foreground / dark tile
+      surfaceContainerHighest: AppColors.black300, // general tile
+      outline: AppColors.black400, // text on bg
+      onSurface: AppColors.black800, // text on tiles
+      onSurfaceVariant: AppColors.black600, // muted text
+      primary: AppColors.black700, // subtle accent
       onPrimary: AppColors.black100,
-      primaryContainer: AppColors.black400,    // used for selected nav bg, etc.
+      primaryContainer: AppColors.black400, // used for selected nav bg, etc.
       onPrimaryContainer: AppColors.black800,
     );
 
@@ -49,14 +45,11 @@ class AppTheme {
       textSelected: AppColors.black100,
     );
 
-    const fields = FieldColors(
-      fill: AppColors.black200,
-      border: AppColors.black400,
-    );
+    const fields = FieldColors(fill: AppColors.black200, border: AppColors.black400);
 
     const nav = NavColors(
       icon: AppColors.black600,
-      bg: Colors.transparent,       // no background
+      bg: Colors.transparent, // no background
       iconSelected: AppColors.black800,
       bgSelected: AppColors.black400,
     );
@@ -85,17 +78,14 @@ class AppTheme {
         backgroundColor: surfaces.foreground,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
-        titleTextStyle: buildTextTheme(brightness)
-            .headlineLarge
-            ?.copyWith(letterSpacing: 0.2, color: scheme.onSurface),
+        titleTextStyle: buildTextTheme(brightness).headlineLarge?.copyWith(letterSpacing: 0.2, color: scheme.onSurface),
         iconTheme: IconThemeData(color: scheme.onSurface),
+        leadingWidth: 40,
+        titleSpacing: -8,
       ),
 
       // Dividers
-      dividerTheme: DividerThemeData(
-        color: scheme.outline,
-        thickness: 1,
-      ),
+      dividerTheme: DividerThemeData(color: scheme.outline, thickness: 1),
 
       // TextFields
       inputDecorationTheme: InputDecorationTheme(
@@ -121,14 +111,16 @@ class AppTheme {
       // Chips (back-compat for older SDKs):
       // Use this with the BrandedChoiceChip wrapper to hide/show borders per state.
       chipTheme: ChipThemeData(
-        backgroundColor: chips.bg,        // idle fill
-        selectedColor: chips.bgSelected,  // selected fill
+        backgroundColor: chips.bg, // idle fill
+        selectedColor: chips.bgSelected, // selected fill
         disabledColor: chips.bg,
-        labelStyle: TextStyle(            // idle text
+        labelStyle: TextStyle(
+          // idle text
           fontWeight: FontWeight.w600,
           color: chips.text,
         ),
-        secondaryLabelStyle: TextStyle(   // selected text
+        secondaryLabelStyle: TextStyle(
+          // selected text
           fontWeight: FontWeight.w600,
           color: chips.textSelected,
         ),
@@ -150,12 +142,7 @@ class AppTheme {
       ),
 
       // Register your tokens
-      extensions: const <ThemeExtension<dynamic>>[
-        surfaces,
-        chips,
-        fields,
-        nav,
-      ],
+      extensions: const <ThemeExtension<dynamic>>[surfaces, chips, fields, nav],
     );
   }
 }

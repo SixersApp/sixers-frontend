@@ -49,6 +49,6 @@ class DraftSettingsService {
         .eq('league_id', leagueId)
         .select()
         .single(); // get the updated row back
-    return row as Map<String, dynamic>;
+    return row;
   }
 }

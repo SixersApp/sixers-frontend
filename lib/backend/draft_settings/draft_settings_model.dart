@@ -13,6 +13,5 @@ sealed class DraftSettings with _$DraftSettings {
     @JsonKey(name: 'snake_draft') bool? snakeDraft,
   }) = _DraftSettings;
 
-  factory DraftSettings.fromJson(Map<String, dynamic> json) =>
-      _$DraftSettingsFromJson(json);
+  factory DraftSettings.fromJson(Map<String, dynamic> json) => _$DraftSettingsFromJson(json);
 }
