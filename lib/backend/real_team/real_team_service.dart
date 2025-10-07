@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'real_team_model.dart';
 import 'package:sixers/utils/logger.dart';

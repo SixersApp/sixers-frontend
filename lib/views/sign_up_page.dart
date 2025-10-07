@@ -305,7 +305,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     required String label,
     required VoidCallback onPressed,
   }) {
-    return Container(
+    return SizedBox(
       height: 44,
       child: OutlinedButton(
         onPressed: onPressed,
