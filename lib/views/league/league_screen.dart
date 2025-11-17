@@ -6,6 +6,7 @@ import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/views/components/league_dropdown/league_dropdown.dart';
 import 'package:sixers/views/components/league_tabs/league_tab_selector.dart';
+import 'package:sixers/views/league/team_content.dart';
 
 class LeagueScreen extends ConsumerStatefulWidget {
   const LeagueScreen({super.key, required this.leagueId, required this.matchupId});
@@ -90,40 +91,5 @@ class _LeagueScreenState extends ConsumerState<LeagueScreen> with TickerProvider
       ),
       body: _buildBody(),
     );
-  }
-}
-
-class TeamContent extends ConsumerWidget {
-  const TeamContent({super.key, required this.league});
-
-  final League league;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (league.status == LeagueStatus.draft_pending || league.status == LeagueStatus.draft_in_progress) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(league.status == LeagueStatus.draft_pending ? "Your league hasn't drafted yet" : "Your league is drafting"),
-            TextButton(
-              onPressed: () => GoRouter.of(context).push('/draft', extra: league),
-              style: TextButton.styleFrom(
-                backgroundColor: AppColors.black200,
-                foregroundColor: AppColors.black800,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              child: const Text('Draft Now'),
-            ),
-          ],
-        ),
-      );
-    } else if (league.status == LeagueStatus.active) {
-      return const Center(child: Text('Draft completed'));
-    } else if (league.status == LeagueStatus.completed) {
-      return const Center(child: Text('League completed'));
-    }
-    return const Center(child: Text('League not found'));
   }
 }
