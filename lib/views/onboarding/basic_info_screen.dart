@@ -67,9 +67,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
 
   Future<void> _loadExisting() async {
     try {
-      final user = ref.watch(authProviderProvider);
-      final userId = user!.idToken;
-      if (userId == null) return;
+      
       print("trying to load default data");
       final response = await ref.read(onboardingStageProvider.notifier).fetchProfile();
       print("Default Data");

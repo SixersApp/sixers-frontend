@@ -41,7 +41,7 @@ final class AuthProviderProvider
   }
 }
 
-String _$authProviderHash() => r'989e8d69d1a78ba767182b22b25ea80f03eaea08';
+String _$authProviderHash() => r'd1c093d1e54eee4078561e66e0d4af2cbc5ab252';
 
 abstract class _$AuthProvider extends $Notifier<AppSession?> {
   AppSession? build();
