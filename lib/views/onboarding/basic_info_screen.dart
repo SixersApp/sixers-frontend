@@ -20,9 +20,8 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   int _selectedYear = 2000;
 
   String? _selectedCountry;
-  bool _isLoading = false;
 
-  // Prevent UI flicker before restore
+  bool _isLoading = false;
   bool _loadingProfile = true;
 
   final List<String> _countries = [
@@ -59,80 +58,62 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   void initState() {
     super.initState();
 
-    // Default values
     _selectedCountry = 'United States';
 
     final defaultDate =
         DateTime.now().subtract(const Duration(days: 365 * 25));
-
     _selectedDay = defaultDate.day;
     _selectedMonth = _months[defaultDate.month - 1];
     _selectedYear = defaultDate.year;
 
-    _restoreAfterAuthReady();
+    _waitForAuthAndRestore();
   }
 
-  /// Wait for AuthProvider to finish loading, THEN fetch profile
-  Future<void> _restoreAfterAuthReady() async {
-    await Future.delayed(const Duration(milliseconds: 75));
+  /// Ensures AuthProvider has finished async loading
+  Future<void> _waitForAuthAndRestore() async {
+    await Future.delayed(const Duration(milliseconds: 60));
 
     final authAsync = ref.read(authProviderProvider);
 
     if (authAsync.isLoading) {
-      await Future.delayed(const Duration(milliseconds: 125));
-      return _restoreAfterAuthReady();
+      return _waitForAuthAndRestore();
     }
 
     final session = authAsync.value;
-
     if (session != null) {
       await _loadExisting();
     }
 
-    if (mounted) {
-      setState(() => _loadingProfile = false);
-    }
+    if (mounted) setState(() => _loadingProfile = false);
   }
 
   Future<void> _loadExisting() async {
     try {
-      print("Loading profile…");
-
       final response =
           await ref.read(onboardingStageProvider.notifier).fetchProfile();
 
-      print("Loaded profile: $response");
-
       if (!mounted || response.isEmpty) return;
 
-      // Prefill name
-      final fullName = response['full_name'] as String?;
-      if (fullName != null && fullName.isNotEmpty) {
-        _nameController.text = fullName;
+      if (response['full_name'] != null) {
+        _nameController.text = response['full_name'];
       }
 
-      // Prefill country
-      final country = response['country'] as String?;
-      if (country != null &&
-          country.isNotEmpty &&
-          _countries.contains(country)) {
-        setState(() => _selectedCountry = country);
+      final country = response['country'];
+      if (country != null && _countries.contains(country)) {
+        _selectedCountry = country;
       }
 
-      // Prefill DOB
-      final dobStr = response['dob'] as String?;
-      if (dobStr != null && dobStr.isNotEmpty) {
+      final dobStr = response['dob'];
+      if (dobStr != null) {
         final dob = DateTime.tryParse(dobStr);
         if (dob != null) {
-          setState(() {
-            _selectedDay = dob.day;
-            _selectedMonth = _months[dob.month - 1];
-            _selectedYear = dob.year;
-          });
+          _selectedDay = dob.day;
+          _selectedMonth = _months[dob.month - 1];
+          _selectedYear = dob.year;
         }
       }
     } catch (e) {
-      print("Profile prefill error: $e");
+      print("Profile restore failed: $e");
     }
   }
 
@@ -159,10 +140,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
           );
     } catch (e, st) {
       logError('BasicInfoScreen error: $e', st);
-      if (mounted) {
-        _showErrorSnackBar(
-            'Failed to save information. Please try again.');
-      }
+      _showErrorSnackBar('Failed to save information. Please try again.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -216,7 +194,22 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
               ),
         ),
         const SizedBox(height: 32),
-        Expanded(child: _buildForm()),
+
+        /// ⭐ Limit the scrollable form height
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: constraints.maxHeight * 0.8,
+                ),
+                child: SingleChildScrollView(
+                  child: _buildForm(),
+                ),
+              );
+            },
+          ),
+        ),
       ],
     );
   }
@@ -238,7 +231,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
           _buildFieldLabel('Country'),
           const SizedBox(height: 12),
           _buildCountryDropdown(),
-          const Spacer(),
+          const SizedBox(height: 48),
           _buildNextButton(),
         ],
       ),
@@ -259,10 +252,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   Widget _buildNameField() {
     return TextFormField(
       controller: _nameController,
-      style: Theme.of(context)
-          .textTheme
-          .bodyLarge
-          ?.copyWith(color: Colors.white, fontSize: 16),
+      style: const TextStyle(color: Colors.white, fontSize: 16),
       decoration: InputDecoration(
         hintText: 'John Doe',
         hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
@@ -272,10 +262,8 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) return 'Name is required';
@@ -299,18 +287,16 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
           ),
         ),
         const SizedBox(width: 8),
-
         Flexible(
           flex: 4,
           child: _buildDropdownField(
             value: _selectedMonth,
             items: _months,
             onChanged: (value) => setState(() => _selectedMonth = value!),
-            fontSize: 14, // shrink font to prevent overflow
+            fontSize: 14,
           ),
         ),
         const SizedBox(width: 8),
-
         Flexible(
           flex: 3,
           child: _buildDropdownField(
@@ -327,6 +313,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
       ],
     );
   }
+
   Widget _buildCountryDropdown() {
     final safeValue = (_selectedCountry != null &&
             _countries.contains(_selectedCountry))
@@ -336,28 +323,19 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     return DropdownButtonFormField<String>(
       value: safeValue,
       items: _countries
-          .map(
-            (c) => DropdownMenuItem(
-              value: c,
-              child: Text(
-                c,
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          )
+          .map((c) => DropdownMenuItem(
+                value: c,
+                child: Text(c, style: const TextStyle(color: Colors.white)),
+              ))
           .toList(),
       onChanged: (value) => setState(() => _selectedCountry = value),
       dropdownColor: const Color(0xFF2C2C2C),
       decoration: InputDecoration(
         filled: true,
         fillColor: const Color(0xFF2C2C2C),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       ),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
     );
@@ -371,19 +349,16 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   }) {
     return DropdownButtonFormField<String>(
       value: items.contains(value) ? value : null,
-      isExpanded: true, // prevents overflow!
+      isExpanded: true,
       items: items
           .map(
             (item) => DropdownMenuItem(
               value: item,
               child: Text(
                 item,
-                overflow: TextOverflow.ellipsis,
                 maxLines: 1,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: fontSize,
-                ),
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.white, fontSize: fontSize),
               ),
             ),
           )
@@ -393,17 +368,14 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
       decoration: InputDecoration(
         filled: true,
         fillColor: const Color(0xFF2C2C2C),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
     );
   }
+
   Widget _buildNextButton() {
     return SizedBox(
       width: double.infinity,
@@ -413,25 +385,19 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 0,
         ),
         child: _isLoading
             ? const SizedBox(
                 width: 24,
                 height: 24,
-                child: CircularProgressIndicator(
-                  color: Colors.black,
-                  strokeWidth: 2,
-                ),
+                child:
+                    CircularProgressIndicator(color: Colors.black, strokeWidth: 2),
               )
-            : const Text(
-                'Next',
-                style: TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.w600),
-              ),
+            : const Text('Next',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
       ),
     );
   }
@@ -440,12 +406,9 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     return Column(
       children: [
         Row(
-          children: [
-            const Spacer(),
-            Text(
-              '1 of 2',
-              style: TextStyle(color: Colors.white),
-            ),
+          children: const [
+            Spacer(),
+            Text('1 of 2', style: TextStyle(color: Colors.white)),
           ],
         ),
         const SizedBox(height: 8),
@@ -461,9 +424,8 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
               Expanded(
                 child: Container(
                   decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.horizontal(
-                      left: Radius.circular(3),
-                    ),
+                    borderRadius:
+                        BorderRadius.horizontal(left: Radius.circular(3)),
                     color: Color(0xFF4CAF50),
                   ),
                 ),
@@ -471,9 +433,8 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.horizontal(
-                      right: Radius.circular(3),
-                    ),
+                    borderRadius:
+                        const BorderRadius.horizontal(right: Radius.circular(3)),
                     color: Colors.grey.withOpacity(0.3),
                   ),
                 ),
