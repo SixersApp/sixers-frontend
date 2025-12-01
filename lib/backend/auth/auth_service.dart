@@ -29,13 +29,13 @@ class AuthService {
     final appSession = await _buildSessionFromCognito();
     ApiClient.setAuthToken(appSession.idToken);
 
-    print(appSession.userId);
-    final text = appSession.idToken;
-    const chunkSize = 800;
-    for (var i = 0; i < text.length; i += chunkSize) {
-      print(text.substring(i, 
-        i + chunkSize > text.length ? text.length : i + chunkSize));
-    }
+    // print(appSession.userId);
+    // final text = appSession.idToken;
+    // const chunkSize = 800;
+    // for (var i = 0; i < text.length; i += chunkSize) {
+    //   print(text.substring(i, 
+    //     i + chunkSize > text.length ? text.length : i + chunkSize));
+    // }
 
     initUserInBackend(appSession);
 
