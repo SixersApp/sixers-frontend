@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/backend/auth/onboarding_provider.dart';
 import 'package:sixers/utils/logger.dart';
 
@@ -49,9 +49,10 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
 
   Future<void> _loadExisting() async {
     try {
-      final userId = Supabase.instance.client.auth.currentUser?.id;
+      final user = ref.watch(authProviderProvider);
+      final userId = user!.idToken;
       if (userId == null) return;
-      final response = await Supabase.instance.client.from('profiles').select('experience').eq('user_id', userId).maybeSingle();
+      final response = await ref.read(onboardingStageProvider.notifier).fetchProfile();
       if (!mounted || response == null) return;
       final exp = response['experience'];
       final id = {1: 'new_to_cricket', 2: 'casual_fan', 3: 'die_hard_fan'}[exp];
@@ -64,7 +65,8 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
   }
 
   void _handleBack() async {
-    final userId = Supabase.instance.client.auth.currentUser?.id;
+    final user = ref.watch(authProviderProvider);
+    final userId = user!.idToken;
     if (userId == null) return;
     await ref.read(onboardingStageProvider.notifier).advanceTo(0);
   }
@@ -78,17 +80,10 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final userId = Supabase.instance.client.auth.currentUser!.id;
       final experienceValue = {'new_to_cricket': 1, 'casual_fan': 2, 'die_hard_fan': 3}[_selectedExperience]!;
 
       // Write and force return to surface server errors
-      await Supabase.instance.client
-          .from('profiles')
-          .upsert({'user_id': userId, 'experience': experienceValue, 'onboarding_stage': 2})
-          .select('user_id')
-          .single();
-
-      await ref.read(onboardingStageProvider.notifier).complete();
+      await ref.read(onboardingStageProvider.notifier).updateExperience(experienceValue);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -102,9 +97,6 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
     } catch (e, st) {
       // Log detailed error for debugging
       logError('ExperienceScreen error: $e', st);
-      if (e is PostgrestException) {
-        logWarning('PostgrestException: ${e.code} ${e.message} ${e.details}');
-      }
       if (mounted) {
         _showErrorSnackBar('Failed to complete setup. Please try again.');
       }

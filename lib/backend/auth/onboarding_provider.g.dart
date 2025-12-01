@@ -33,7 +33,7 @@ final class OnboardingStageProvider
   OnboardingStage create() => OnboardingStage();
 }
 
-String _$onboardingStageHash() => r'0947fef05aa9577a2d088333460ecc87967b2776';
+String _$onboardingStageHash() => r'3b33a983b802b2c4f8d67ac4641525b7a90254c5';
 
 abstract class _$OnboardingStage extends $AsyncNotifier<int> {
   FutureOr<int> build();

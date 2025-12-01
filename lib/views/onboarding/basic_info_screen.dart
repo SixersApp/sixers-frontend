@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/backend/auth/onboarding_provider.dart';
 import 'package:sixers/utils/logger.dart';
 
@@ -67,13 +67,13 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
 
   Future<void> _loadExisting() async {
     try {
-      final userId = Supabase.instance.client.auth.currentUser?.id;
+      final user = ref.watch(authProviderProvider);
+      final userId = user!.idToken;
       if (userId == null) return;
-      final response = await Supabase.instance.client
-          .from('profiles')
-          .select('full_name, country, dob')
-          .eq('user_id', userId)
-          .maybeSingle();
+      print("trying to load default data");
+      final response = await ref.read(onboardingStageProvider.notifier).fetchProfile();
+      print("Default Data");
+      print(response);
       if (!mounted || response == null) return;
       final fullName = response['full_name'] as String?;
       final country = response['country'] as String?;
@@ -111,26 +111,13 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final userId = Supabase.instance.client.auth.currentUser!.id;
-
-      await Supabase.instance.client
-          .from('profiles')
-          .upsert({
-            'user_id': userId,
-            'full_name': _nameController.text.trim(),
-            'country': _selectedCountry,
-            'dob': DateTime(_selectedYear, _months.indexOf(_selectedMonth) + 1, _selectedDay).toIso8601String(),
-            'onboarding_stage': 1,
-          })
-          .select('user_id')
-          .single();
-
-      await ref.read(onboardingStageProvider.notifier).advanceTo(1);
+      await ref.read(onboardingStageProvider.notifier).updateBasicInfo(
+        fullName: _nameController.text,
+        country: _selectedCountry!,
+        dob: DateTime(_selectedYear, _months.indexOf(_selectedMonth) + 1, _selectedDay).toIso8601String(),
+      );
     } catch (e, st) {
       logError('BasicInfoScreen error: $e', st);
-      if (e is PostgrestException) {
-        logWarning('PostgrestException: ${e.code} ${e.message} ${e.details}');
-      }
       if (mounted) _showErrorSnackBar('Failed to save information. Please try again.');
     } finally {
       if (mounted) setState(() => _isLoading = false);

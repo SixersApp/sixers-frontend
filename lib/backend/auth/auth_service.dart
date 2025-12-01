@@ -1,5 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:flutter/material.dart';
 import 'package:sixers/backend/auth/dio_client.dart';
 import 'app_session.dart';
 
@@ -27,6 +28,14 @@ class AuthService {
 
     final appSession = await _buildSessionFromCognito();
     ApiClient.setAuthToken(appSession.idToken);
+
+    print(appSession.userId);
+    final text = appSession.idToken;
+    const chunkSize = 800;
+    for (var i = 0; i < text.length; i += chunkSize) {
+      print(text.substring(i, 
+        i + chunkSize > text.length ? text.length : i + chunkSize));
+    }
 
     initUserInBackend(appSession);
 
