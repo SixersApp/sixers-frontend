@@ -33,7 +33,7 @@ final class LeaguesProvider
   Leagues create() => Leagues();
 }
 
-String _$leaguesHash() => r'ad53c47d033c9102523aa486be969a28f6b92bc6';
+String _$leaguesHash() => r'99d682a1ec99808540f97b6fe21c01ac7a8bc7f4';
 
 abstract class _$Leagues extends $AsyncNotifier<List<League>> {
   FutureOr<List<League>> build();
@@ -51,58 +51,5 @@ abstract class _$Leagues extends $AsyncNotifier<List<League>> {
               Object?
             >;
     element.handleValue(ref, created);
-  }
-}
-
-@ProviderFor(LeagueActions)
-const leagueActionsProvider = LeagueActionsProvider._();
-
-final class LeagueActionsProvider
-    extends $NotifierProvider<LeagueActions, void> {
-  const LeagueActionsProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'leagueActionsProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$leagueActionsHash();
-
-  @$internal
-  @override
-  LeagueActions create() => LeagueActions();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(void value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<void>(value),
-    );
-  }
-}
-
-String _$leagueActionsHash() => r'14c07482b21973c80b12bb5b6bf2bce5d686eb32';
-
-abstract class _$LeagueActions extends $Notifier<void> {
-  void build();
-  @$mustCallSuper
-  @override
-  void runBuild() {
-    build();
-    final ref = this.ref as $Ref<void, void>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<void, void>,
-              void,
-              Object?,
-              Object?
-            >;
-    element.handleValue(ref, null);
   }
 }

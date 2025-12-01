@@ -44,10 +44,6 @@ class AuthGate extends ConsumerWidget {
                 return const ExperienceScreen();
               default:
                 return MaterialApp.router(
-                  routerConfig: router,
-                  theme: AppTheme.dark,
-                  darkTheme: AppTheme.dark,
-                  themeMode: ThemeMode.dark,
                 );
             }
           },
