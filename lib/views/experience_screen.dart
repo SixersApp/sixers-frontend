@@ -65,7 +65,7 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
   void _handleBack() async {
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) return;
-    await ref.read(onboardingStageProvider(userId).notifier).advanceTo(0);
+    await ref.read(onboardingStageProvider.notifier).advanceTo(0);
   }
 
   Future<void> _handleNext() async {
@@ -87,7 +87,7 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
           .select('user_id')
           .single();
 
-      await ref.read(onboardingStageProvider(userId).notifier).complete();
+      await ref.read(onboardingStageProvider.notifier).complete();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

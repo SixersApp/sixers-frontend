@@ -6,145 +6,80 @@ part of 'player_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$allPlayersHash() => r'2af163b726a6297dd3f9fbb622e54abf88534c24';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [allPlayers].
 @ProviderFor(allPlayers)
-const allPlayersProvider = AllPlayersFamily();
+const allPlayersProvider = AllPlayersFamily._();
 
-/// See also [allPlayers].
-class AllPlayersFamily extends Family<AsyncValue<List<Player>>> {
-  /// See also [allPlayers].
-  const AllPlayersFamily();
+final class AllPlayersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Player>>,
+          List<Player>,
+          FutureOr<List<Player>>
+        >
+    with $FutureModifier<List<Player>>, $FutureProvider<List<Player>> {
+  const AllPlayersProvider._({
+    required AllPlayersFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'allPlayersProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
-  /// See also [allPlayers].
-  AllPlayersProvider call(String tournamentId) {
-    return AllPlayersProvider(tournamentId);
+  @override
+  String debugGetCreateSourceHash() => _$allPlayersHash();
+
+  @override
+  String toString() {
+    return r'allPlayersProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  AllPlayersProvider getProviderOverride(
-    covariant AllPlayersProvider provider,
-  ) {
-    return call(provider.tournamentId);
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  $FutureProviderElement<List<Player>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'allPlayersProvider';
-}
-
-/// See also [allPlayers].
-class AllPlayersProvider extends AutoDisposeFutureProvider<List<Player>> {
-  /// See also [allPlayers].
-  AllPlayersProvider(String tournamentId)
-    : this._internal(
-        (ref) => allPlayers(ref as AllPlayersRef, tournamentId),
-        from: allPlayersProvider,
-        name: r'allPlayersProvider',
-        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-            ? null
-            : _$allPlayersHash,
-        dependencies: AllPlayersFamily._dependencies,
-        allTransitiveDependencies: AllPlayersFamily._allTransitiveDependencies,
-        tournamentId: tournamentId,
-      );
-
-  AllPlayersProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.tournamentId,
-  }) : super.internal();
-
-  final String tournamentId;
-
-  @override
-  Override overrideWith(
-    FutureOr<List<Player>> Function(AllPlayersRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: AllPlayersProvider._internal(
-        (ref) => create(ref as AllPlayersRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        tournamentId: tournamentId,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeFutureProviderElement<List<Player>> createElement() {
-    return _AllPlayersProviderElement(this);
+  FutureOr<List<Player>> create(Ref ref) {
+    final argument = this.argument as String;
+    return allPlayers(ref, argument);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is AllPlayersProvider && other.tournamentId == tournamentId;
+    return other is AllPlayersProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, tournamentId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin AllPlayersRef on AutoDisposeFutureProviderRef<List<Player>> {
-  /// The parameter `tournamentId` of this provider.
-  String get tournamentId;
-}
+String _$allPlayersHash() => r'2af163b726a6297dd3f9fbb622e54abf88534c24';
 
-class _AllPlayersProviderElement
-    extends AutoDisposeFutureProviderElement<List<Player>>
-    with AllPlayersRef {
-  _AllPlayersProviderElement(super.provider);
+final class AllPlayersFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<Player>>, String> {
+  const AllPlayersFamily._()
+    : super(
+        retry: null,
+        name: r'allPlayersProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  AllPlayersProvider call(String tournamentId) =>
+      AllPlayersProvider._(argument: tournamentId, from: this);
 
   @override
-  String get tournamentId => (origin as AllPlayersProvider).tournamentId;
+  String toString() => r'allPlayersProvider';
 }
-
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
+import 'package:sixers/views/auth/verify_code_page.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
@@ -24,7 +26,15 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
     setState(() => _isLoading = true);
     try {
-      await ref.read(authProvider.notifier).signUp(emailController.text.trim(), passwordController.text);
+      await ref.read(authProviderProvider.notifier).signUp(emailController.text.trim(), passwordController.text);
+      if (mounted){
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => VerifyCodePage(email: emailController.text.trim(), password: passwordController.text,),
+            ),
+          );
+      }
     } catch (e) {
       setState(() => error = e.toString());
     } finally {

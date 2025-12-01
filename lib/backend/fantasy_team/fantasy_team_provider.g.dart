@@ -6,163 +6,96 @@ part of 'fantasy_team_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fantasyTeamsHash() => r'a0001602e1987735bff71fed37385589804963ae';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$FantasyTeams
-    extends BuildlessAutoDisposeAsyncNotifier<List<FantasyTeam>> {
-  late final String? leagueId;
-
-  FutureOr<List<FantasyTeam>> build({String? leagueId});
-}
-
-/// See also [FantasyTeams].
 @ProviderFor(FantasyTeams)
-const fantasyTeamsProvider = FantasyTeamsFamily();
+const fantasyTeamsProvider = FantasyTeamsFamily._();
 
-/// See also [FantasyTeams].
-class FantasyTeamsFamily extends Family<AsyncValue<List<FantasyTeam>>> {
-  /// See also [FantasyTeams].
-  const FantasyTeamsFamily();
+final class FantasyTeamsProvider
+    extends $AsyncNotifierProvider<FantasyTeams, List<FantasyTeam>> {
+  const FantasyTeamsProvider._({
+    required FantasyTeamsFamily super.from,
+    required String? super.argument,
+  }) : super(
+         retry: null,
+         name: r'fantasyTeamsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
-  /// See also [FantasyTeams].
-  FantasyTeamsProvider call({String? leagueId}) {
-    return FantasyTeamsProvider(leagueId: leagueId);
+  @override
+  String debugGetCreateSourceHash() => _$fantasyTeamsHash();
+
+  @override
+  String toString() {
+    return r'fantasyTeamsProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  FantasyTeamsProvider getProviderOverride(
-    covariant FantasyTeamsProvider provider,
-  ) {
-    return call(leagueId: provider.leagueId);
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'fantasyTeamsProvider';
-}
-
-/// See also [FantasyTeams].
-class FantasyTeamsProvider
-    extends
-        AutoDisposeAsyncNotifierProviderImpl<FantasyTeams, List<FantasyTeam>> {
-  /// See also [FantasyTeams].
-  FantasyTeamsProvider({String? leagueId})
-    : this._internal(
-        () => FantasyTeams()..leagueId = leagueId,
-        from: fantasyTeamsProvider,
-        name: r'fantasyTeamsProvider',
-        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-            ? null
-            : _$fantasyTeamsHash,
-        dependencies: FantasyTeamsFamily._dependencies,
-        allTransitiveDependencies:
-            FantasyTeamsFamily._allTransitiveDependencies,
-        leagueId: leagueId,
-      );
-
-  FantasyTeamsProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.leagueId,
-  }) : super.internal();
-
-  final String? leagueId;
-
-  @override
-  FutureOr<List<FantasyTeam>> runNotifierBuild(
-    covariant FantasyTeams notifier,
-  ) {
-    return notifier.build(leagueId: leagueId);
-  }
-
-  @override
-  Override overrideWith(FantasyTeams Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: FantasyTeamsProvider._internal(
-        () => create()..leagueId = leagueId,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        leagueId: leagueId,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeAsyncNotifierProviderElement<FantasyTeams, List<FantasyTeam>>
-  createElement() {
-    return _FantasyTeamsProviderElement(this);
-  }
+  FantasyTeams create() => FantasyTeams();
 
   @override
   bool operator ==(Object other) {
-    return other is FantasyTeamsProvider && other.leagueId == leagueId;
+    return other is FantasyTeamsProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, leagueId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin FantasyTeamsRef
-    on AutoDisposeAsyncNotifierProviderRef<List<FantasyTeam>> {
-  /// The parameter `leagueId` of this provider.
-  String? get leagueId;
-}
+String _$fantasyTeamsHash() => r'a0001602e1987735bff71fed37385589804963ae';
 
-class _FantasyTeamsProviderElement
-    extends
-        AutoDisposeAsyncNotifierProviderElement<FantasyTeams, List<FantasyTeam>>
-    with FantasyTeamsRef {
-  _FantasyTeamsProviderElement(super.provider);
+final class FantasyTeamsFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          FantasyTeams,
+          AsyncValue<List<FantasyTeam>>,
+          List<FantasyTeam>,
+          FutureOr<List<FantasyTeam>>,
+          String?
+        > {
+  const FantasyTeamsFamily._()
+    : super(
+        retry: null,
+        name: r'fantasyTeamsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  FantasyTeamsProvider call({String? leagueId}) =>
+      FantasyTeamsProvider._(argument: leagueId, from: this);
 
   @override
-  String? get leagueId => (origin as FantasyTeamsProvider).leagueId;
+  String toString() => r'fantasyTeamsProvider';
 }
 
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$FantasyTeams extends $AsyncNotifier<List<FantasyTeam>> {
+  late final _$args = ref.$arg as String?;
+  String? get leagueId => _$args;
+
+  FutureOr<List<FantasyTeam>> build({String? leagueId});
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build(leagueId: _$args);
+    final ref =
+        this.ref as $Ref<AsyncValue<List<FantasyTeam>>, List<FantasyTeam>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<FantasyTeam>>, List<FantasyTeam>>,
+              AsyncValue<List<FantasyTeam>>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}

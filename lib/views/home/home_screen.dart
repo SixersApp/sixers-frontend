@@ -14,9 +14,9 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authProvider);
+    final user = ref.watch(authProviderProvider);
     final leaguesAsync = ref.watch(leaguesProvider);
-    final matchupsAsync = user != null ? ref.watch(userMatchupsProvider(userId: user.id)) : const AsyncValue.data([]);
+    final matchupsAsync = user != null ? ref.watch(userMatchupsProvider(userId: user.userId)) : const AsyncValue.data([]);
 
     return Scaffold(
       body: Container(
@@ -26,7 +26,7 @@ class HomeScreen extends ConsumerWidget {
             onRefresh: () async {
               await ref.read(leaguesProvider.notifier).refresh();
               if (user != null) {
-                await ref.read(userMatchupsProvider(userId: user.id).notifier).refresh();
+                await ref.read(userMatchupsProvider(userId: user.userId).notifier).refresh();
               }
             },
             child: ListView(

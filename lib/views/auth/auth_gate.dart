@@ -13,13 +13,13 @@ class AuthGate extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authProvider);
+    final user = ref.watch(authProviderProvider);
 
     if (user == null) {
       return const SignInScreen();
     }
 
-    final stageAsync = ref.watch(onboardingStageProvider(user.id));
+    final stageAsync = ref.watch(onboardingStageProvider);
 
     return stageAsync.when(
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),

@@ -19,7 +19,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Future<void> _signIn() async {
     setState(() => _isLoading = true);
     try {
-      await ref.read(authProvider.notifier).signIn(emailController.text.trim(), passwordController.text);
+      await ref.read(authProviderProvider.notifier).signIn(emailController.text.trim(), passwordController.text);
     } catch (e) {
       setState(() => error = e.toString());
     } finally {

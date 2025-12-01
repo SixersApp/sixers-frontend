@@ -6,161 +6,133 @@ part of 'draft_pick_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$draftPicksHash() => r'3e005469476bb05e50b38100ceaebbc55b4a3fe7';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [draftPicks].
 @ProviderFor(draftPicks)
-const draftPicksProvider = DraftPicksFamily();
+const draftPicksProvider = DraftPicksFamily._();
 
-/// See also [draftPicks].
-class DraftPicksFamily extends Family<AsyncValue<List<DraftPick>>> {
-  /// See also [draftPicks].
-  const DraftPicksFamily();
+final class DraftPicksProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<DraftPick>>,
+          List<DraftPick>,
+          FutureOr<List<DraftPick>>
+        >
+    with $FutureModifier<List<DraftPick>>, $FutureProvider<List<DraftPick>> {
+  const DraftPicksProvider._({
+    required DraftPicksFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'draftPicksProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
-  /// See also [draftPicks].
-  DraftPicksProvider call(String leagueId) {
-    return DraftPicksProvider(leagueId);
+  @override
+  String debugGetCreateSourceHash() => _$draftPicksHash();
+
+  @override
+  String toString() {
+    return r'draftPicksProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  DraftPicksProvider getProviderOverride(
-    covariant DraftPicksProvider provider,
-  ) {
-    return call(provider.leagueId);
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  $FutureProviderElement<List<DraftPick>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'draftPicksProvider';
-}
-
-/// See also [draftPicks].
-class DraftPicksProvider extends AutoDisposeFutureProvider<List<DraftPick>> {
-  /// See also [draftPicks].
-  DraftPicksProvider(String leagueId)
-    : this._internal(
-        (ref) => draftPicks(ref as DraftPicksRef, leagueId),
-        from: draftPicksProvider,
-        name: r'draftPicksProvider',
-        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-            ? null
-            : _$draftPicksHash,
-        dependencies: DraftPicksFamily._dependencies,
-        allTransitiveDependencies: DraftPicksFamily._allTransitiveDependencies,
-        leagueId: leagueId,
-      );
-
-  DraftPicksProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.leagueId,
-  }) : super.internal();
-
-  final String leagueId;
-
-  @override
-  Override overrideWith(
-    FutureOr<List<DraftPick>> Function(DraftPicksRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: DraftPicksProvider._internal(
-        (ref) => create(ref as DraftPicksRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        leagueId: leagueId,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeFutureProviderElement<List<DraftPick>> createElement() {
-    return _DraftPicksProviderElement(this);
+  FutureOr<List<DraftPick>> create(Ref ref) {
+    final argument = this.argument as String;
+    return draftPicks(ref, argument);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is DraftPicksProvider && other.leagueId == leagueId;
+    return other is DraftPicksProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, leagueId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin DraftPicksRef on AutoDisposeFutureProviderRef<List<DraftPick>> {
-  /// The parameter `leagueId` of this provider.
-  String get leagueId;
-}
+String _$draftPicksHash() => r'3e005469476bb05e50b38100ceaebbc55b4a3fe7';
 
-class _DraftPicksProviderElement
-    extends AutoDisposeFutureProviderElement<List<DraftPick>>
-    with DraftPicksRef {
-  _DraftPicksProviderElement(super.provider);
+final class DraftPicksFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<DraftPick>>, String> {
+  const DraftPicksFamily._()
+    : super(
+        retry: null,
+        name: r'draftPicksProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  DraftPicksProvider call(String leagueId) =>
+      DraftPicksProvider._(argument: leagueId, from: this);
 
   @override
-  String get leagueId => (origin as DraftPicksProvider).leagueId;
+  String toString() => r'draftPicksProvider';
+}
+
+@ProviderFor(DraftPickActions)
+const draftPickActionsProvider = DraftPickActionsProvider._();
+
+final class DraftPickActionsProvider
+    extends $NotifierProvider<DraftPickActions, void> {
+  const DraftPickActionsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'draftPickActionsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$draftPickActionsHash();
+
+  @$internal
+  @override
+  DraftPickActions create() => DraftPickActions();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(void value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
+    );
+  }
 }
 
 String _$draftPickActionsHash() => r'fe014cc0da4480d9f7291b0dbdd8184f5489b1d4';
 
-/// See also [DraftPickActions].
-@ProviderFor(DraftPickActions)
-final draftPickActionsProvider =
-    AutoDisposeNotifierProvider<DraftPickActions, void>.internal(
-      DraftPickActions.new,
-      name: r'draftPickActionsProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$draftPickActionsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-typedef _$DraftPickActions = AutoDisposeNotifier<void>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$DraftPickActions extends $Notifier<void> {
+  void build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    build();
+    final ref = this.ref as $Ref<void, void>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<void, void>,
+              void,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, null);
+  }
+}

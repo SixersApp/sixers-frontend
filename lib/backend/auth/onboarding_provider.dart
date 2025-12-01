@@ -1,48 +1,51 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:dio/dio.dart';
+import 'package:sixers/backend/auth/dio_client.dart';
+import '../auth/auth_provider.dart';
 
 part 'onboarding_provider.g.dart';
 
-/// Represents the user's onboarding stage.
-/// 0 => Basic Info, 1 => Experience, >=2 => Done
 @riverpod
 class OnboardingStage extends _$OnboardingStage {
   @override
-  Future<int> build(String userId) async {
+  Future<int> build() async {
+    final session = ref.watch(authProviderProvider);
+    if (session == null) return 0;
+
+    final userId = session.userId;
+    if (userId.isEmpty) return 0;
+
     try {
-      final response = await Supabase.instance.client
-          .from('profiles')
-          .select('onboarding_stage')
-          .eq('user_id', userId)
-          .maybeSingle();
+      final res = await ApiClient.dio.get("/profiles/$userId");
 
-      if (response == null) {
-        return 0;
-      }
+      if (res.statusCode != 200) return 0;
 
-      final dynamic value = response['onboarding_stage'];
-      if (value == null) return 0;
+      final value = res.data["onboarding_stage"];
+
       if (value is int) return value;
       if (value is String) return int.tryParse(value) ?? 0;
+
       return 0;
     } catch (_) {
       return 0;
     }
   }
 
-  /// Advance to a specific stage and refresh the provider state.
+  /// Update onboarding stage
   Future<void> advanceTo(int nextStage) async {
-    final client = Supabase.instance.client;
-    final userId = client.auth.currentUser?.id;
-    if (userId == null) return;
+    final session = ref.read(authProviderProvider);
+    if (session == null) return;
 
-    await client.from('profiles').upsert({'user_id': userId, 'onboarding_stage': nextStage});
+    final userId = session.userId;
+    if (userId.isEmpty) return;
+
+    await ApiClient.dio.put(
+      "/profiles/$userId",
+      data: {"onboarding_stage": nextStage},
+    );
 
     state = AsyncData(nextStage);
   }
 
-  /// Mark onboarding as completed (stage 2+)
-  Future<void> complete() async {
-    await advanceTo(2);
-  }
+  Future<void> complete() => advanceTo(2);
 }

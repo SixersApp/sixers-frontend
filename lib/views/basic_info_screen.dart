@@ -124,7 +124,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
           .select('user_id')
           .single();
 
-      await ref.read(onboardingStageProvider(userId).notifier).advanceTo(1);
+      await ref.read(onboardingStageProvider.notifier).advanceTo(1);
     } catch (e, st) {
       // ignore: avoid_print
       print('BasicInfoScreen error: $e\n$st');

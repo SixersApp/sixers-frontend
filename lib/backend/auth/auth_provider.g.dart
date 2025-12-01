@@ -6,20 +6,58 @@ part of 'auth_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authHash() => r'45cd780cb94de669389be3c6e42e2ec4995e334f';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [Auth].
-@ProviderFor(Auth)
-final authProvider = AutoDisposeNotifierProvider<Auth, User?>.internal(
-  Auth.new,
-  name: r'authProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$authHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+@ProviderFor(AuthProvider)
+const authProviderProvider = AuthProviderProvider._();
 
-typedef _$Auth = AutoDisposeNotifier<User?>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class AuthProviderProvider
+    extends $NotifierProvider<AuthProvider, AppSession?> {
+  const AuthProviderProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'authProviderProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$authProviderHash();
+
+  @$internal
+  @override
+  AuthProvider create() => AuthProvider();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AppSession? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AppSession?>(value),
+    );
+  }
+}
+
+String _$authProviderHash() => r'989e8d69d1a78ba767182b22b25ea80f03eaea08';
+
+abstract class _$AuthProvider extends $Notifier<AppSession?> {
+  AppSession? build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AppSession?, AppSession?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AppSession?, AppSession?>,
+              AppSession?,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}

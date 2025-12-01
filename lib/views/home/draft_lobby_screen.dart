@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import 'package:sixers/backend/draft_pick/draft_pick_provider.dart';
 import 'package:sixers/backend/draft_state/draft_state_model.dart';
