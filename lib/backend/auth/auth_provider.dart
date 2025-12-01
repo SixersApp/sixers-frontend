@@ -8,36 +8,24 @@ part 'auth_provider.g.dart';
 @Riverpod(keepAlive: true)
 class AuthProvider extends _$AuthProvider {
   late final AuthService _authService;
-  late AppSession? session; 
 
   @override
-  AppSession? build() {
+  Future<AppSession?> build() async {
     _authService = ref.watch(authServiceProvider);
 
-    // Restore existing Cognito session if user already signed in
-    _restoreSession(); 
-
-    return null;
-  }
-
-  Future<AppSession?> _restoreSession() async {
+    // Wait for Cognito session BEFORE returning the provider value.
     final session = await _authService.getCurrentSession();
-    if (session != null) {
-      state = session;
-      this.session = session;
-      return session;
-    }
-    return null;
+
+    return session; // <-- critical fix
   }
 
   // LOGIN
   Future<void> signIn(String email, String password) async {
     final session = await _authService.signIn(email, password);
-    state = session;
-    this.session = session;
+    state = AsyncData(session); // <-- because build() is async, state must use AsyncData
   }
 
-  // SIGNUP (email verification handled outside)
+  // SIGNUP (email verification handled separately)
   Future<void> signUp(String email, String password) async {
     await _authService.signUp(email, password);
   }
@@ -45,15 +33,10 @@ class AuthProvider extends _$AuthProvider {
   // LOGOUT
   Future<void> signOut() async {
     await _authService.signOut();
-    state = null;
-    session = null;
+    state = const AsyncData(null);
   }
 }
 
-
-
-// Provides AuthService as a dependency
 final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService();
 });
-

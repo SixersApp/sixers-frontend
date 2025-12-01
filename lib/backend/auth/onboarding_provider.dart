@@ -9,7 +9,10 @@ part 'onboarding_provider.g.dart';
 class OnboardingStage extends _$OnboardingStage {
   @override
   Future<int> build() async {
-    final session = ref.watch(authProviderProvider);
+    final authAsync = ref.watch(authProviderProvider);
+
+    // Must wait for authentication to load.
+    final session = authAsync.value;
     if (session == null) return 0;
 
     final userId = session.userId;
@@ -31,19 +34,18 @@ class OnboardingStage extends _$OnboardingStage {
     }
   }
 
-  /// Update basic info: full_name, country, dob, onboarding_stage
+  // BASIC INFO UPDATE
   Future<void> updateBasicInfo({
     required String fullName,
     required String country,
     required String dob,
   }) async {
-    final session = ref.read(authProviderProvider);
+    final session = ref.read(authProviderProvider).value;
     if (session == null) return;
 
     final userId = session.userId;
     if (userId.isEmpty) return;
 
-    // Convert ISO8601 → YYYY-MM-DD
     final parsedDob = DateTime.tryParse(dob)?.toIso8601String().split("T")[0];
 
     await ApiClient.dio.put(
@@ -56,13 +58,12 @@ class OnboardingStage extends _$OnboardingStage {
       },
     );
 
-    // move to next stage
     state = const AsyncData(1);
   }
 
-  /// Update experience + onboarding stage
+  // EXPERIENCE
   Future<void> updateExperience(int experience) async {
-    final session = ref.read(authProviderProvider);
+    final session = ref.read(authProviderProvider).value;
     if (session == null) return;
 
     final userId = session.userId;
@@ -79,9 +80,9 @@ class OnboardingStage extends _$OnboardingStage {
     state = const AsyncData(2);
   }
 
-  /// Update only the onboarding stage
+  // ADVANCE STAGE
   Future<void> advanceTo(int nextStage) async {
-    final session = ref.read(authProviderProvider);
+    final session = ref.read(authProviderProvider).value;
     if (session == null) return;
 
     final userId = session.userId;
@@ -95,9 +96,9 @@ class OnboardingStage extends _$OnboardingStage {
     state = AsyncData(nextStage);
   }
 
-    /// Fetch full profile data: full_name, country, dob, onboarding_stage, experience
+  // FETCH PROFILE
   Future<Map<String, dynamic>> fetchProfile() async {
-    final session = ref.read(authProviderProvider);
+    final session = ref.read(authProviderProvider).value;
     if (session == null) return {};
 
     final userId = session.userId;
@@ -119,7 +120,7 @@ class OnboardingStage extends _$OnboardingStage {
       print("Error fetching profile: $e");
     }
 
-    return {}; // fallback
+    return {};
   }
 
   Future<void> complete() => advanceTo(2);

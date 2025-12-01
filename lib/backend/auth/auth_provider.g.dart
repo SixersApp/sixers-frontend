@@ -13,7 +13,7 @@ part of 'auth_provider.dart';
 const authProviderProvider = AuthProviderProvider._();
 
 final class AuthProviderProvider
-    extends $NotifierProvider<AuthProvider, AppSession?> {
+    extends $AsyncNotifierProvider<AuthProvider, AppSession?> {
   const AuthProviderProvider._()
     : super(
         from: null,
@@ -31,30 +31,22 @@ final class AuthProviderProvider
   @$internal
   @override
   AuthProvider create() => AuthProvider();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(AppSession? value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<AppSession?>(value),
-    );
-  }
 }
 
-String _$authProviderHash() => r'd1c093d1e54eee4078561e66e0d4af2cbc5ab252';
+String _$authProviderHash() => r'2bf1d34387bc77fcb13a396b67ab9823d9c762ab';
 
-abstract class _$AuthProvider extends $Notifier<AppSession?> {
-  AppSession? build();
+abstract class _$AuthProvider extends $AsyncNotifier<AppSession?> {
+  FutureOr<AppSession?> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AppSession?, AppSession?>;
+    final ref = this.ref as $Ref<AsyncValue<AppSession?>, AppSession?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AppSession?, AppSession?>,
-              AppSession?,
+              AnyNotifier<AsyncValue<AppSession?>, AppSession?>,
+              AsyncValue<AppSession?>,
               Object?,
               Object?
             >;
