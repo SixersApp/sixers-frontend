@@ -9,7 +9,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sixers/amplifyconfiguration.dart';
 import 'package:sixers/views/auth/auth_gate.dart';
 import 'package:sixers/theme/app_theme.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 late final ui.Image matchupPatternImage;
 
