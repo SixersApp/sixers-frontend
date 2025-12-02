@@ -37,7 +37,7 @@ class HomeScreen extends ConsumerWidget {
         // Fetch matchups (match 2)
         final matchupsAsync = userId.isEmpty
             ? const AsyncValue.data([])
-            : ref.watch(userMatchupsProvider(2));
+            : ref.watch(userMatchupsProvider(0));
 
         return Scaffold(
           body: SafeArea(
@@ -45,7 +45,7 @@ class HomeScreen extends ConsumerWidget {
               onRefresh: () async {
                 await ref.read(leaguesProvider.notifier).refresh();
                 if (userId.isNotEmpty) {
-                  ref.refresh(userMatchupsProvider(2));
+                  ref.refresh(userMatchupsProvider(0));
                 }
               },
               child: ListView(
