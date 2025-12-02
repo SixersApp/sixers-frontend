@@ -24,6 +24,8 @@ class MatchupCard extends StatelessWidget {
     required this.gameNumber,
     required this.matchupId,
     required this.leagueId,
+    required this.team1FtiId,
+    required this.team2FtiId,
     this.isLive = true,
     this.width,
     this.onTap,
@@ -43,6 +45,8 @@ class MatchupCard extends StatelessWidget {
   final String gameNumber;
   final String matchupId;
   final String leagueId;
+  final String team1FtiId;
+  final String team2FtiId;
   final bool isLive;
   final double? width;
   final VoidCallback? onTap;
@@ -52,10 +56,10 @@ class MatchupCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         GoRouter.of(context).push(
-          '/matchupScoring',
+          '/fantasyMatchup',
           extra: {
-            "team1": team1Name,
-            "team2": team2Name,
+            "team1FtiId": team1FtiId,
+            "team2FtiId": team2FtiId,
           },
         );
       },
