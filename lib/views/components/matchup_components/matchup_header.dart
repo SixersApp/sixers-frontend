@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 /// A scoreboard-style header widget for showing a live matchup.
 ///
 /// This widget is designed to resemble the reference image the user provided:
@@ -20,7 +21,6 @@ class MatchupHeader extends StatelessWidget {
     this.leagueLabel,
     this.isLive = true,
   });
-  
 
   /// Data for the left team (home).
   final MatchupTeamInfo leftTeam;
@@ -419,5 +419,3 @@ class _ScoreBlock extends StatelessWidget {
     );
   }
 }
-
-
