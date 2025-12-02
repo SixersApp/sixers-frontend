@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
-import 'package:sixers/backend/auth/onboarding_provider.dart';
+import 'package:sixers/backend/onboarding/onboarding_provider.dart';
 import 'package:sixers/utils/logger.dart';
 
 class BasicInfoScreen extends ConsumerStatefulWidget {
@@ -69,7 +69,6 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     _waitForAuthAndRestore();
   }
 
-  /// Ensures AuthProvider has finished async loading
   Future<void> _waitForAuthAndRestore() async {
     await Future.delayed(const Duration(milliseconds: 60));
 
@@ -89,10 +88,11 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
 
   Future<void> _loadExisting() async {
     try {
-      final response =
-          await ref.read(onboardingStageProvider.notifier).fetchProfile();
+      final notifier = ref.read(onboardingStageProvider.notifier);
 
-      if (!mounted || response.isEmpty) return;
+      if (!mounted) return;
+
+      final response = await notifier.fetchProfile();
 
       if (response['full_name'] != null) {
         _nameController.text = response['full_name'];
@@ -129,15 +129,17 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(onboardingStageProvider.notifier).updateBasicInfo(
-            fullName: _nameController.text,
-            country: _selectedCountry!,
-            dob: DateTime(
-              _selectedYear,
-              _months.indexOf(_selectedMonth) + 1,
-              _selectedDay,
-            ).toIso8601String(),
-          );
+      final notifier = ref.read(onboardingStageProvider.notifier);
+
+      await notifier.updateBasicInfo(
+        fullName: _nameController.text,
+        country: _selectedCountry!,
+        dob: DateTime(
+          _selectedYear,
+          _months.indexOf(_selectedMonth) + 1,
+          _selectedDay,
+        ).toIso8601String(),
+      );
     } catch (e, st) {
       logError('BasicInfoScreen error: $e', st);
       _showErrorSnackBar('Failed to save information. Please try again.');
@@ -195,7 +197,6 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         ),
         const SizedBox(height: 32),
 
-        /// ⭐ Limit the scrollable form height
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) {

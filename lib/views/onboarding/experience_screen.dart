@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
-import 'package:sixers/backend/auth/onboarding_provider.dart';
+import 'package:sixers/backend/onboarding/onboarding_provider.dart';
 import 'package:sixers/utils/logger.dart';
 
 class ExperienceScreen extends ConsumerStatefulWidget {
@@ -45,7 +45,6 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
     _restoreAfterAuthReady();
   }
 
-  /// ⚡ Wait for AuthProvider -> THEN load profile
   Future<void> _restoreAfterAuthReady() async {
     await Future.delayed(const Duration(milliseconds: 100));
 
@@ -64,8 +63,9 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
 
   Future<void> _loadExisting() async {
     try {
-      final profile =
-          await ref.read(onboardingStageProvider.notifier).fetchProfile();
+      final notifier = ref.read(onboardingStageProvider.notifier);
+
+      final profile = await notifier.fetchProfile();
 
       if (!mounted || profile.isEmpty) return;
 
@@ -85,12 +85,11 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
     }
   }
 
-  /// ⚡ Back button → set onboarding stage to 0
   void _handleBack() async {
-    await ref.read(onboardingStageProvider.notifier).advanceTo(0);
+    final notifier = ref.read(onboardingStageProvider.notifier);
+    await notifier.advanceTo(0);
   }
 
-  /// ⚡ Next button → update experience and stage
   Future<void> _handleNext() async {
     if (_selectedExperience == null) {
       _showErrorSnackBar('Please select your cricket experience level');
@@ -100,15 +99,15 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
     setState(() => _isLoading = true);
 
     try {
+      final notifier = ref.read(onboardingStageProvider.notifier);
+
       final expValue = {
         'new_to_cricket': 1,
         'casual_fan': 2,
         'die_hard_fan': 3,
       }[_selectedExperience]!;
 
-      await ref
-          .read(onboardingStageProvider.notifier)
-          .updateExperience(expValue);
+      await notifier.updateExperience(expValue);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -169,7 +168,6 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Experience list
               Column(
                 children: _experiences.asMap().entries.map((entry) {
                   final index = entry.key;
@@ -223,8 +221,9 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
           width: double.infinity,
           height: 6,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(3),
-              color: const Color(0xFF4CAF50)),
+            borderRadius: BorderRadius.circular(3),
+            color: Color(0xFF4CAF50),
+          ),
         ),
       ],
     );

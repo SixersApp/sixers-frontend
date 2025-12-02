@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
-import 'package:sixers/backend/auth/onboarding_provider.dart';
+import 'package:sixers/backend/onboarding/onboarding_provider.dart';
 import 'package:sixers/theme/app_theme.dart';
 import 'package:sixers/views/home/home_screen.dart';
 import 'package:sixers/views/onboarding/experience_screen.dart';

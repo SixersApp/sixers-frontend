@@ -1,126 +1,100 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:dio/dio.dart';
-import 'package:sixers/backend/auth/dio_client.dart';
-import '../auth/auth_provider.dart';
+import 'package:sixers/backend/auth/auth_provider.dart';
+import 'onboarding_service.dart';
 
 part 'onboarding_provider.g.dart';
 
 @riverpod
 class OnboardingStage extends _$OnboardingStage {
+  late final OnboardingService _service;
+
   @override
   Future<int> build() async {
-    final authAsync = ref.watch(authProviderProvider);
+    _service = OnboardingService();
 
-    // Must wait for authentication to load.
-    final session = authAsync.value;
-    if (session == null) return 0;
+    // SAFE AUTH FETCH
+    final auth = await ref.watch(authProviderProvider.future);
+    if (auth == null || auth.userId.isEmpty) return 0;
 
-    final userId = session.userId;
-    if (userId.isEmpty) return 0;
+    final stage = await _service.fetchStage(auth.userId);
 
-    try {
-      final res = await ApiClient.dio.get("/profile/$userId");
+    if (!ref.mounted) return 0;
 
-      if (res.statusCode != 200) return 0;
-
-      final value = res.data["onboarding_stage"];
-
-      if (value is int) return value;
-      if (value is String) return int.tryParse(value) ?? 0;
-
-      return 0;
-    } catch (_) {
-      return 0;
-    }
+    return stage;
   }
 
-  // BASIC INFO UPDATE
+  // ---------------------------------------------------------
+  // UPDATE BASIC INFO
+  // ---------------------------------------------------------
   Future<void> updateBasicInfo({
     required String fullName,
     required String country,
     required String dob,
   }) async {
-    final session = ref.read(authProviderProvider).value;
-    if (session == null) return;
+    // ❗ MUST use .future here
+    final auth = await ref.watch(authProviderProvider.future);
+    if (!ref.mounted || auth == null || auth.userId.isEmpty) return;
 
-    final userId = session.userId;
-    if (userId.isEmpty) return;
-
-    final parsedDob = DateTime.tryParse(dob)?.toIso8601String().split("T")[0];
-
-    await ApiClient.dio.put(
-      "/profile/$userId",
-      data: {
-        "full_name": fullName,
-        "country": country,
-        "dob": parsedDob,
-        "onboarding_stage": 1,
-      },
+    await _service.updateBasicInfo(
+      userId: auth.userId,
+      fullName: fullName,
+      country: country,
+      dob: dob,
     );
+
+    if (!ref.mounted) return;
 
     state = const AsyncData(1);
   }
 
-  // EXPERIENCE
+  // ---------------------------------------------------------
+  // UPDATE EXPERIENCE
+  // ---------------------------------------------------------
   Future<void> updateExperience(int experience) async {
-    final session = ref.read(authProviderProvider).value;
-    if (session == null) return;
+    final auth = await ref.watch(authProviderProvider.future);
+    if (!ref.mounted || auth == null || auth.userId.isEmpty) return;
 
-    final userId = session.userId;
-    if (userId.isEmpty) return;
-
-    await ApiClient.dio.put(
-      "/profile/$userId",
-      data: {
-        "experience": experience,
-        "onboarding_stage": 2,
-      },
+    await _service.updateExperience(
+      userId: auth.userId,
+      experience: experience,
     );
+
+    if (!ref.mounted) return;
 
     state = const AsyncData(2);
   }
 
+  // ---------------------------------------------------------
   // ADVANCE STAGE
+  // ---------------------------------------------------------
   Future<void> advanceTo(int nextStage) async {
-    final session = ref.read(authProviderProvider).value;
-    if (session == null) return;
+    final auth = await ref.watch(authProviderProvider.future);
+    if (!ref.mounted || auth == null || auth.userId.isEmpty) return;
 
-    final userId = session.userId;
-    if (userId.isEmpty) return;
-
-    await ApiClient.dio.put(
-      "/profile/$userId",
-      data: {"onboarding_stage": nextStage},
+    await _service.updateStage(
+      userId: auth.userId,
+      stage: nextStage,
     );
+
+    if (!ref.mounted) return;
 
     state = AsyncData(nextStage);
   }
 
+  // ---------------------------------------------------------
   // FETCH PROFILE
+  // ---------------------------------------------------------
   Future<Map<String, dynamic>> fetchProfile() async {
-    final session = ref.read(authProviderProvider).value;
-    if (session == null) return {};
-
-    final userId = session.userId;
-    if (userId.isEmpty) return {};
-
-    try {
-      final res = await ApiClient.dio.get("/profile/$userId");
-
-      if (res.statusCode == 200) {
-        return {
-          "full_name": res.data["full_name"],
-          "country": res.data["country"],
-          "dob": res.data["dob"],
-          "onboarding_stage": res.data["onboarding_stage"],
-          "experience": res.data["experience"],
-        };
-      }
-    } catch (e) {
-      print("Error fetching profile: $e");
+    final auth = await ref.watch(authProviderProvider.future);
+    if (!ref.mounted || auth == null || auth.userId.isEmpty) {
+      return {};
     }
 
-    return {};
+    final data = await _service.fetchProfile(auth.userId);
+
+    if (!ref.mounted) return {};
+
+    return data;
   }
 
   Future<void> complete() => advanceTo(2);
