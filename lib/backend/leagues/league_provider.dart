@@ -1,33 +1,31 @@
 // lib/backend/leagues/league_provider.dart
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../auth/auth_provider.dart';
 import 'league_model.dart';
 import 'league_service.dart';
-import '../auth/auth_provider.dart';
 
-final leaguesProvider =
-    AsyncNotifierProvider<LeaguesNotifier, List<League>>(LeaguesNotifier.new);
+part 'league_provider.g.dart';
 
-class LeaguesNotifier extends AsyncNotifier<List<League>> {
-  late final LeagueService _service;
-
+@riverpod
+class Leagues extends _$Leagues {
   @override
   Future<List<League>> build() async {
-    _service = LeagueService();
+    // Wait for authentication to finish loading
+    final auth = await ref.watch(authProviderProvider.future);
+    if (auth == null) return [];
 
+    final service = LeagueService();
 
     try {
-      final leagues = await _service.getLeagues();
-      return leagues;
+      return await service.getLeagues();
     } catch (e, st) {
-      // Optional: log for debugging
-      // ignore: avoid_print
-      print("Error loading leagues: $e\n$st");
-      // Let Riverpod see the error so UI can show fallback
-      throw e;
+      print("❌ Error loading leagues: $e\n$st");
+      rethrow;
     }
   }
 
+  /// Allows manual refreshing just like matchups
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() => build());

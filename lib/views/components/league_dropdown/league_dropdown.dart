@@ -12,8 +12,8 @@ class LeagueDropdown extends ConsumerWidget {
   const LeagueDropdown({
     super.key,
     this.onSelected,
-    this.label = 'SIXERS',
-    this.width = 'auto',
+    this.label = "SIXERS",
+    this.width = "auto",
     this.selectedLeague,
   });
 
@@ -24,144 +24,137 @@ class LeagueDropdown extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final leaguesAsync = ref.watch(leaguesProvider);
+    final leaguesAv = ref.watch(leaguesProvider);
 
-    return Theme(
-      data: Theme.of(context).copyWith(
-        popupMenuTheme: PopupMenuThemeData(
-          color: AppColors.black200,
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          elevation: 8,
-          textStyle:
-              Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.black800),
-        ),
-      ),
-      child: PopupMenuButton<League?>(
-        onSelected: (value) {
-          if (value != null) {
-            onSelected?.call(value);
-          }
-        },
-        itemBuilder: (ctx) {
-          final List<PopupMenuEntry<League?>> entries = [
-            const PopupMenuDivider(height: 8),
-            PopupMenuItem<League?>(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Row(
-                children: [
-                  Icon(PhosphorIcons.plusCircle(), size: 18, color: AppColors.black800),
-                  const SizedBox(width: 10),
-                  const Text('Create New League'),
-                ],
-              ),
-              onTap: () => GoRouter.of(ctx).push('/create-league'),
-            ),
-            PopupMenuItem<League?>(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Row(
-                children: [
-                  Icon(PhosphorIcons.signIn(), size: 18, color: AppColors.black800),
-                  const SizedBox(width: 10),
-                  const Text('Join New League'),
-                ],
-              ),
-              onTap: () => GoRouter.of(ctx).push('/joinLeague'),
-            ),
-          ];
+    return PopupMenuButton<League?>(
+      onSelected: (value) {
+        if (value != null) {
+          onSelected?.call(value);
+        }
+      },
+      itemBuilder: (ctx) {
+        final List<PopupMenuEntry<League?>> menuItems = [];
 
-          // LEAGUE LIST
-          final leagueItems = leaguesAsync.maybeWhen(
-            data: (leagues) {
-              if (leagues.isEmpty) {
-                return [
-                  const PopupMenuItem<League?>(
-                    enabled: false,
-                    child: Text('No leagues yet'),
-                  )
-                ];
-              }
-
-              return leagues.map((l) {
-                return PopupMenuItem<League?>(
-                  value: l,
-                  child: Consumer(
-                    builder: (context, ref, child) {
-                      final teamAsync = ref.watch(userTeamInLeagueProvider(l.id));
-                      return teamAsync.when(
-                        data: (team) => LeagueItem(
-                          league: l,
-                          teamName: team?.teamName ?? "No Team",
-                        ),
-                        loading: () => LeagueItem(league: l, teamName: "Loading..."),
-                        error: (_, __) => LeagueItem(league: l, teamName: "Error"),
-                      );
-                    },
-                  ),
-                );
-              }).toList();
-            },
-            loading: () => [
-              const PopupMenuItem<League?>(
+        /// -------------------------
+        /// LEAGUE LIST
+        /// -------------------------
+        leaguesAv.when(
+          loading: () {
+            menuItems.add(
+              const PopupMenuItem(
                 enabled: false,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            ],
-            orElse: () => [
-              const PopupMenuItem<League?>(enabled: false, child: Text("Failed to load"))
-            ],
-          );
-
-          return [...leagueItems, ...entries];
-        },
-        child: Container(
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(6)),
-          padding: const EdgeInsets.only(right: 20),
-          child: Row(
-            mainAxisSize: width == "auto" ? MainAxisSize.min : MainAxisSize.max,
-            mainAxisAlignment:
-                width == "fill" ? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
-            children: [
-              selectedLeague != null
-                  ? Consumer(
+                child: SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            );
+          },
+          error: (_, __) {
+            menuItems.add(
+              const PopupMenuItem(
+                enabled: false,
+                child: Text("Failed to load"),
+              ),
+            );
+          },
+          data: (leagues) {
+            if (leagues.isEmpty) {
+              menuItems.add(
+                const PopupMenuItem(
+                  enabled: false,
+                  child: Text("No leagues yet"),
+                ),
+              );
+            } else {
+              menuItems.addAll(
+                leagues.map(
+                  (l) => PopupMenuItem(
+                    value: l,
+                    child: Consumer(
                       builder: (context, ref, _) {
-                        final teamAsync = ref.watch(
-                          userTeamInLeagueProvider(selectedLeague!.id),
-                        );
-                        return teamAsync.when(
-                          data: (team) => LeagueItem(
-                            league: selectedLeague!,
-                            teamName: team?.teamName ?? 'No Team',
-                          ),
-                          loading: () => LeagueItem(
-                            league: selectedLeague!,
-                            teamName: 'Loading...',
-                          ),
-                          error: (_, __) => LeagueItem(
-                            league: selectedLeague!,
-                            teamName: 'Error',
-                          ),
+                        // USER'S OWN TEAMS
+                        final teamsAv = ref.watch(fantasyTeamsProvider);
+
+                        return teamsAv.when(
+                          loading: () =>
+                              LeagueItem(league: l, teamName: "Loading..."),
+                          error: (_, __) =>
+                              LeagueItem(league: l, teamName: "Error"),
+                          data: (teams) {
+                            // find THIS USER's team for this league
+                            final userTeam = teams
+                                .firstWhereOrNull(
+                                  (t) => t.leagueId == l.id,
+                                )
+                                ?.teamName;
+
+                            return LeagueItem(
+                              league: l,
+                              teamName: userTeam ?? "No Team",
+                            );
+                          },
                         );
                       },
-                    )
-                  : Row(
-                      children: [
-                        Image.asset('assets/sixers_logo.png', width: 24, height: 24),
-                        const SizedBox(width: 8),
-                        Text(label,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.copyWith(color: AppColors.black800)),
-                      ],
                     ),
-              Icon(
-                PhosphorIcons.caretDown(PhosphorIconsStyle.fill),
-                color: AppColors.black800,
-                size: 18,
-              )
-            ],
+                  ),
+                ),
+              );
+            }
+          },
+        );
+
+        /// -------------------------
+        /// DIVIDER + CREATE/JOIN ACTIONS
+        /// -------------------------
+        menuItems.add(const PopupMenuDivider());
+
+        menuItems.add(
+          PopupMenuItem(
+            child: Row(
+              children: [
+                Icon(PhosphorIcons.plusCircle(), color: AppColors.black800),
+                const SizedBox(width: 10),
+                const Text("Create New League"),
+              ],
+            ),
+            onTap: () => GoRouter.of(ctx).push("/create-league"),
           ),
+        );
+
+        menuItems.add(
+          PopupMenuItem(
+            child: Row(
+              children: [
+                Icon(PhosphorIcons.signIn(), color: AppColors.black800),
+                const SizedBox(width: 10),
+                const Text("Join New League"),
+              ],
+            ),
+            onTap: () => GoRouter.of(ctx).push("/joinLeague"),
+          ),
+        );
+
+        return menuItems;
+      },
+      child: Container(
+        padding: const EdgeInsets.only(right: 8),
+        child: Row(
+          mainAxisSize:
+              width == "auto" ? MainAxisSize.min : MainAxisSize.max,
+          children: [
+            selectedLeague != null
+                ? Text(
+                    selectedLeague!.name,
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                  )
+                : Text(
+                    label,
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+            const Icon(Icons.arrow_drop_down, color: Colors.white),
+          ],
         ),
       ),
     );
@@ -215,7 +208,7 @@ class _LeagueAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final initials = name.isNotEmpty
-        ? name.split(" ").map((word) => word[0]).take(2).join().toUpperCase()
+        ? name.split(" ").map((w) => w[0]).take(2).join().toUpperCase()
         : "?";
 
     return Container(
@@ -228,10 +221,10 @@ class _LeagueAvatar extends StatelessWidget {
       ),
       child: Text(
         initials,
-        style: Theme.of(context)
-            .textTheme
-            .labelMedium
-            ?.copyWith(color: AppColors.black800, fontWeight: FontWeight.bold),
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: AppColors.black800,
+              fontWeight: FontWeight.bold,
+            ),
       ),
     );
   }

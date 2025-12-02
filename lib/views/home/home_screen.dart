@@ -24,13 +24,13 @@ class HomeScreen extends ConsumerWidget {
       data: (session) {
         final userId = session?.userId ?? "";
 
-        // Leagues always load
+        // Fetch leagues normally
         final leaguesAsync = ref.watch(leaguesProvider);
 
-        // Matchups loaded by matchNum only
+        // Fetch matchups by matchNum only
         final matchupsAsync = userId.isEmpty
             ? const AsyncValue.data([])
-            : ref.watch(userMatchupsProvider(1));
+            : ref.watch(userMatchupsProvider(2));
 
         return Scaffold(
           body: SafeArea(
@@ -53,8 +53,8 @@ class HomeScreen extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             LeagueDropdown(
-                              onSelected: (league) => GoRouter.of(context)
-                                  .push('/league', extra: {
+                              onSelected: (league) =>
+                                  GoRouter.of(context).push('/league', extra: {
                                 "leagueId": league.id,
                               }),
                             ),
@@ -99,6 +99,7 @@ class HomeScreen extends ConsumerWidget {
                       error: (err, _) =>
                           Center(child: Text("Failed to load matches: $err")),
                       data: (matchups) {
+                        // Handle leagues too
                         final leagues = leaguesAsync.value ?? [];
 
                         final pendingLeagues = leagues
@@ -119,6 +120,7 @@ class HomeScreen extends ConsumerWidget {
                             final pad = EdgeInsets.only(
                                 left: index == 0 ? 10 : 0, right: 10);
 
+                            // ---------- Pending leagues ----------
                             if (index < pendingLeagues.length) {
                               return Padding(
                                 padding: pad,
@@ -127,11 +129,24 @@ class HomeScreen extends ConsumerWidget {
                               );
                             }
 
+                            // ---------- Matchups ----------
                             final m =
                                 matchups[index - pendingLeagues.length];
 
-                            final league =
-                                leagues.firstWhere((l) => l.id == m.leagueId);
+                            final league = leagues.firstWhere(
+                              (l) => l.id == m.leagueId,
+                              orElse: () => League(
+                                id: m.leagueId,
+                                name: "Unknown League",
+                                tournamentId: "",
+                                creatorId: "",
+                                status: LeagueStatus.active,
+                                maxTeams: 0,
+                                joinCode: "",
+                                seasonId: "",
+                                createdAt: DateTime.now(),
+                              ),
+                            );
 
                             return Padding(
                               padding: pad,
@@ -154,7 +169,7 @@ class HomeScreen extends ConsumerWidget {
                                 team2Logo: const Icon(Icons.sports_cricket,
                                     color: Colors.white, size: 25),
 
-                                leagueName: league.name,
+                                leagueName: league?.name ?? "Unknown League",
                                 gameNumber: "Game ${m.matchNum}",
                                 isLive: false,
                                 matchupId: m.id,
