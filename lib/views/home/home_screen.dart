@@ -6,8 +6,10 @@ import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/fantasy_matchup/matchup_provider.dart';
 import 'package:sixers/views/components/league_dropdown/league_dropdown.dart';
+import 'package:sixers/views/components/matches/match_feed.dart';
 import 'package:sixers/views/components/matchup_card/matchup_card.dart';
 import 'package:sixers/theme/colors.dart';
+
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -32,7 +34,7 @@ class HomeScreen extends ConsumerWidget {
         // Fetch leagues
         final leaguesAsync = ref.watch(leaguesProvider);
 
-        // Fetch matchups (match 2 for now)
+        // Fetch matchups (match 2)
         final matchupsAsync = userId.isEmpty
             ? const AsyncValue.data([])
             : ref.watch(userMatchupsProvider(2));
@@ -102,11 +104,9 @@ class HomeScreen extends ConsumerWidget {
                       loading: () => const Center(
                         child: CircularProgressIndicator(strokeWidth: 2),
                       ),
-
                       error: (err, _) => Center(
                         child: Text("Failed to load matches: $err"),
                       ),
-
                       data: (matchups) {
                         final leagues = leaguesAsync.value ?? [];
 
@@ -158,10 +158,10 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             );
 
-                            final team1Score = _parseScore(
-                                m.fantasyTeamInstance1Score);
-                            final team2Score = _parseScore(
-                                m.fantasyTeamInstance2Score);
+                            final team1Score =
+                                _parseScore(m.fantasyTeamInstance1Score);
+                            final team2Score =
+                                _parseScore(m.fantasyTeamInstance2Score);
 
                             return Padding(
                               padding: pad,
@@ -176,7 +176,6 @@ class HomeScreen extends ConsumerWidget {
                                   color: Colors.white,
                                   size: 25,
                                 ),
-
                                 team2Name:
                                     m.fantasyTeam2Name ?? "Team 2",
                                 team2Score: team2Score.toStringAsFixed(1),
@@ -187,7 +186,6 @@ class HomeScreen extends ConsumerWidget {
                                   color: Colors.white,
                                   size: 25,
                                 ),
-
                                 leagueName: league.name,
                                 gameNumber: "Game ${m.matchNum}",
                                 isLive: false,
@@ -203,7 +201,7 @@ class HomeScreen extends ConsumerWidget {
 
                   const SizedBox(height: 20),
 
-                  // --------------- UPCOMING ------------------
+                  // --------------- UPCOMING HEADER ------------------
                   Padding(
                     padding: const EdgeInsets.all(12),
                     child: Text(
@@ -214,6 +212,14 @@ class HomeScreen extends ConsumerWidget {
                           ?.copyWith(color: AppColors.black600),
                     ),
                   ),
+
+                  // --------------- MATCH FEED SECTION ------------------
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: MatchFeedSection(),
+                  ),
+
+                  const SizedBox(height: 30),
                 ],
               ),
             ),
