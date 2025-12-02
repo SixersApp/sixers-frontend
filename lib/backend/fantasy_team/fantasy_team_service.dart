@@ -18,7 +18,7 @@ class FantasyTeamService {
     required String userId,
     required String leagueId,
   }) async {
-    final res = await _dio.get("/fantasy-teams/by-league?leagueId=$leagueId");
+    final res = await _dio.get("/user-fantasy-team/by-league?leagueId=$leagueId");
 
     if (res.data == null) return null;
 

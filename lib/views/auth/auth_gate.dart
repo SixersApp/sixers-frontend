@@ -44,7 +44,7 @@ class AuthGate extends ConsumerWidget {
               case 1:
                 return const ExperienceScreen();
               default:
-                return HomeScreen();
+                return SignInScreen();
             }
           },
         );
