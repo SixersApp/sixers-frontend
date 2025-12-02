@@ -19,14 +19,16 @@ class FantasyMatchupScreen extends ConsumerWidget {
     final team2Async = ref.watch(fantasyPlayerControllerProvider(team2FtiId));
 
     if (team1Async.isLoading || team2Async.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
     if (team1Async.hasError) {
-      return Text("Team 1 ERROR: ${team1Async.error}");
+      return Scaffold(body: Center(child: Text("Team 1 ERROR: ${team1Async.error}")));
     }
     if (team2Async.hasError) {
-      return Text("Team 2 ERROR: ${team2Async.error}");
+      return Scaffold(body: Center(child: Text("Team 2 ERROR: ${team2Async.error}")));
     }
 
     final team1 = team1Async.value!;
@@ -36,45 +38,86 @@ class FantasyMatchupScreen extends ConsumerWidget {
     final team2Score = team2.fold<int>(0, (sum, p) => sum + p.fantasyPoints);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Matchup")),
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: const Text(
+          "Matchup",
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 24),
+        ),
+      ),
+      backgroundColor: const Color(0xFF0D0D0D),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         children: [
-          // --- SCORE HEADER (like screenshot top) ---
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text("$team1Score",
+          // ------- Score Header -------
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "$team1Score",
                   style: const TextStyle(
-                      fontSize: 32, fontWeight: FontWeight.bold)),
-              const Text(" : ", style: TextStyle(fontSize: 32)),
-              Text("$team2Score",
+                    fontSize: 36,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Text(
+                  ":",
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.w300,
+                    color: Colors.grey.shade300,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Text(
+                  "$team2Score",
                   style: const TextStyle(
-                      fontSize: 32, fontWeight: FontWeight.bold)),
-            ],
+                    fontSize: 36,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
 
-          // -------- TEAM 1 TITLE --------
-          Text("Team 1 Players",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-          const SizedBox(height: 10),
+          // ------- Team 1 -------
+          Text(
+            "Team 1 Players",
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade300,
+            ),
+          ),
+          const SizedBox(height: 12),
 
           ...team1.map((p) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: 10),
                 child: PlayerRow(p: p),
               )),
 
-          const SizedBox(height: 30),
+          const SizedBox(height: 26),
 
-          // -------- TEAM 2 TITLE --------
-          Text("Team 2 Players",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-          const SizedBox(height: 10),
+          // ------- Team 2 -------
+          Text(
+            "Team 2 Players",
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade300,
+            ),
+          ),
+          const SizedBox(height: 12),
 
           ...team2.map((p) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: 10),
                 child: PlayerRow(p: p),
               )),
         ],

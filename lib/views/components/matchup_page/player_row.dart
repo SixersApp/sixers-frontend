@@ -9,39 +9,67 @@ class PlayerRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
       decoration: BoxDecoration(
-        color: const Color(0xff121212),
-        borderRadius: BorderRadius.circular(10),
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          // Player name + placeholder badge
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(p.fullName,    // placeholder
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-              Text("${p.homeTeamName} vs ${p.awayTeamName}",
-                  style: TextStyle(fontSize: 12, color: Colors.grey)),
-            ],
-          ),
-          Spacer(),
-
-          // Fantasy points (big green arrow in screenshot)
-          Row(
-            children: [
-              Text(
-                "${p.fantasyPoints}",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.greenAccent,
+          // Player info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  p.fullName ?? "PLAYER NAME",
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 4),
-              Icon(Icons.arrow_upward, color: Colors.greenAccent, size: 18),
-            ],
+                const SizedBox(height: 3),
+                Text(
+                  "${p.homeTeamName} vs ${p.awayTeamName}",
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Fantasy points widget
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F2E12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  "${p.fantasyPoints}",
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF3FFF7F),
+                  ),
+                ),
+                const SizedBox(width: 2),
+                const Icon(Icons.arrow_upward,
+                    color: Color(0xFF3FFF7F), size: 17),
+              ],
+            ),
           ),
         ],
       ),
