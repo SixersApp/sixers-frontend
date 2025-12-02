@@ -10,6 +10,7 @@ sealed class MatchModel with _$MatchModel {
 
     @JsonKey(name: "match_date") String? matchDate,
     @JsonKey(name: "tournament_id") String? tournamentId,
+    @JsonKey(name: "tournament_name") String? tournamentName,
     @JsonKey(name: "season_id") String? seasonId,
     @JsonKey(name: "venue_id") String? venueId,
 

@@ -40,8 +40,7 @@ class MatchFeedSection extends ConsumerWidget {
             );
 
             final upcoming = list
-                .where((m) => (m.status ?? "").toLowerCase() != "live")
-                .take(3);
+                .where((m) => (m.status ?? "").toLowerCase() != "live");
 
             final combined = [...live, ...upcoming];
 
@@ -65,7 +64,7 @@ class MatchFeedSection extends ConsumerWidget {
                       m.awayTeamBalls,
                     ),
 
-                    tournamentLabel: _formatTournament(m.tournamentId),
+                    tournamentLabel: m.tournamentName ?? "",
                     isLive: (m.status ?? "").toLowerCase() == "live",
                   );
                 },
@@ -144,8 +143,4 @@ class MatchFeedSection extends ConsumerWidget {
   // ---------------------------------------------------------------------------
   // TOURNAMENT TAG — fallback when tournamentId is null
   // ---------------------------------------------------------------------------
-  String _formatTournament(String? id) {
-    if (id == null || id.isEmpty) return "Tournament";
-    return id.length > 10 ? id.substring(0, 10) : id;
-  }
 }
