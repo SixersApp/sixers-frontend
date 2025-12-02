@@ -15,7 +15,6 @@ _League _$LeagueFromJson(Map<String, dynamic> json) => _League(
   maxTeams: (json['max_teams'] as num).toInt(),
   joinCode: json['join_code'] as String,
   seasonId: json['season_id'] as String,
-  createdAt: DateTime.parse(json['created_at'] as String),
 );
 
 Map<String, dynamic> _$LeagueToJson(_League instance) => <String, dynamic>{
@@ -27,5 +26,4 @@ Map<String, dynamic> _$LeagueToJson(_League instance) => <String, dynamic>{
   'max_teams': instance.maxTeams,
   'join_code': instance.joinCode,
   'season_id': instance.seasonId,
-  'created_at': instance.createdAt.toIso8601String(),
 };

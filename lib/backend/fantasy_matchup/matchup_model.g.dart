@@ -10,28 +10,26 @@ _Matchup _$MatchupFromJson(Map<String, dynamic> json) => _Matchup(
   id: json['id'] as String,
   leagueId: json['league_id'] as String,
   matchNum: (json['match_num'] as num).toInt(),
-  teamInstance1Id: json['fantasy_team_instance1_id'] as String,
-  teamInstance2Id: json['fantasy_team_instance2_id'] as String,
-  team1Score: _doubleFromJson(json['fantasy_team_instance1_score']),
-  team2Score: _doubleFromJson(json['fantasy_team_instance2_score']),
-  winnerTeamInstanceId: json['fantasy_winner_team_instance_id'] as String?,
-  team1: json['team1'] == null
-      ? null
-      : FantasyTeamInstance.fromJson(json['team1'] as Map<String, dynamic>),
-  team2: json['team2'] == null
-      ? null
-      : FantasyTeamInstance.fromJson(json['team2'] as Map<String, dynamic>),
+  fantasyTeamInstance1Id: json['fantasy_team_instance1_id'] as String,
+  fantasyTeam1Id: json['fantasy_team1_id'] as String,
+  fantasyTeam1Name: json['fantasy_team1_name'] as String?,
+  fantasyTeamInstance1Score: json['fantasy_team_instance1_score'] as String?,
+  fantasyTeamInstance2Id: json['fantasy_team_instance2_id'] as String,
+  fantasyTeam2Id: json['fantasy_team2_id'] as String,
+  fantasyTeam2Name: json['fantasy_team2_name'] as String?,
+  fantasyTeamInstance2Score: json['fantasy_team_instance2_score'] as String?,
 );
 
 Map<String, dynamic> _$MatchupToJson(_Matchup instance) => <String, dynamic>{
   'id': instance.id,
   'league_id': instance.leagueId,
   'match_num': instance.matchNum,
-  'fantasy_team_instance1_id': instance.teamInstance1Id,
-  'fantasy_team_instance2_id': instance.teamInstance2Id,
-  'fantasy_team_instance1_score': _doubleToJson(instance.team1Score),
-  'fantasy_team_instance2_score': _doubleToJson(instance.team2Score),
-  'fantasy_winner_team_instance_id': instance.winnerTeamInstanceId,
-  'team1': instance.team1,
-  'team2': instance.team2,
+  'fantasy_team_instance1_id': instance.fantasyTeamInstance1Id,
+  'fantasy_team1_id': instance.fantasyTeam1Id,
+  'fantasy_team1_name': instance.fantasyTeam1Name,
+  'fantasy_team_instance1_score': instance.fantasyTeamInstance1Score,
+  'fantasy_team_instance2_id': instance.fantasyTeamInstance2Id,
+  'fantasy_team2_id': instance.fantasyTeam2Id,
+  'fantasy_team2_name': instance.fantasyTeam2Name,
+  'fantasy_team_instance2_score': instance.fantasyTeamInstance2Score,
 };

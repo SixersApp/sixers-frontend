@@ -51,7 +51,6 @@ sealed class League with _$League {
     @JsonKey(name: "max_teams") required int maxTeams,
     @JsonKey(name: "join_code") required String joinCode,
     @JsonKey(name: "season_id") required String seasonId,
-    @JsonKey(name: "created_at") required DateTime createdAt,
   }) = _League;
 
   factory League.fromJson(Map<String, dynamic> json) =>

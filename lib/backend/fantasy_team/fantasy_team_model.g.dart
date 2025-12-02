@@ -8,23 +8,23 @@ part of 'fantasy_team_model.dart';
 
 _FantasyTeam _$FantasyTeamFromJson(Map<String, dynamic> json) => _FantasyTeam(
   id: json['id'] as String,
-  leagueId: json['leagueId'] as String,
-  userId: json['userId'] as String,
-  teamName: json['teamName'] as String,
-  draftOrder: (json['draftOrder'] as num).toInt(),
-  teamColor: json['teamColor'] as String,
-  teamIcon: json['teamIcon'] as String,
-  createdAt: DateTime.parse(json['createdAt'] as String),
+  leagueId: json['league_id'] as String,
+  userId: json['user_id'] as String,
+  teamName: json['team_name'] as String,
+  draftOrder: (json['draft_order'] as num?)?.toInt(),
+  teamColor: json['team_color'] as String?,
+  teamIcon: json['team_icon'] as String?,
+  createdAt: json['created_at'] as String?,
 );
 
 Map<String, dynamic> _$FantasyTeamToJson(_FantasyTeam instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'leagueId': instance.leagueId,
-      'userId': instance.userId,
-      'teamName': instance.teamName,
-      'draftOrder': instance.draftOrder,
-      'teamColor': instance.teamColor,
-      'teamIcon': instance.teamIcon,
-      'createdAt': instance.createdAt.toIso8601String(),
+      'league_id': instance.leagueId,
+      'user_id': instance.userId,
+      'team_name': instance.teamName,
+      'draft_order': instance.draftOrder,
+      'team_color': instance.teamColor,
+      'team_icon': instance.teamIcon,
+      'created_at': instance.createdAt,
     };
