@@ -1,16 +1,14 @@
-import 'package:sixers/backend/fantasy_matchup/matchup_model.dart';
-import 'package:sixers/backend/auth/dio_client.dart';
+import '../auth/dio_client.dart';
+import 'matchup_model.dart';
 
 class MatchupService {
-  Future<List<Matchup>> getMatchups({
-    required int matchNum
-  }) async {
+  Future<List<Matchup>> getUserMatchups(int matchNum) async {
     final res = await ApiClient.dio.get(
-      "/matchups",
-      queryParameters: {"match_num": matchNum},
+      "/matchups/match_num",
+      queryParameters: { "match_num": matchNum },
     );
-
-    final List data = res.data as List;
-    return data.map((e) => Matchup.fromJson(e)).toList();
+    return (res.data as List)
+        .map((e) => Matchup.fromJson(e))
+        .toList();
   }
 }

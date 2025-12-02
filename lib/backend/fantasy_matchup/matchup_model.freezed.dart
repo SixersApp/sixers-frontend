@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Matchup {
 
- String get id; String get leagueId; int get matchNum; String get fantasyTeamInstance1Id; String get fantasyTeamInstance2Id; double? get fantasyTeamInstance1Score; double? get fantasyTeamInstance2Score; String? get fantasyWinnerTeamInstanceId; String get createdAt;
+ String get id;@JsonKey(name: "league_id") String get leagueId;@JsonKey(name: "match_num") int get matchNum;@JsonKey(name: "fantasy_team_instance1_id") String get teamInstance1Id;@JsonKey(name: "fantasy_team_instance2_id") String get teamInstance2Id;@JsonKey(name: "fantasy_team_instance1_score", fromJson: _doubleFromJson, toJson: _doubleToJson) double? get team1Score;@JsonKey(name: "fantasy_team_instance2_score", fromJson: _doubleFromJson, toJson: _doubleToJson) double? get team2Score;@JsonKey(name: "fantasy_winner_team_instance_id") String? get winnerTeamInstanceId;// Nested optional models
+ FantasyTeamInstance? get team1; FantasyTeamInstance? get team2;
 /// Create a copy of Matchup
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +29,16 @@ $MatchupCopyWith<Matchup> get copyWith => _$MatchupCopyWithImpl<Matchup>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Matchup&&(identical(other.id, id) || other.id == id)&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.matchNum, matchNum) || other.matchNum == matchNum)&&(identical(other.fantasyTeamInstance1Id, fantasyTeamInstance1Id) || other.fantasyTeamInstance1Id == fantasyTeamInstance1Id)&&(identical(other.fantasyTeamInstance2Id, fantasyTeamInstance2Id) || other.fantasyTeamInstance2Id == fantasyTeamInstance2Id)&&(identical(other.fantasyTeamInstance1Score, fantasyTeamInstance1Score) || other.fantasyTeamInstance1Score == fantasyTeamInstance1Score)&&(identical(other.fantasyTeamInstance2Score, fantasyTeamInstance2Score) || other.fantasyTeamInstance2Score == fantasyTeamInstance2Score)&&(identical(other.fantasyWinnerTeamInstanceId, fantasyWinnerTeamInstanceId) || other.fantasyWinnerTeamInstanceId == fantasyWinnerTeamInstanceId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Matchup&&(identical(other.id, id) || other.id == id)&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.matchNum, matchNum) || other.matchNum == matchNum)&&(identical(other.teamInstance1Id, teamInstance1Id) || other.teamInstance1Id == teamInstance1Id)&&(identical(other.teamInstance2Id, teamInstance2Id) || other.teamInstance2Id == teamInstance2Id)&&(identical(other.team1Score, team1Score) || other.team1Score == team1Score)&&(identical(other.team2Score, team2Score) || other.team2Score == team2Score)&&(identical(other.winnerTeamInstanceId, winnerTeamInstanceId) || other.winnerTeamInstanceId == winnerTeamInstanceId)&&(identical(other.team1, team1) || other.team1 == team1)&&(identical(other.team2, team2) || other.team2 == team2));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,leagueId,matchNum,fantasyTeamInstance1Id,fantasyTeamInstance2Id,fantasyTeamInstance1Score,fantasyTeamInstance2Score,fantasyWinnerTeamInstanceId,createdAt);
+int get hashCode => Object.hash(runtimeType,id,leagueId,matchNum,teamInstance1Id,teamInstance2Id,team1Score,team2Score,winnerTeamInstanceId,team1,team2);
 
 @override
 String toString() {
-  return 'Matchup(id: $id, leagueId: $leagueId, matchNum: $matchNum, fantasyTeamInstance1Id: $fantasyTeamInstance1Id, fantasyTeamInstance2Id: $fantasyTeamInstance2Id, fantasyTeamInstance1Score: $fantasyTeamInstance1Score, fantasyTeamInstance2Score: $fantasyTeamInstance2Score, fantasyWinnerTeamInstanceId: $fantasyWinnerTeamInstanceId, createdAt: $createdAt)';
+  return 'Matchup(id: $id, leagueId: $leagueId, matchNum: $matchNum, teamInstance1Id: $teamInstance1Id, teamInstance2Id: $teamInstance2Id, team1Score: $team1Score, team2Score: $team2Score, winnerTeamInstanceId: $winnerTeamInstanceId, team1: $team1, team2: $team2)';
 }
 
 
@@ -48,11 +49,11 @@ abstract mixin class $MatchupCopyWith<$Res>  {
   factory $MatchupCopyWith(Matchup value, $Res Function(Matchup) _then) = _$MatchupCopyWithImpl;
 @useResult
 $Res call({
- String id, String leagueId, int matchNum, String fantasyTeamInstance1Id, String fantasyTeamInstance2Id, double? fantasyTeamInstance1Score, double? fantasyTeamInstance2Score, String? fantasyWinnerTeamInstanceId, String createdAt
+ String id,@JsonKey(name: "league_id") String leagueId,@JsonKey(name: "match_num") int matchNum,@JsonKey(name: "fantasy_team_instance1_id") String teamInstance1Id,@JsonKey(name: "fantasy_team_instance2_id") String teamInstance2Id,@JsonKey(name: "fantasy_team_instance1_score", fromJson: _doubleFromJson, toJson: _doubleToJson) double? team1Score,@JsonKey(name: "fantasy_team_instance2_score", fromJson: _doubleFromJson, toJson: _doubleToJson) double? team2Score,@JsonKey(name: "fantasy_winner_team_instance_id") String? winnerTeamInstanceId, FantasyTeamInstance? team1, FantasyTeamInstance? team2
 });
 
 
-
+$FantasyTeamInstanceCopyWith<$Res>? get team1;$FantasyTeamInstanceCopyWith<$Res>? get team2;
 
 }
 /// @nodoc
@@ -65,21 +66,46 @@ class _$MatchupCopyWithImpl<$Res>
 
 /// Create a copy of Matchup
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? leagueId = null,Object? matchNum = null,Object? fantasyTeamInstance1Id = null,Object? fantasyTeamInstance2Id = null,Object? fantasyTeamInstance1Score = freezed,Object? fantasyTeamInstance2Score = freezed,Object? fantasyWinnerTeamInstanceId = freezed,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? leagueId = null,Object? matchNum = null,Object? teamInstance1Id = null,Object? teamInstance2Id = null,Object? team1Score = freezed,Object? team2Score = freezed,Object? winnerTeamInstanceId = freezed,Object? team1 = freezed,Object? team2 = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,leagueId: null == leagueId ? _self.leagueId : leagueId // ignore: cast_nullable_to_non_nullable
 as String,matchNum: null == matchNum ? _self.matchNum : matchNum // ignore: cast_nullable_to_non_nullable
-as int,fantasyTeamInstance1Id: null == fantasyTeamInstance1Id ? _self.fantasyTeamInstance1Id : fantasyTeamInstance1Id // ignore: cast_nullable_to_non_nullable
-as String,fantasyTeamInstance2Id: null == fantasyTeamInstance2Id ? _self.fantasyTeamInstance2Id : fantasyTeamInstance2Id // ignore: cast_nullable_to_non_nullable
-as String,fantasyTeamInstance1Score: freezed == fantasyTeamInstance1Score ? _self.fantasyTeamInstance1Score : fantasyTeamInstance1Score // ignore: cast_nullable_to_non_nullable
-as double?,fantasyTeamInstance2Score: freezed == fantasyTeamInstance2Score ? _self.fantasyTeamInstance2Score : fantasyTeamInstance2Score // ignore: cast_nullable_to_non_nullable
-as double?,fantasyWinnerTeamInstanceId: freezed == fantasyWinnerTeamInstanceId ? _self.fantasyWinnerTeamInstanceId : fantasyWinnerTeamInstanceId // ignore: cast_nullable_to_non_nullable
-as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as String,
+as int,teamInstance1Id: null == teamInstance1Id ? _self.teamInstance1Id : teamInstance1Id // ignore: cast_nullable_to_non_nullable
+as String,teamInstance2Id: null == teamInstance2Id ? _self.teamInstance2Id : teamInstance2Id // ignore: cast_nullable_to_non_nullable
+as String,team1Score: freezed == team1Score ? _self.team1Score : team1Score // ignore: cast_nullable_to_non_nullable
+as double?,team2Score: freezed == team2Score ? _self.team2Score : team2Score // ignore: cast_nullable_to_non_nullable
+as double?,winnerTeamInstanceId: freezed == winnerTeamInstanceId ? _self.winnerTeamInstanceId : winnerTeamInstanceId // ignore: cast_nullable_to_non_nullable
+as String?,team1: freezed == team1 ? _self.team1 : team1 // ignore: cast_nullable_to_non_nullable
+as FantasyTeamInstance?,team2: freezed == team2 ? _self.team2 : team2 // ignore: cast_nullable_to_non_nullable
+as FantasyTeamInstance?,
   ));
 }
+/// Create a copy of Matchup
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$FantasyTeamInstanceCopyWith<$Res>? get team1 {
+    if (_self.team1 == null) {
+    return null;
+  }
 
+  return $FantasyTeamInstanceCopyWith<$Res>(_self.team1!, (value) {
+    return _then(_self.copyWith(team1: value));
+  });
+}/// Create a copy of Matchup
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$FantasyTeamInstanceCopyWith<$Res>? get team2 {
+    if (_self.team2 == null) {
+    return null;
+  }
+
+  return $FantasyTeamInstanceCopyWith<$Res>(_self.team2!, (value) {
+    return _then(_self.copyWith(team2: value));
+  });
+}
 }
 
 
@@ -158,10 +184,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String leagueId,  int matchNum,  String fantasyTeamInstance1Id,  String fantasyTeamInstance2Id,  double? fantasyTeamInstance1Score,  double? fantasyTeamInstance2Score,  String? fantasyWinnerTeamInstanceId,  String createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: "league_id")  String leagueId, @JsonKey(name: "match_num")  int matchNum, @JsonKey(name: "fantasy_team_instance1_id")  String teamInstance1Id, @JsonKey(name: "fantasy_team_instance2_id")  String teamInstance2Id, @JsonKey(name: "fantasy_team_instance1_score", fromJson: _doubleFromJson, toJson: _doubleToJson)  double? team1Score, @JsonKey(name: "fantasy_team_instance2_score", fromJson: _doubleFromJson, toJson: _doubleToJson)  double? team2Score, @JsonKey(name: "fantasy_winner_team_instance_id")  String? winnerTeamInstanceId,  FantasyTeamInstance? team1,  FantasyTeamInstance? team2)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Matchup() when $default != null:
-return $default(_that.id,_that.leagueId,_that.matchNum,_that.fantasyTeamInstance1Id,_that.fantasyTeamInstance2Id,_that.fantasyTeamInstance1Score,_that.fantasyTeamInstance2Score,_that.fantasyWinnerTeamInstanceId,_that.createdAt);case _:
+return $default(_that.id,_that.leagueId,_that.matchNum,_that.teamInstance1Id,_that.teamInstance2Id,_that.team1Score,_that.team2Score,_that.winnerTeamInstanceId,_that.team1,_that.team2);case _:
   return orElse();
 
 }
@@ -179,10 +205,10 @@ return $default(_that.id,_that.leagueId,_that.matchNum,_that.fantasyTeamInstance
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String leagueId,  int matchNum,  String fantasyTeamInstance1Id,  String fantasyTeamInstance2Id,  double? fantasyTeamInstance1Score,  double? fantasyTeamInstance2Score,  String? fantasyWinnerTeamInstanceId,  String createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: "league_id")  String leagueId, @JsonKey(name: "match_num")  int matchNum, @JsonKey(name: "fantasy_team_instance1_id")  String teamInstance1Id, @JsonKey(name: "fantasy_team_instance2_id")  String teamInstance2Id, @JsonKey(name: "fantasy_team_instance1_score", fromJson: _doubleFromJson, toJson: _doubleToJson)  double? team1Score, @JsonKey(name: "fantasy_team_instance2_score", fromJson: _doubleFromJson, toJson: _doubleToJson)  double? team2Score, @JsonKey(name: "fantasy_winner_team_instance_id")  String? winnerTeamInstanceId,  FantasyTeamInstance? team1,  FantasyTeamInstance? team2)  $default,) {final _that = this;
 switch (_that) {
 case _Matchup():
-return $default(_that.id,_that.leagueId,_that.matchNum,_that.fantasyTeamInstance1Id,_that.fantasyTeamInstance2Id,_that.fantasyTeamInstance1Score,_that.fantasyTeamInstance2Score,_that.fantasyWinnerTeamInstanceId,_that.createdAt);}
+return $default(_that.id,_that.leagueId,_that.matchNum,_that.teamInstance1Id,_that.teamInstance2Id,_that.team1Score,_that.team2Score,_that.winnerTeamInstanceId,_that.team1,_that.team2);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -196,10 +222,10 @@ return $default(_that.id,_that.leagueId,_that.matchNum,_that.fantasyTeamInstance
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String leagueId,  int matchNum,  String fantasyTeamInstance1Id,  String fantasyTeamInstance2Id,  double? fantasyTeamInstance1Score,  double? fantasyTeamInstance2Score,  String? fantasyWinnerTeamInstanceId,  String createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: "league_id")  String leagueId, @JsonKey(name: "match_num")  int matchNum, @JsonKey(name: "fantasy_team_instance1_id")  String teamInstance1Id, @JsonKey(name: "fantasy_team_instance2_id")  String teamInstance2Id, @JsonKey(name: "fantasy_team_instance1_score", fromJson: _doubleFromJson, toJson: _doubleToJson)  double? team1Score, @JsonKey(name: "fantasy_team_instance2_score", fromJson: _doubleFromJson, toJson: _doubleToJson)  double? team2Score, @JsonKey(name: "fantasy_winner_team_instance_id")  String? winnerTeamInstanceId,  FantasyTeamInstance? team1,  FantasyTeamInstance? team2)?  $default,) {final _that = this;
 switch (_that) {
 case _Matchup() when $default != null:
-return $default(_that.id,_that.leagueId,_that.matchNum,_that.fantasyTeamInstance1Id,_that.fantasyTeamInstance2Id,_that.fantasyTeamInstance1Score,_that.fantasyTeamInstance2Score,_that.fantasyWinnerTeamInstanceId,_that.createdAt);case _:
+return $default(_that.id,_that.leagueId,_that.matchNum,_that.teamInstance1Id,_that.teamInstance2Id,_that.team1Score,_that.team2Score,_that.winnerTeamInstanceId,_that.team1,_that.team2);case _:
   return null;
 
 }
@@ -211,18 +237,20 @@ return $default(_that.id,_that.leagueId,_that.matchNum,_that.fantasyTeamInstance
 @JsonSerializable()
 
 class _Matchup implements Matchup {
-  const _Matchup({required this.id, required this.leagueId, required this.matchNum, required this.fantasyTeamInstance1Id, required this.fantasyTeamInstance2Id, this.fantasyTeamInstance1Score, this.fantasyTeamInstance2Score, this.fantasyWinnerTeamInstanceId, required this.createdAt});
+  const _Matchup({required this.id, @JsonKey(name: "league_id") required this.leagueId, @JsonKey(name: "match_num") required this.matchNum, @JsonKey(name: "fantasy_team_instance1_id") required this.teamInstance1Id, @JsonKey(name: "fantasy_team_instance2_id") required this.teamInstance2Id, @JsonKey(name: "fantasy_team_instance1_score", fromJson: _doubleFromJson, toJson: _doubleToJson) this.team1Score, @JsonKey(name: "fantasy_team_instance2_score", fromJson: _doubleFromJson, toJson: _doubleToJson) this.team2Score, @JsonKey(name: "fantasy_winner_team_instance_id") this.winnerTeamInstanceId, this.team1, this.team2});
   factory _Matchup.fromJson(Map<String, dynamic> json) => _$MatchupFromJson(json);
 
 @override final  String id;
-@override final  String leagueId;
-@override final  int matchNum;
-@override final  String fantasyTeamInstance1Id;
-@override final  String fantasyTeamInstance2Id;
-@override final  double? fantasyTeamInstance1Score;
-@override final  double? fantasyTeamInstance2Score;
-@override final  String? fantasyWinnerTeamInstanceId;
-@override final  String createdAt;
+@override@JsonKey(name: "league_id") final  String leagueId;
+@override@JsonKey(name: "match_num") final  int matchNum;
+@override@JsonKey(name: "fantasy_team_instance1_id") final  String teamInstance1Id;
+@override@JsonKey(name: "fantasy_team_instance2_id") final  String teamInstance2Id;
+@override@JsonKey(name: "fantasy_team_instance1_score", fromJson: _doubleFromJson, toJson: _doubleToJson) final  double? team1Score;
+@override@JsonKey(name: "fantasy_team_instance2_score", fromJson: _doubleFromJson, toJson: _doubleToJson) final  double? team2Score;
+@override@JsonKey(name: "fantasy_winner_team_instance_id") final  String? winnerTeamInstanceId;
+// Nested optional models
+@override final  FantasyTeamInstance? team1;
+@override final  FantasyTeamInstance? team2;
 
 /// Create a copy of Matchup
 /// with the given fields replaced by the non-null parameter values.
@@ -237,16 +265,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Matchup&&(identical(other.id, id) || other.id == id)&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.matchNum, matchNum) || other.matchNum == matchNum)&&(identical(other.fantasyTeamInstance1Id, fantasyTeamInstance1Id) || other.fantasyTeamInstance1Id == fantasyTeamInstance1Id)&&(identical(other.fantasyTeamInstance2Id, fantasyTeamInstance2Id) || other.fantasyTeamInstance2Id == fantasyTeamInstance2Id)&&(identical(other.fantasyTeamInstance1Score, fantasyTeamInstance1Score) || other.fantasyTeamInstance1Score == fantasyTeamInstance1Score)&&(identical(other.fantasyTeamInstance2Score, fantasyTeamInstance2Score) || other.fantasyTeamInstance2Score == fantasyTeamInstance2Score)&&(identical(other.fantasyWinnerTeamInstanceId, fantasyWinnerTeamInstanceId) || other.fantasyWinnerTeamInstanceId == fantasyWinnerTeamInstanceId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Matchup&&(identical(other.id, id) || other.id == id)&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.matchNum, matchNum) || other.matchNum == matchNum)&&(identical(other.teamInstance1Id, teamInstance1Id) || other.teamInstance1Id == teamInstance1Id)&&(identical(other.teamInstance2Id, teamInstance2Id) || other.teamInstance2Id == teamInstance2Id)&&(identical(other.team1Score, team1Score) || other.team1Score == team1Score)&&(identical(other.team2Score, team2Score) || other.team2Score == team2Score)&&(identical(other.winnerTeamInstanceId, winnerTeamInstanceId) || other.winnerTeamInstanceId == winnerTeamInstanceId)&&(identical(other.team1, team1) || other.team1 == team1)&&(identical(other.team2, team2) || other.team2 == team2));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,leagueId,matchNum,fantasyTeamInstance1Id,fantasyTeamInstance2Id,fantasyTeamInstance1Score,fantasyTeamInstance2Score,fantasyWinnerTeamInstanceId,createdAt);
+int get hashCode => Object.hash(runtimeType,id,leagueId,matchNum,teamInstance1Id,teamInstance2Id,team1Score,team2Score,winnerTeamInstanceId,team1,team2);
 
 @override
 String toString() {
-  return 'Matchup(id: $id, leagueId: $leagueId, matchNum: $matchNum, fantasyTeamInstance1Id: $fantasyTeamInstance1Id, fantasyTeamInstance2Id: $fantasyTeamInstance2Id, fantasyTeamInstance1Score: $fantasyTeamInstance1Score, fantasyTeamInstance2Score: $fantasyTeamInstance2Score, fantasyWinnerTeamInstanceId: $fantasyWinnerTeamInstanceId, createdAt: $createdAt)';
+  return 'Matchup(id: $id, leagueId: $leagueId, matchNum: $matchNum, teamInstance1Id: $teamInstance1Id, teamInstance2Id: $teamInstance2Id, team1Score: $team1Score, team2Score: $team2Score, winnerTeamInstanceId: $winnerTeamInstanceId, team1: $team1, team2: $team2)';
 }
 
 
@@ -257,11 +285,11 @@ abstract mixin class _$MatchupCopyWith<$Res> implements $MatchupCopyWith<$Res> {
   factory _$MatchupCopyWith(_Matchup value, $Res Function(_Matchup) _then) = __$MatchupCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String leagueId, int matchNum, String fantasyTeamInstance1Id, String fantasyTeamInstance2Id, double? fantasyTeamInstance1Score, double? fantasyTeamInstance2Score, String? fantasyWinnerTeamInstanceId, String createdAt
+ String id,@JsonKey(name: "league_id") String leagueId,@JsonKey(name: "match_num") int matchNum,@JsonKey(name: "fantasy_team_instance1_id") String teamInstance1Id,@JsonKey(name: "fantasy_team_instance2_id") String teamInstance2Id,@JsonKey(name: "fantasy_team_instance1_score", fromJson: _doubleFromJson, toJson: _doubleToJson) double? team1Score,@JsonKey(name: "fantasy_team_instance2_score", fromJson: _doubleFromJson, toJson: _doubleToJson) double? team2Score,@JsonKey(name: "fantasy_winner_team_instance_id") String? winnerTeamInstanceId, FantasyTeamInstance? team1, FantasyTeamInstance? team2
 });
 
 
-
+@override $FantasyTeamInstanceCopyWith<$Res>? get team1;@override $FantasyTeamInstanceCopyWith<$Res>? get team2;
 
 }
 /// @nodoc
@@ -274,22 +302,47 @@ class __$MatchupCopyWithImpl<$Res>
 
 /// Create a copy of Matchup
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? leagueId = null,Object? matchNum = null,Object? fantasyTeamInstance1Id = null,Object? fantasyTeamInstance2Id = null,Object? fantasyTeamInstance1Score = freezed,Object? fantasyTeamInstance2Score = freezed,Object? fantasyWinnerTeamInstanceId = freezed,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? leagueId = null,Object? matchNum = null,Object? teamInstance1Id = null,Object? teamInstance2Id = null,Object? team1Score = freezed,Object? team2Score = freezed,Object? winnerTeamInstanceId = freezed,Object? team1 = freezed,Object? team2 = freezed,}) {
   return _then(_Matchup(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,leagueId: null == leagueId ? _self.leagueId : leagueId // ignore: cast_nullable_to_non_nullable
 as String,matchNum: null == matchNum ? _self.matchNum : matchNum // ignore: cast_nullable_to_non_nullable
-as int,fantasyTeamInstance1Id: null == fantasyTeamInstance1Id ? _self.fantasyTeamInstance1Id : fantasyTeamInstance1Id // ignore: cast_nullable_to_non_nullable
-as String,fantasyTeamInstance2Id: null == fantasyTeamInstance2Id ? _self.fantasyTeamInstance2Id : fantasyTeamInstance2Id // ignore: cast_nullable_to_non_nullable
-as String,fantasyTeamInstance1Score: freezed == fantasyTeamInstance1Score ? _self.fantasyTeamInstance1Score : fantasyTeamInstance1Score // ignore: cast_nullable_to_non_nullable
-as double?,fantasyTeamInstance2Score: freezed == fantasyTeamInstance2Score ? _self.fantasyTeamInstance2Score : fantasyTeamInstance2Score // ignore: cast_nullable_to_non_nullable
-as double?,fantasyWinnerTeamInstanceId: freezed == fantasyWinnerTeamInstanceId ? _self.fantasyWinnerTeamInstanceId : fantasyWinnerTeamInstanceId // ignore: cast_nullable_to_non_nullable
-as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as String,
+as int,teamInstance1Id: null == teamInstance1Id ? _self.teamInstance1Id : teamInstance1Id // ignore: cast_nullable_to_non_nullable
+as String,teamInstance2Id: null == teamInstance2Id ? _self.teamInstance2Id : teamInstance2Id // ignore: cast_nullable_to_non_nullable
+as String,team1Score: freezed == team1Score ? _self.team1Score : team1Score // ignore: cast_nullable_to_non_nullable
+as double?,team2Score: freezed == team2Score ? _self.team2Score : team2Score // ignore: cast_nullable_to_non_nullable
+as double?,winnerTeamInstanceId: freezed == winnerTeamInstanceId ? _self.winnerTeamInstanceId : winnerTeamInstanceId // ignore: cast_nullable_to_non_nullable
+as String?,team1: freezed == team1 ? _self.team1 : team1 // ignore: cast_nullable_to_non_nullable
+as FantasyTeamInstance?,team2: freezed == team2 ? _self.team2 : team2 // ignore: cast_nullable_to_non_nullable
+as FantasyTeamInstance?,
   ));
 }
 
+/// Create a copy of Matchup
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$FantasyTeamInstanceCopyWith<$Res>? get team1 {
+    if (_self.team1 == null) {
+    return null;
+  }
 
+  return $FantasyTeamInstanceCopyWith<$Res>(_self.team1!, (value) {
+    return _then(_self.copyWith(team1: value));
+  });
+}/// Create a copy of Matchup
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$FantasyTeamInstanceCopyWith<$Res>? get team2 {
+    if (_self.team2 == null) {
+    return null;
+  }
+
+  return $FantasyTeamInstanceCopyWith<$Res>(_self.team2!, (value) {
+    return _then(_self.copyWith(team2: value));
+  });
+}
 }
 
 // dart format on

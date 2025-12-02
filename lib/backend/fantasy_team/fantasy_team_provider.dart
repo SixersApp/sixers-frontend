@@ -1,7 +1,9 @@
+// lib/backend/fantasy_team/fantasy_team_provider.dart
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../auth/auth_provider.dart';
 import 'fantasy_team_model.dart';
 import 'fantasy_team_service.dart';
-import '../auth/auth_provider.dart';
 
 final fantasyTeamsProvider =
     AsyncNotifierProvider<FantasyTeamsNotifier, List<FantasyTeam>>(
@@ -15,46 +17,54 @@ class FantasyTeamsNotifier extends AsyncNotifier<List<FantasyTeam>> {
   Future<List<FantasyTeam>> build() async {
     _service = FantasyTeamService();
 
-    final auth = ref.watch(authProviderProvider);
+    final auth = await ref.watch(authProviderProvider.future);
+    if (auth == null || auth.userId.isEmpty) {
+      return [];
+    }
 
-    return auth.when(
-      loading: () => [],
-      error: (_, __) => [],
-      data: (session) async {
-        final userId = session?.userId;
-        if (userId == null || userId.isEmpty) return [];
-        return await _service.getAllTeams(userId);
-      },
-    );
+    try {
+      return await _service.getAllUsersTeams();
+    } catch (e, st) {
+      // ignore: avoid_print
+      print("Error loading user fantasy teams: $e\n$st");
+      throw e;
+    }
   }
 
-  // ============================================================
-  // 🔹 FUNCTION 1: Refresh user’s fantasy teams
-  // ============================================================
   Future<void> refresh() async {
     state = const AsyncLoading();
-    state = AsyncValue.data(await build());
+    state = await AsyncValue.guard(() => build());
   }
 
-  // ============================================================
-  // 🔹 FUNCTION 2: Get fantasy teams in a league
-  // ============================================================
+  /// Get ALL fantasy teams in a league
   Future<List<FantasyTeam>> getTeamsInLeague(String leagueId) async {
-    return await _service.getTeamsInLeague(leagueId);
+    return _service.getTeamsInLeague(leagueId);
   }
 
-  // ============================================================
-  // 🔹 FUNCTION 3: Get THIS USER'S fantasy team in a league
-  // ============================================================
+  /// Get THIS USER'S fantasy team in a given league
   Future<FantasyTeam?> getTeamForLeague(String leagueId) async {
-    final auth = ref.read(authProviderProvider);
+    final auth = await ref.watch(authProviderProvider.future);
+    final userId = auth?.userId;
+    if (userId == null || userId.isEmpty) return null;
 
-    final userId = auth.value?.userId;
-    if (userId == null) return null;
-
-    return await _service.getTeamForLeague(
-      userId: userId,
-      leagueId: leagueId,
-    );
+    return _service.getTeamForLeague(leagueId);
   }
 }
+
+// ------------------------------------------------------------
+// 🔹 Helper Provider 1: All fantasy teams in a league
+// ------------------------------------------------------------
+final leagueTeamsProvider =
+    FutureProvider.family<List<FantasyTeam>, String>((ref, leagueId) {
+  return ref.read(fantasyTeamsProvider.notifier)
+      .getTeamsInLeague(leagueId);
+});
+
+// ------------------------------------------------------------
+// 🔹 Helper Provider 2: This user's fantasy team in a league
+// ------------------------------------------------------------
+final userTeamInLeagueProvider =
+    FutureProvider.family<FantasyTeam?, String>((ref, leagueId) {
+  return ref.read(fantasyTeamsProvider.notifier)
+      .getTeamForLeague(leagueId);
+});

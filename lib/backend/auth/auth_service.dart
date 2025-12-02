@@ -10,7 +10,12 @@ class AuthService {
       final session = await Amplify.Auth.fetchAuthSession();
       if (!session.isSignedIn) return null;
 
-      return await _buildSessionFromCognito();
+      final appSession = await _buildSessionFromCognito();
+
+      // ✅ IMPORTANT: set token on restore too
+      ApiClient.setAuthToken(appSession.idToken);
+
+      return appSession;
     } on AuthException {
       return null;
     }
