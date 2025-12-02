@@ -20,7 +20,7 @@ class PlayerRow extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("PLAYER NAME",    // placeholder
+              Text(p.fullName,    // placeholder
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
               Text("${p.homeTeamName} vs ${p.awayTeamName}",
                   style: TextStyle(fontSize: 12, color: Colors.grey)),

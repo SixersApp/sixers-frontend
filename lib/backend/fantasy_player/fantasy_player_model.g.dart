@@ -10,6 +10,7 @@ _FantasyPlayer _$FantasyPlayerFromJson(Map<String, dynamic> json) =>
     _FantasyPlayer(
       playerSeasonId: json['player_season_id'] as String? ?? '',
       playerId: json['player_id'] as String? ?? '',
+      fullName: json['full_name'] as String? ?? '',
       performanceId: json['performance_id'] as String? ?? '',
       runsScored: (json['runs_scored'] as num?)?.toInt() ?? 0,
       ballsFaced: (json['balls_faced'] as num?)?.toInt() ?? 0,
@@ -42,6 +43,7 @@ Map<String, dynamic> _$FantasyPlayerToJson(_FantasyPlayer instance) =>
     <String, dynamic>{
       'player_season_id': instance.playerSeasonId,
       'player_id': instance.playerId,
+      'full_name': instance.fullName,
       'performance_id': instance.performanceId,
       'runs_scored': instance.runsScored,
       'balls_faced': instance.ballsFaced,
