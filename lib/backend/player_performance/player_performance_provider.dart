@@ -4,19 +4,23 @@ import 'package:sixers/backend/player_performance/player_performance_service.dar
 
 part 'player_performance_provider.g.dart';
 
+@Riverpod(keepAlive: true)
+PlayerPerformanceService playerPerformanceService(ref) {
+  return PlayerPerformanceService();
+}
+
 @riverpod
 class PlayerPerformanceController extends _$PlayerPerformanceController {
-  late final PlayerPerformanceService _service;
-
   @override
   Future<List<PlayerPerformance>> build(String ftiId) async {
-    _service = PlayerPerformanceService();
-    return _service.fetchPerformances(ftiId);
+    final service = ref.read(playerPerformanceServiceProvider);
+    return service.fetchPerformances(ftiId);
   }
 
-  /// Optional manual refresh
   Future<void> refresh() async {
+    final service = ref.read(playerPerformanceServiceProvider);
+
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => _service.fetchPerformances(ftiId));
+    state = await AsyncValue.guard(() => service.fetchPerformances(ftiId));
   }
 }

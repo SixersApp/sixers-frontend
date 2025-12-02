@@ -9,6 +9,54 @@ part of 'player_performance_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
+@ProviderFor(playerPerformanceService)
+const playerPerformanceServiceProvider = PlayerPerformanceServiceProvider._();
+
+final class PlayerPerformanceServiceProvider
+    extends
+        $FunctionalProvider<
+          PlayerPerformanceService,
+          PlayerPerformanceService,
+          PlayerPerformanceService
+        >
+    with $Provider<PlayerPerformanceService> {
+  const PlayerPerformanceServiceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'playerPerformanceServiceProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$playerPerformanceServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<PlayerPerformanceService> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  PlayerPerformanceService create(Ref ref) {
+    return playerPerformanceService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PlayerPerformanceService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PlayerPerformanceService>(value),
+    );
+  }
+}
+
+String _$playerPerformanceServiceHash() =>
+    r'bc4e15a3f829a79afa86b57a231b223a9d100658';
+
 @ProviderFor(PlayerPerformanceController)
 const playerPerformanceControllerProvider =
     PlayerPerformanceControllerFamily._();
@@ -57,7 +105,7 @@ final class PlayerPerformanceControllerProvider
 }
 
 String _$playerPerformanceControllerHash() =>
-    r'e02c8ad11728b03d9f8cf94a1046a2be5727706a';
+    r'65c6def5fe47fb74541e554721ae00786451c5dd';
 
 final class PlayerPerformanceControllerFamily extends $Family
     with
