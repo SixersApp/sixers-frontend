@@ -11,11 +11,10 @@ _FantasyTeam _$FantasyTeamFromJson(Map<String, dynamic> json) => _FantasyTeam(
   leagueId: json['league_id'] as String,
   userId: json['user_id'] as String,
   teamName: json['team_name'] as String,
-  akaName: json['aka_name'] as String,
   draftOrder: (json['draft_order'] as num?)?.toInt(),
-  createdAt: json['created_at'] == null
-      ? null
-      : DateTime.parse(json['created_at'] as String),
+  teamColor: json['team_color'] as String?,
+  teamIcon: json['team_icon'] as String?,
+  createdAt: json['created_at'] as String?,
 );
 
 Map<String, dynamic> _$FantasyTeamToJson(_FantasyTeam instance) =>
@@ -24,7 +23,8 @@ Map<String, dynamic> _$FantasyTeamToJson(_FantasyTeam instance) =>
       'league_id': instance.leagueId,
       'user_id': instance.userId,
       'team_name': instance.teamName,
-      'aka_name': instance.akaName,
       'draft_order': instance.draftOrder,
-      'created_at': instance.createdAt?.toIso8601String(),
+      'team_color': instance.teamColor,
+      'team_icon': instance.teamIcon,
+      'created_at': instance.createdAt,
     };

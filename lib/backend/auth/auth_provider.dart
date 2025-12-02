@@ -1,33 +1,42 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sixers/backend/auth/app_session.dart';
 import 'package:sixers/backend/auth/auth_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:sixers/utils/logger.dart';
 
 part 'auth_provider.g.dart';
 
-@riverpod
-class Auth extends _$Auth {
-  final _service = AuthService();
+@Riverpod(keepAlive: true)
+class AuthProvider extends _$AuthProvider {
+  late final AuthService _authService;
 
   @override
-  User? build() {
-    _service.authStateChanges.listen((event) {
-      state = event.session?.user;
-    });
-    return _service.currentUser;
+  Future<AppSession?> build() async {
+    _authService = ref.watch(authServiceProvider);
+
+    // Wait for Cognito session BEFORE returning the provider value.
+    final session = await _authService.getCurrentSession();
+
+    return session; // <-- critical fix
   }
 
+  // LOGIN
   Future<void> signIn(String email, String password) async {
-    await _service.signIn(email, password);
+    final session = await _authService.signIn(email, password);
+    state = AsyncData(session); // <-- because build() is async, state must use AsyncData
   }
 
+  // SIGNUP (email verification handled separately)
   Future<void> signUp(String email, String password) async {
-    logInfo("Signing up with $email");
-    final response = await _service.signUp(email, password);
-    logDebug("SignUp response: ${response.user}, ${response.session}");
+    await _authService.signUp(email, password);
   }
 
+  // LOGOUT
   Future<void> signOut() async {
-    await _service.signOut();
+    await _authService.signOut();
+    state = const AsyncData(null);
   }
 }
+
+final authServiceProvider = Provider<AuthService>((ref) {
+  return AuthService();
+});

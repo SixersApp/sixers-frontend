@@ -6,37 +6,50 @@ part of 'league_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$leaguesHash() => r'ad53c47d033c9102523aa486be969a28f6b92bc6';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [Leagues].
 @ProviderFor(Leagues)
-final leaguesProvider =
-    AutoDisposeAsyncNotifierProvider<Leagues, List<League>>.internal(
-      Leagues.new,
-      name: r'leaguesProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$leaguesHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+const leaguesProvider = LeaguesProvider._();
 
-typedef _$Leagues = AutoDisposeAsyncNotifier<List<League>>;
-String _$leagueActionsHash() => r'45ebd205221751058240cd7965dc6ae7ed56b65d';
+final class LeaguesProvider
+    extends $AsyncNotifierProvider<Leagues, List<League>> {
+  const LeaguesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'leaguesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
-/// See also [LeagueActions].
-@ProviderFor(LeagueActions)
-final leagueActionsProvider =
-    AutoDisposeNotifierProvider<LeagueActions, void>.internal(
-      LeagueActions.new,
-      name: r'leagueActionsProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$leagueActionsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  @override
+  String debugGetCreateSourceHash() => _$leaguesHash();
 
-typedef _$LeagueActions = AutoDisposeNotifier<void>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+  @$internal
+  @override
+  Leagues create() => Leagues();
+}
+
+String _$leaguesHash() => r'1a4ee2a9c5f96662dc8df1f3552da0a61979be0b';
+
+abstract class _$Leagues extends $AsyncNotifier<List<League>> {
+  FutureOr<List<League>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<List<League>>, List<League>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<League>>, List<League>>,
+              AsyncValue<List<League>>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
-import 'package:sixers/backend/auth/onboarding_provider.dart';
+import 'package:sixers/backend/onboarding/onboarding_provider.dart';
 import 'package:sixers/theme/app_theme.dart';
+import 'package:sixers/views/home/home_screen.dart';
 import 'package:sixers/views/onboarding/experience_screen.dart';
 import 'package:sixers/views/auth/sign_in_screen.dart';
 import 'package:sixers/views/onboarding/basic_info_screen.dart';
@@ -13,31 +14,40 @@ class AuthGate extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authProvider);
+    final authAsync = ref.watch(authProviderProvider);
 
-    if (user == null) {
-      return const SignInScreen();
-    }
-
-    final stageAsync = ref.watch(onboardingStageProvider(user.id));
-
-    return stageAsync.when(
-      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) => const BasicInfoScreen(),
-      data: (stage) {
-        switch (stage) {
-          case 0:
-            return const BasicInfoScreen();
-          case 1:
-            return const ExperienceScreen();
-          default:
-            return MaterialApp.router(
-              routerConfig: router,
-              theme: AppTheme.dark,
-              darkTheme: AppTheme.dark,
-              themeMode: ThemeMode.dark,
-            );
+    return authAsync.when(
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (err, _) => Scaffold(
+        body: Center(child: Text("Authentication error: $err")),
+      ),
+      data: (session) {
+        // User not logged in → go to login
+        if (session == null) {
+          return const SignInScreen();
         }
+
+        // Now check onboarding state
+        final onboardingAsync = ref.watch(onboardingStageProvider);
+
+        return onboardingAsync.when(
+          loading: () => const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          ),
+          error: (_, __) => const BasicInfoScreen(),
+          data: (stage) {
+            switch (stage) {
+              case 0:
+                return const BasicInfoScreen();
+              case 1:
+                return const ExperienceScreen();
+              default:
+                return HomeScreen();
+            }
+          },
+        );
       },
     );
   }

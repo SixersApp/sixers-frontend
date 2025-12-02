@@ -11,12 +11,10 @@ _League _$LeagueFromJson(Map<String, dynamic> json) => _League(
   name: json['name'] as String,
   tournamentId: json['tournament_id'] as String,
   creatorId: json['creator_id'] as String,
-  status: $enumDecode(_$LeagueStatusEnumMap, json['status']),
+  status: const LeagueStatusConverter().fromJson(json['status'] as String),
   maxTeams: (json['max_teams'] as num).toInt(),
   joinCode: json['join_code'] as String,
-  createdAt: json['created_at'] == null
-      ? null
-      : DateTime.parse(json['created_at'] as String),
+  seasonId: json['season_id'] as String,
 );
 
 Map<String, dynamic> _$LeagueToJson(_League instance) => <String, dynamic>{
@@ -24,15 +22,8 @@ Map<String, dynamic> _$LeagueToJson(_League instance) => <String, dynamic>{
   'name': instance.name,
   'tournament_id': instance.tournamentId,
   'creator_id': instance.creatorId,
-  'status': _$LeagueStatusEnumMap[instance.status]!,
+  'status': const LeagueStatusConverter().toJson(instance.status),
   'max_teams': instance.maxTeams,
   'join_code': instance.joinCode,
-  'created_at': instance.createdAt?.toIso8601String(),
-};
-
-const _$LeagueStatusEnumMap = {
-  LeagueStatus.draft_pending: 'draft_pending',
-  LeagueStatus.draft_in_progress: 'draft_in_progress',
-  LeagueStatus.active: 'active',
-  LeagueStatus.completed: 'completed',
+  'season_id': instance.seasonId,
 };

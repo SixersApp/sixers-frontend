@@ -6,146 +6,80 @@ part of 'draft_state_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$draftStateStreamHash() => r'97aac7e8ebac0d765fd9b1fcebc1454af3804593';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [draftStateStream].
 @ProviderFor(draftStateStream)
-const draftStateStreamProvider = DraftStateStreamFamily();
+const draftStateStreamProvider = DraftStateStreamFamily._();
 
-/// See also [draftStateStream].
-class DraftStateStreamFamily extends Family<AsyncValue<DraftState?>> {
-  /// See also [draftStateStream].
-  const DraftStateStreamFamily();
+final class DraftStateStreamProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<DraftState?>,
+          DraftState?,
+          Stream<DraftState?>
+        >
+    with $FutureModifier<DraftState?>, $StreamProvider<DraftState?> {
+  const DraftStateStreamProvider._({
+    required DraftStateStreamFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'draftStateStreamProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
-  /// See also [draftStateStream].
-  DraftStateStreamProvider call(String leagueId) {
-    return DraftStateStreamProvider(leagueId);
+  @override
+  String debugGetCreateSourceHash() => _$draftStateStreamHash();
+
+  @override
+  String toString() {
+    return r'draftStateStreamProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  DraftStateStreamProvider getProviderOverride(
-    covariant DraftStateStreamProvider provider,
-  ) {
-    return call(provider.leagueId);
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  $StreamProviderElement<DraftState?> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'draftStateStreamProvider';
-}
-
-/// See also [draftStateStream].
-class DraftStateStreamProvider extends StreamProvider<DraftState?> {
-  /// See also [draftStateStream].
-  DraftStateStreamProvider(String leagueId)
-    : this._internal(
-        (ref) => draftStateStream(ref as DraftStateStreamRef, leagueId),
-        from: draftStateStreamProvider,
-        name: r'draftStateStreamProvider',
-        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-            ? null
-            : _$draftStateStreamHash,
-        dependencies: DraftStateStreamFamily._dependencies,
-        allTransitiveDependencies:
-            DraftStateStreamFamily._allTransitiveDependencies,
-        leagueId: leagueId,
-      );
-
-  DraftStateStreamProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.leagueId,
-  }) : super.internal();
-
-  final String leagueId;
-
-  @override
-  Override overrideWith(
-    Stream<DraftState?> Function(DraftStateStreamRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: DraftStateStreamProvider._internal(
-        (ref) => create(ref as DraftStateStreamRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        leagueId: leagueId,
-      ),
-    );
-  }
-
-  @override
-  StreamProviderElement<DraftState?> createElement() {
-    return _DraftStateStreamProviderElement(this);
+  Stream<DraftState?> create(Ref ref) {
+    final argument = this.argument as String;
+    return draftStateStream(ref, argument);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is DraftStateStreamProvider && other.leagueId == leagueId;
+    return other is DraftStateStreamProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, leagueId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin DraftStateStreamRef on StreamProviderRef<DraftState?> {
-  /// The parameter `leagueId` of this provider.
-  String get leagueId;
-}
+String _$draftStateStreamHash() => r'97aac7e8ebac0d765fd9b1fcebc1454af3804593';
 
-class _DraftStateStreamProviderElement
-    extends StreamProviderElement<DraftState?>
-    with DraftStateStreamRef {
-  _DraftStateStreamProviderElement(super.provider);
+final class DraftStateStreamFamily extends $Family
+    with $FunctionalFamilyOverride<Stream<DraftState?>, String> {
+  const DraftStateStreamFamily._()
+    : super(
+        retry: null,
+        name: r'draftStateStreamProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: false,
+      );
+
+  DraftStateStreamProvider call(String leagueId) =>
+      DraftStateStreamProvider._(argument: leagueId, from: this);
 
   @override
-  String get leagueId => (origin as DraftStateStreamProvider).leagueId;
+  String toString() => r'draftStateStreamProvider';
 }
-
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

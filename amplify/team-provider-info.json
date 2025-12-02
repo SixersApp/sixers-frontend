@@ -1,0 +1,16 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-sixersscoring-dev-17eb3-authRole",
+      "UnauthRoleArn": "arn:aws:iam::804320730546:role/amplify-sixersscoring-dev-17eb3-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::804320730546:role/amplify-sixersscoring-dev-17eb3-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-sixersscoring-dev-17eb3-deployment",
+      "UnauthRoleName": "amplify-sixersscoring-dev-17eb3-unauthRole",
+      "StackName": "amplify-sixersscoring-dev-17eb3",
+      "StackId": "arn:aws:cloudformation:us-west-2:804320730546:stack/amplify-sixersscoring-dev-17eb3/18b8e1d0-bc5f-11f0-828e-02f368145315",
+      "AmplifyAppId": "d2mke2k84o44ok",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-sixersscoring-dev-17eb3-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
+    }
+  }
+}

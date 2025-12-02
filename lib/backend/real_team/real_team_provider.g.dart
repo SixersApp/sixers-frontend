@@ -6,155 +6,95 @@ part of 'real_team_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$realTeamsHash() => r'6938219b79a9412bd12c7bc0abdea8d1ce1b31d7';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$RealTeams
-    extends BuildlessAutoDisposeAsyncNotifier<List<RealTeam>> {
-  late final String? tournamentId;
-
-  FutureOr<List<RealTeam>> build({String? tournamentId});
-}
-
-/// See also [RealTeams].
 @ProviderFor(RealTeams)
-const realTeamsProvider = RealTeamsFamily();
+const realTeamsProvider = RealTeamsFamily._();
 
-/// See also [RealTeams].
-class RealTeamsFamily extends Family<AsyncValue<List<RealTeam>>> {
-  /// See also [RealTeams].
-  const RealTeamsFamily();
+final class RealTeamsProvider
+    extends $AsyncNotifierProvider<RealTeams, List<RealTeam>> {
+  const RealTeamsProvider._({
+    required RealTeamsFamily super.from,
+    required String? super.argument,
+  }) : super(
+         retry: null,
+         name: r'realTeamsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
-  /// See also [RealTeams].
-  RealTeamsProvider call({String? tournamentId}) {
-    return RealTeamsProvider(tournamentId: tournamentId);
+  @override
+  String debugGetCreateSourceHash() => _$realTeamsHash();
+
+  @override
+  String toString() {
+    return r'realTeamsProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  RealTeamsProvider getProviderOverride(covariant RealTeamsProvider provider) {
-    return call(tournamentId: provider.tournamentId);
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'realTeamsProvider';
-}
-
-/// See also [RealTeams].
-class RealTeamsProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<RealTeams, List<RealTeam>> {
-  /// See also [RealTeams].
-  RealTeamsProvider({String? tournamentId})
-    : this._internal(
-        () => RealTeams()..tournamentId = tournamentId,
-        from: realTeamsProvider,
-        name: r'realTeamsProvider',
-        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-            ? null
-            : _$realTeamsHash,
-        dependencies: RealTeamsFamily._dependencies,
-        allTransitiveDependencies: RealTeamsFamily._allTransitiveDependencies,
-        tournamentId: tournamentId,
-      );
-
-  RealTeamsProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.tournamentId,
-  }) : super.internal();
-
-  final String? tournamentId;
-
-  @override
-  FutureOr<List<RealTeam>> runNotifierBuild(covariant RealTeams notifier) {
-    return notifier.build(tournamentId: tournamentId);
-  }
-
-  @override
-  Override overrideWith(RealTeams Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: RealTeamsProvider._internal(
-        () => create()..tournamentId = tournamentId,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        tournamentId: tournamentId,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeAsyncNotifierProviderElement<RealTeams, List<RealTeam>>
-  createElement() {
-    return _RealTeamsProviderElement(this);
-  }
+  RealTeams create() => RealTeams();
 
   @override
   bool operator ==(Object other) {
-    return other is RealTeamsProvider && other.tournamentId == tournamentId;
+    return other is RealTeamsProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, tournamentId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin RealTeamsRef on AutoDisposeAsyncNotifierProviderRef<List<RealTeam>> {
-  /// The parameter `tournamentId` of this provider.
-  String? get tournamentId;
-}
+String _$realTeamsHash() => r'6938219b79a9412bd12c7bc0abdea8d1ce1b31d7';
 
-class _RealTeamsProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<RealTeams, List<RealTeam>>
-    with RealTeamsRef {
-  _RealTeamsProviderElement(super.provider);
+final class RealTeamsFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          RealTeams,
+          AsyncValue<List<RealTeam>>,
+          List<RealTeam>,
+          FutureOr<List<RealTeam>>,
+          String?
+        > {
+  const RealTeamsFamily._()
+    : super(
+        retry: null,
+        name: r'realTeamsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  RealTeamsProvider call({String? tournamentId}) =>
+      RealTeamsProvider._(argument: tournamentId, from: this);
 
   @override
-  String? get tournamentId => (origin as RealTeamsProvider).tournamentId;
+  String toString() => r'realTeamsProvider';
 }
 
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$RealTeams extends $AsyncNotifier<List<RealTeam>> {
+  late final _$args = ref.$arg as String?;
+  String? get tournamentId => _$args;
+
+  FutureOr<List<RealTeam>> build({String? tournamentId});
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build(tournamentId: _$args);
+    final ref = this.ref as $Ref<AsyncValue<List<RealTeam>>, List<RealTeam>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<RealTeam>>, List<RealTeam>>,
+              AsyncValue<List<RealTeam>>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}

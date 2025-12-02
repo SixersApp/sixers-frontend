@@ -6,21 +6,51 @@ part of 'tournament_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(Tournaments)
+const tournamentsProvider = TournamentsProvider._();
+
+final class TournamentsProvider
+    extends $AsyncNotifierProvider<Tournaments, List<Tournament>> {
+  const TournamentsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'tournamentsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$tournamentsHash();
+
+  @$internal
+  @override
+  Tournaments create() => Tournaments();
+}
+
 String _$tournamentsHash() => r'ec87dcddf3b84adfef3df4b7521f8eb3b6e45332';
 
-/// See also [Tournaments].
-@ProviderFor(Tournaments)
-final tournamentsProvider =
-    AutoDisposeAsyncNotifierProvider<Tournaments, List<Tournament>>.internal(
-      Tournaments.new,
-      name: r'tournamentsProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$tournamentsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-typedef _$Tournaments = AutoDisposeAsyncNotifier<List<Tournament>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$Tournaments extends $AsyncNotifier<List<Tournament>> {
+  FutureOr<List<Tournament>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref =
+        this.ref as $Ref<AsyncValue<List<Tournament>>, List<Tournament>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<Tournament>>, List<Tournament>>,
+              AsyncValue<List<Tournament>>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}

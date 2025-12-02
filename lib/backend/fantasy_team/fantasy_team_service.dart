@@ -1,34 +1,31 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../auth/dio_client.dart';
 import 'fantasy_team_model.dart';
 
 class FantasyTeamService {
-  final client = Supabase.instance.client;
-
-  Future<List<FantasyTeam>> fetchTeamsForUser(String userId) async {
-    final rows = await client.from('fantasy_teams').select().eq('user_id', userId);
-
-    return (rows as List).map((row) => FantasyTeam.fromJson(row as Map<String, dynamic>)).toList();
+  Future<List<FantasyTeam>> getAllUsersTeams() async {
+    final res = await ApiClient.dio.get("/fantasy-teams");
+    return (res.data as List)
+        .map((e) => FantasyTeam.fromJson(e))
+        .toList();
   }
 
-  Future<List<FantasyTeam>> fetchTeamsForLeague(String leagueId) async {
-    final rows = await client.from('fantasy_teams').select().eq('league_id', leagueId);
+  Future<FantasyTeam?> getTeamForLeague(String leagueId) async {
+    final res = await ApiClient.dio.get(
+      "/user-fantasy-team/by-league",
+      queryParameters: { "leagueId": leagueId },
+    );
 
-    return (rows as List).map((row) => FantasyTeam.fromJson(row as Map<String, dynamic>)).toList();
+    if (res.data == null) return null;
+    return FantasyTeam.fromJson(res.data);
   }
 
-  Future<FantasyTeam?> getTeamById(String id) async {
-    final row = await client.from('fantasy_teams').select().eq('id', id).maybeSingle();
-    return row == null ? null : FantasyTeam.fromJson(row);
+  Future<List<FantasyTeam>> getTeamsInLeague(String leagueId) async {
+    final res = await ApiClient.dio.get(
+      "/fantasy-teams/in-league",
+      queryParameters: { "leagueId": leagueId },
+    );
+    return (res.data as List)
+        .map((e) => FantasyTeam.fromJson(e))
+        .toList();
   }
-
-  Future<FantasyTeam?> getTeamForUser(String userId) async {
-    final row = await client.from('fantasy_teams').select().eq('user_id', userId).maybeSingle();
-    return row == null ? null : FantasyTeam.fromJson(row);
-  }
-
-  Future<void> createTeam(FantasyTeam team) => client.from('fantasy_teams').insert(team.toJson());
-
-  Future<void> updateTeam(FantasyTeam team) => client.from('fantasy_teams').update(team.toJson()).eq('id', team.id);
-
-  Future<void> deleteTeam(String id) => client.from('fantasy_teams').delete().eq('id', id);
 }

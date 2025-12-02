@@ -1,5 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../auth/auth_provider.dart';
 import 'fantasy_team_model.dart';
 import 'fantasy_team_service.dart';
 
@@ -7,44 +7,59 @@ part 'fantasy_team_provider.g.dart';
 
 @riverpod
 class FantasyTeams extends _$FantasyTeams {
-  final _service = FantasyTeamService();
-  String? _leagueId;
+  late final FantasyTeamService _service;
 
   @override
-  Future<List<FantasyTeam>> build({String? leagueId}) async {
-    _leagueId = leagueId;
-    if (leagueId != null) {
-      return _service.fetchTeamsForLeague(leagueId);
+  Future<List<FantasyTeam>> build() async {
+    _service = FantasyTeamService();
+
+    // Wait for auth to load
+    final auth = await ref.watch(authProviderProvider.future);
+    if (auth == null || auth.userId.isEmpty) return [];
+
+    try {
+      return await _service.getAllUsersTeams();
+    } catch (e, st) {
+      print("❌ Error loading fantasy teams: $e\n$st");
+      rethrow;
     }
-    final uid = Supabase.instance.client.auth.currentUser?.id;
-    if (uid == null) return [];
-    return _service.fetchTeamsForUser(uid);
   }
 
+  // ------------------------------------------------------------------
+  // 🔹 Refresh (same behavior as your Matchups.refresh method)
+  // ------------------------------------------------------------------
   Future<void> refresh() async {
     state = const AsyncLoading();
-    final uid = Supabase.instance.client.auth.currentUser?.id;
-    if (uid == null) {
-      state = const AsyncData([]);
-      return;
-    }
-    state = await AsyncValue.guard(() => _service.fetchTeamsForUser(uid));
+    state = await AsyncValue.guard(() => build());
   }
 
-  Future<void> createTeam(FantasyTeam team) async {
-    await _service.createTeam(team);
-    await refresh();
+  // ------------------------------------------------------------------
+  // 🔹 Get all fantasy teams inside a league
+  // ------------------------------------------------------------------
+  Future<List<FantasyTeam>> getTeamsInLeague(String leagueId) async {
+    return _service.getTeamsInLeague(leagueId);
   }
 
-  Future<void> updateTeam(FantasyTeam team) async {
-    await _service.updateTeam(team);
-    await refresh();
-  }
+  // ------------------------------------------------------------------
+  // 🔹 Get THIS USER’S fantasy team for a specific league
+  // ------------------------------------------------------------------
+  Future<FantasyTeam?> getTeamForLeague(String leagueId) async {
+    final auth = await ref.watch(authProviderProvider.future);
+    if (auth == null || auth.userId.isEmpty) return null;
 
-  Future<void> deleteTeam(String id) async {
-    await _service.deleteTeam(id);
-    await refresh();
+    return _service.getTeamForLeague(leagueId);
   }
+}
 
-  Future<FantasyTeam?> getTeamById(String id) => _service.getTeamById(id);
+//
+// -------------------- Helper Providers (unchanged) --------------------
+//
+@riverpod
+Future<List<FantasyTeam>> leagueTeams(ref, String leagueId) {
+  return ref.watch(fantasyTeamsProvider.notifier).getTeamsInLeague(leagueId);
+}
+
+@riverpod
+Future<FantasyTeam?> userTeamInLeague(ref, String leagueId) {
+  return ref.watch(fantasyTeamsProvider.notifier).getTeamForLeague(leagueId);
 }
