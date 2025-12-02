@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'fantasy_player_service.dart';
 import 'fantasy_player_model.dart';
@@ -11,11 +13,23 @@ class FantasyPlayerController extends _$FantasyPlayerController {
   @override
   Future<List<FantasyPlayer>> build(String ftiId) async {
     _service = FantasyPlayerService();
+
+    // Auto refresh
+    final timer = Timer.periodic(const Duration(seconds: 5), (_) {
+      refresh();
+    });
+    ref.onDispose(() => timer.cancel());
+
     return _service.fetchFantasyPlayers(ftiId);
   }
 
   Future<void> refresh() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() => _service.fetchFantasyPlayers(ftiId));
+    final previous = state;          // save current UI state
+
+    final newState = await AsyncValue.guard(() {
+      return _service.fetchFantasyPlayers(ftiId);
+    });
+
+    state = newState.copyWithPrevious(previous);
   }
 }

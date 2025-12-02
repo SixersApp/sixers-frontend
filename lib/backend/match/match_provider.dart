@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'match_service.dart';
@@ -12,33 +13,54 @@ class MatchFeed extends _$MatchFeed {
   @override
   Future<List<MatchModel>> build({String? matchId}) async {
     final auth = await ref.watch(authProviderProvider.future);
-
-    if (auth == null || auth.idToken == null) {
-      return [];
-    }
+    if (auth == null || auth.idToken == null) return [];
 
     _service = MatchService();
 
-    // FEED MODE
+    // --- AUTO REFRESH EVERY 5 SECONDS ---
+    final timer = Timer.periodic(const Duration(seconds: 5), (_) {
+      // If matchId is null = feed mode, else fetch specific match
+      if (matchId == null) {
+        refreshFeed();
+      } else {
+        refreshMatch(matchId);
+      }
+    });
+    ref.onDispose(() => timer.cancel());
+
+    // --- INITIAL LOAD ---
     if (matchId == null) {
       return await _service.fetchHomeFeed();
     }
 
-    // SPECIFIC MATCH MODE
     final match = await _service.fetchMatchById(matchId);
     return [match];
   }
 
-  /// Force refresh feed
+  // -------------------------------------------------------------
+  // Smooth feed refresh (NO loading state, NO flicker)
+  // -------------------------------------------------------------
   Future<void> refreshFeed() async {
-    state = const AsyncLoading();
-    state = AsyncData(await _service.fetchHomeFeed());
+    final previous = state;
+
+    final nextState = await AsyncValue.guard(() async {
+      return await _service.fetchHomeFeed();
+    });
+
+    state = nextState.copyWithPrevious(previous);
   }
 
-  /// Force refresh one match
+  // -------------------------------------------------------------
+  // Smooth single-match refresh (same behavior)
+  // -------------------------------------------------------------
   Future<void> refreshMatch(String matchId) async {
-    state = const AsyncLoading();
-    final data = await _service.fetchMatchById(matchId);
-    state = AsyncData([data]);
+    final previous = state;
+
+    final nextState = await AsyncValue.guard(() async {
+      final match = await _service.fetchMatchById(matchId);
+      return [match];
+    });
+
+    state = nextState.copyWithPrevious(previous);
   }
 }

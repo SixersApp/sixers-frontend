@@ -50,7 +50,7 @@ final class UserMatchupsProvider
   }
 }
 
-String _$userMatchupsHash() => r'57d7ab1074e122f3d57747ce50889d14420413e9';
+String _$userMatchupsHash() => r'b68dd870dc410e360ca3788094b6dfe16293d039';
 
 final class UserMatchupsFamily extends $Family
     with
