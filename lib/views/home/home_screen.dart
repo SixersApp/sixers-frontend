@@ -191,6 +191,15 @@ class HomeScreen extends ConsumerWidget {
                                 isLive: false,
                                 matchupId: m.id,
                                 leagueId: m.leagueId,
+                                onTap: () {
+                                  GoRouter.of(context).push(
+                                    '/matchupScoring',
+                                    extra: {
+                                      "team1": m.fantasyTeamInstance1Id,
+                                      "team2": m.fantasyTeamInstance2Id,
+                                    },
+                                  );
+                                },
                               ),
                             );
                           },

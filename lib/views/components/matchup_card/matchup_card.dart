@@ -26,6 +26,7 @@ class MatchupCard extends StatelessWidget {
     required this.leagueId,
     this.isLive = true,
     this.width,
+    this.onTap,
   });
 
   final String team1Name;
@@ -44,11 +45,20 @@ class MatchupCard extends StatelessWidget {
   final String leagueId;
   final bool isLive;
   final double? width;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => GoRouter.of(context).push('/league', extra: {"leagueId": leagueId, "matchupId": matchupId}),
+      onTap: () {
+        GoRouter.of(context).push(
+          '/matchupScoring',
+          extra: {
+            "team1": team1Name,
+            "team2": team2Name,
+          },
+        );
+      },
       child: Container(
         width: 341,
         decoration: BoxDecoration(color: AppColors.black300, borderRadius: BorderRadius.circular(16)),

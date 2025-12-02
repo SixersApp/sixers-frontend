@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_previews/flutter_previews.dart';
 
 /// A scoreboard-style header widget for showing a live matchup.
 ///
@@ -20,10 +19,8 @@ class MatchupHeader extends StatelessWidget {
     this.gameLabel = 'Game',
     this.leagueLabel,
     this.isLive = true,
-  }) : assert(
-          (leftWinProbability + rightWinProbability) > 0,
-          'Win probabilities must sum to more than 0',
-        );
+  });
+  
 
   /// Data for the left team (home).
   final MatchupTeamInfo leftTeam;
@@ -238,7 +235,7 @@ class _TeamCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                info.managerName,
+                info.teamName,
                 textAlign: isLeft ? TextAlign.left : TextAlign.right,
                 style: textTheme.bodySmall?.copyWith(
                   color: Colors.grey.shade400,
@@ -296,7 +293,7 @@ class _LogoBadge extends StatelessWidget {
               border: Border.all(color: Colors.white, width: 1),
             ),
             child: Text(
-              info.rankLabel,
+              "1",
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
