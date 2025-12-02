@@ -16,7 +16,7 @@ final class ScoringRulesProvider
     extends $AsyncNotifierProvider<ScoringRules, List<ScoringRule>> {
   const ScoringRulesProvider._({
     required ScoringRulesFamily super.from,
-    required String? super.argument,
+    required String super.argument,
   }) : super(
          retry: null,
          name: r'scoringRulesProvider',
@@ -50,7 +50,7 @@ final class ScoringRulesProvider
   }
 }
 
-String _$scoringRulesHash() => r'6c5435f61b40950eb48ca0e5cc4362bb80c094a9';
+String _$scoringRulesHash() => r'd54eac90a73f2b8cc02a1d2b1fbb8491ea57aea9';
 
 final class ScoringRulesFamily extends $Family
     with
@@ -59,7 +59,7 @@ final class ScoringRulesFamily extends $Family
           AsyncValue<List<ScoringRule>>,
           List<ScoringRule>,
           FutureOr<List<ScoringRule>>,
-          String?
+          String
         > {
   const ScoringRulesFamily._()
     : super(
@@ -70,22 +70,22 @@ final class ScoringRulesFamily extends $Family
         isAutoDispose: true,
       );
 
-  ScoringRulesProvider call({String? leagueId}) =>
-      ScoringRulesProvider._(argument: leagueId, from: this);
+  ScoringRulesProvider call(String fantasyTeamInstanceId) =>
+      ScoringRulesProvider._(argument: fantasyTeamInstanceId, from: this);
 
   @override
   String toString() => r'scoringRulesProvider';
 }
 
 abstract class _$ScoringRules extends $AsyncNotifier<List<ScoringRule>> {
-  late final _$args = ref.$arg as String?;
-  String? get leagueId => _$args;
+  late final _$args = ref.$arg as String;
+  String get fantasyTeamInstanceId => _$args;
 
-  FutureOr<List<ScoringRule>> build({String? leagueId});
+  FutureOr<List<ScoringRule>> build(String fantasyTeamInstanceId);
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(leagueId: _$args);
+    final created = build(_$args);
     final ref =
         this.ref as $Ref<AsyncValue<List<ScoringRule>>, List<ScoringRule>>;
     final element =
