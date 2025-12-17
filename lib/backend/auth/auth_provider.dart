@@ -20,9 +20,9 @@ class AuthProvider extends _$AuthProvider {
   }
 
   // LOGIN
-  Future<void> signIn(String email, String password) async {
-    final session = await _authService.signIn(email, password);
-    state = AsyncData(session); // <-- because build() is async, state must use AsyncData
+  Future<void> signIn(String email, String password, bool firstTime) async {
+    final session = await _authService.signIn(email, password, firstTime);
+    state = AsyncData(session);
   }
 
   // SIGNUP (email verification handled separately)

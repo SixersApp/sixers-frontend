@@ -60,7 +60,7 @@ class OnboardingService {
   }
 
   Future<Map<String, dynamic>> fetchProfile(String userId) async {
-    final res = await _dio.get("/profile/$userId");
+    final res = await _dio.get("/users/profile");
     if (res.statusCode != 200) return {};
 
     return {

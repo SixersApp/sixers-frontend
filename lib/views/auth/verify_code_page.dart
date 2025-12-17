@@ -44,7 +44,7 @@ class _VerifyCodePageState extends ConsumerState<VerifyCodePage> {
       }
 
       // 2️⃣ Sign user in automatically after confirm
-      await ref.read(authProviderProvider.notifier).signIn(widget.email, widget.password);
+      await ref.read(authProviderProvider.notifier).signIn(widget.email, widget.password, true);
 
       Navigator.push(
             context,

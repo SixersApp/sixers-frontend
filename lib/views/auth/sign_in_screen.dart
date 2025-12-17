@@ -21,7 +21,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     try {
       await ref
           .read(authProviderProvider.notifier)
-          .signIn(emailController.text.trim(), passwordController.text);
+          .signIn(emailController.text.trim(), passwordController.text, false);
     } catch (e) {
       setState(() => error = e.toString());
     } finally {

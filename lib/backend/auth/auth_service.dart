@@ -21,7 +21,7 @@ class AuthService {
     }
   }
 
-  Future<AppSession> signIn(String email, String password) async {
+  Future<AppSession> signIn(String email, String password, bool firstTime) async {
     final result = await Amplify.Auth.signIn(
       username: email,
       password: password,
@@ -41,8 +41,10 @@ class AuthService {
       print(text.substring(i, 
         i + chunkSize > text.length ? text.length : i + chunkSize));
     }
-
-    initUserInBackend(appSession);
+    
+    if (firstTime){
+      initUserInBackend(appSession);
+    }
 
     return appSession;
   }
@@ -93,13 +95,8 @@ class AuthService {
   }
 
   Future<void> initUserInBackend(AppSession session) async {
-    final id = session.idToken;   // Cognito user ID
-
-    final email = session.email;  // or from attributes
-
-    await ApiClient.dio.put("/auth/createUser", data: {
-      "id": id,
-      "email": email,
+    await ApiClient.dio.put("/users/auth/signup", data: {
+      "email": session.email
     });
   }
 }
