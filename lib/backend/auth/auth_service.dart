@@ -97,9 +97,9 @@ class AuthService {
 
     final email = session.email;  // or from attributes
 
-    // await ApiClient.dio.post("/auth/createUser", data: {
-    //   "id": id,
-    //   "email": email,
-    // });
+    await ApiClient.dio.put("/auth/createUser", data: {
+      "id": id,
+      "email": email,
+    });
   }
 }
