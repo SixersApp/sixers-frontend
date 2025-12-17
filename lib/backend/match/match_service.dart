@@ -9,7 +9,7 @@ class MatchService {
 
   /// Get home feed matches (list)
   Future<List<MatchModel>> fetchHomeFeed() async {
-    final response = await _dio.get("/matches/homeFeed");
+    final response = await _dio.get("/matches/feed");
 
     final data = response.data as List;
     return data.map((e) => MatchModel.fromJson(e)).toList();

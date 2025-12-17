@@ -50,7 +50,7 @@ final class MatchFeedProvider
   }
 }
 
-String _$matchFeedHash() => r'6532a8f42c94ca350cc04f365bcdea3f0cfb44b5';
+String _$matchFeedHash() => r'cf4734573f199989b86bfec7beb4521dd95943af';
 
 final class MatchFeedFamily extends $Family
     with

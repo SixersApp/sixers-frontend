@@ -8,29 +8,33 @@ part 'match_provider.g.dart';
 
 @riverpod
 class MatchFeed extends _$MatchFeed {
-  late final MatchService _service;
+  final MatchService _service = MatchService();
+  Timer? _timer;
+  bool _pollingStarted = false;
 
   @override
   Future<List<MatchModel>> build({String? matchId}) async {
-    final auth = await ref.watch(authProviderProvider.future);
-    if (auth == null || auth.idToken == null) return [];
-
-    _service = MatchService();
-
-    // --- AUTO REFRESH EVERY 5 SECONDS ---
-    final timer = Timer.periodic(const Duration(seconds: 5), (_) {
-      // If matchId is null = feed mode, else fetch specific match
-      if (matchId == null) {
-        refreshFeed();
-      } else {
-        refreshMatch(matchId);
-      }
+    // Cleanup
+    ref.onDispose(() {
+      _timer?.cancel();
+      _timer = null;
+      _pollingStarted = false;
     });
-    ref.onDispose(() => timer.cancel());
 
-    // --- INITIAL LOAD ---
+    final auth = await ref.watch(authProviderProvider.future);
+    if (auth == null || auth.idToken == null) {
+      return [];
+    }
+
+    // Start polling AFTER first successful build
+    if (!_pollingStarted) {
+      _pollingStarted = true;
+      _startPolling(matchId);
+    }
+
+    // Initial fetch
     if (matchId == null) {
-      return await _service.fetchHomeFeed();
+      return _service.fetchHomeFeed();
     }
 
     final match = await _service.fetchMatchById(matchId);
@@ -38,20 +42,33 @@ class MatchFeed extends _$MatchFeed {
   }
 
   // -------------------------------------------------------------
-  // Smooth feed refresh (NO loading state, NO flicker)
+  // Polling
+  // -------------------------------------------------------------
+  void _startPolling(String? matchId) {
+    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (matchId == null) {
+        refreshFeed();
+      } else {
+        refreshMatch(matchId);
+      }
+    });
+  }
+
+  // -------------------------------------------------------------
+  // Smooth feed refresh
   // -------------------------------------------------------------
   Future<void> refreshFeed() async {
     final previous = state;
 
     final nextState = await AsyncValue.guard(() async {
-      return await _service.fetchHomeFeed();
+      return _service.fetchHomeFeed();
     });
 
     state = nextState.copyWithPrevious(previous);
   }
 
   // -------------------------------------------------------------
-  // Smooth single-match refresh (same behavior)
+  // Smooth single match refresh
   // -------------------------------------------------------------
   Future<void> refreshMatch(String matchId) async {
     final previous = state;

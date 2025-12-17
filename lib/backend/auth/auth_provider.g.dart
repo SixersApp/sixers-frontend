@@ -33,7 +33,7 @@ final class AuthProviderProvider
   AuthProvider create() => AuthProvider();
 }
 
-String _$authProviderHash() => r'2bf1d34387bc77fcb13a396b67ab9823d9c762ab';
+String _$authProviderHash() => r'9855b917180ba698de64f2f5e556ac08bfd2b786';
 
 abstract class _$AuthProvider extends $AsyncNotifier<AppSession?> {
   FutureOr<AppSession?> build();
