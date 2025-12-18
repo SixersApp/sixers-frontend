@@ -3,7 +3,7 @@ import 'fantasy_team_model.dart';
 
 class FantasyTeamService {
   Future<List<FantasyTeam>> getAllUsersTeams() async {
-    final res = await ApiClient.dio.get("/fantasy-teams");
+    final res = await ApiClient.dio.get("/fantasy-teams/user");
     return (res.data as List)
         .map((e) => FantasyTeam.fromJson(e))
         .toList();
@@ -11,7 +11,7 @@ class FantasyTeamService {
 
   Future<FantasyTeam?> getTeamForLeague(String leagueId) async {
     final res = await ApiClient.dio.get(
-      "/user-fantasy-team/by-league",
+      "/fantasy-teams/user",
       queryParameters: { "leagueId": leagueId },
     );
 
@@ -21,7 +21,7 @@ class FantasyTeamService {
 
   Future<List<FantasyTeam>> getTeamsInLeague(String leagueId) async {
     final res = await ApiClient.dio.get(
-      "/fantasy-teams/in-league",
+      "/fantasy-teams",
       queryParameters: { "leagueId": leagueId },
     );
     return (res.data as List)
