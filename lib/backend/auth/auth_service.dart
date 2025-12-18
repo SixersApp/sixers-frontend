@@ -104,7 +104,9 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    await Amplify.Auth.signOut();
+    await Amplify.Auth.signOut(
+      options: const SignOutOptions()
+    );
     ApiClient.setAuthToken(null);
   }
 

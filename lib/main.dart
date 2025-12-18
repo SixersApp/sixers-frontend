@@ -32,9 +32,9 @@ void main() async {
 
   await dotenv.load(fileName: '.env');
   await _configureAmplify();
-  final _authService = new AuthService();
+  // final _authService = new AuthService();
 
-  _authService.signOut();
+  // _authService.signOut();
   matchupPatternImage = await loadUiImage('assets/matchup_pattern.png');
   runApp(const ProviderScope(child: SixersApp()));
 }

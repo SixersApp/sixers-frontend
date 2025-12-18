@@ -33,7 +33,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       if (authState.isLoading || onboardingState.isLoading) return null;
 
-      if (location.startsWith(SplashScreen.route)) {
+      if (location == (SplashScreen.route)) {
         if (authState.value == null) return SignInScreen.route;
         if (onboardingState.value == null) return BasicInfoScreen.route;
         switch (onboardingState.value!.onboardingStage) {
@@ -48,8 +48,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         }
       }
 
-      if (location.startsWith(SignInScreen.route) ||
-          location.startsWith(SignUpScreen.route)) {
+      if (location == (SignInScreen.route) ||
+          location == (SignUpScreen.route)) {
         if (authState.value == null) return null;
         if (onboardingState.value == null) return BasicInfoScreen.route;
         switch (onboardingState.value!.onboardingStage) {
@@ -80,8 +80,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (authState.value == null &&
-          !(location.startsWith(SignInScreen.route) ||
-              location.startsWith(SignUpScreen.route))) {
+          !(location == (SignInScreen.route) ||
+              location == (SignUpScreen.route))) {
         return SignInScreen.route;
       }
       return null;
