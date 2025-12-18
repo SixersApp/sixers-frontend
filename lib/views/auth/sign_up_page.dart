@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/views/auth/verify_code_page.dart';
+import 'package:sixers/theme/colors.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
+  static final String route = "/sign-up";
   const SignUpScreen({super.key});
 
   @override
@@ -26,14 +28,21 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
     setState(() => _isLoading = true);
     try {
-      await ref.read(authProviderProvider.notifier).signUp(emailController.text.trim(), passwordController.text);
-      if (mounted){
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => VerifyCodePage(email: emailController.text.trim(), password: passwordController.text,),
+      await ref
+          .read(authProviderProvider.notifier)
+          .signUp(emailController.text.trim(), passwordController.text);
+      if (mounted) {
+        if (mounted) {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => VerifyCodeSheet(
+              email: emailController.text.trim(),
+              password: passwordController.text,
             ),
           );
+        }
       }
     } catch (e) {
       setState(() => error = e.toString());
@@ -54,14 +63,20 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             child: Container(
               width: double.infinity,
               decoration: const BoxDecoration(
-                image: DecorationImage(image: AssetImage('assets/images/cricket_stadium.jpg'), fit: BoxFit.cover),
+                image: DecorationImage(
+                  image: AssetImage('assets/images/cricket_stadium.jpg'),
+                  fit: BoxFit.cover,
+                ),
               ),
               child: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)],
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.7),
+                    ],
                   ),
                 ),
                 child: SafeArea(
@@ -80,7 +95,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               color: Colors.black.withValues(alpha: 0.3),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+                            child: const Icon(
+                              Icons.arrow_back_ios,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                           ),
                         ),
                       ],
@@ -107,13 +126,17 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       'SIGN UP',
                       style: Theme.of(
                         context,
-                      ).textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.w900, letterSpacing: 1.5, color: Colors.white),
+                      ).textTheme.headlineLarge?.copyWith(color: Colors.white),
                     ),
 
                     const SizedBox(height: 20),
 
                     // Email Field
-                    _buildTextField(controller: emailController, hintText: 'someone@example.com', label: 'Email'),
+                    _buildTextField(
+                      controller: emailController,
+                      hintText: 'someone@example.com',
+                      label: 'Email',
+                    ),
 
                     const SizedBox(height: 12),
 
@@ -146,9 +169,16 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         decoration: BoxDecoration(
                           color: Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                          border: Border.all(
+                            color: Colors.red.withValues(alpha: 0.3),
+                          ),
                         ),
-                        child: Text(error!, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red)),
+                        child: Text(
+                          error!,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(color: Colors.red),
+                        ),
                       ),
                     ],
 
@@ -160,52 +190,27 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       height: 56,
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _signUp,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4CAF50),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          elevation: 0,
-                        ),
                         child: _isLoading
                             ? const SizedBox(
                                 width: 24,
                                 height: 24,
-                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
-                            : Text(
-                                'Submit',
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600, color: Colors.white),
-                              ),
+                            : Text('Submit'),
                       ),
                     ),
 
                     const SizedBox(height: 16),
 
                     // Social Login Buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildSocialButton(
-                            icon: Icons.g_mobiledata,
-                            label: 'Google',
-                            onPressed: () {
-                              // Handle Google sign up
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildSocialButton(
-                            icon: Icons.facebook,
-                            label: 'Facebook',
-                            onPressed: () {
-                              // Handle Facebook sign up
-                            },
-                          ),
-                        ),
-                      ],
+                    _buildSocialButton(
+                      image: Image.asset('assets/images/google.png'),
+                      label: 'Continue with Google',
+                      onPressed: () {
+                        // Handle Google sign up
+                      },
                     ),
 
                     const SizedBox(height: 12),
@@ -216,15 +221,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: Text(
-                          'Already Have an Account',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,
-                            decorationColor: Colors.white,
-                          ),
-                        ),
+                        child: Text('Already Have an Account'),
                       ),
                     ),
                   ],
@@ -246,49 +243,30 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w500),
-        ),
+        Text(label, style: Theme.of(context).textTheme.labelSmall),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           obscureText: isPassword,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white),
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.6)),
-            filled: true,
-            fillColor: Colors.black.withValues(alpha: 0.4),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(color: Colors.white),
+          decoration: InputDecoration(hintText: hintText),
         ),
       ],
     );
   }
 
-  Widget _buildSocialButton({required IconData icon, required String label, required VoidCallback onPressed}) {
-    return SizedBox(
-      height: 44,
-      child: OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          backgroundColor: Colors.black.withValues(alpha: 0.2),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white, size: 18),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
+  Widget _buildSocialButton({
+    required Widget image,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return FilledButton(
+      onPressed: onPressed,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [image, const SizedBox(width: 12), Text(label)],
       ),
     );
   }

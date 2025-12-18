@@ -1,10 +1,14 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/backend/onboarding/onboarding_provider.dart';
 import 'package:sixers/utils/logger.dart';
+import 'package:sixers/theme/colors.dart';
 
 class BasicInfoScreen extends ConsumerStatefulWidget {
+  static final String route = '/onboarding/1';
   const BasicInfoScreen({super.key});
 
   @override
@@ -60,8 +64,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
 
     _selectedCountry = 'United States';
 
-    final defaultDate =
-        DateTime.now().subtract(const Duration(days: 365 * 25));
+    final defaultDate = DateTime.now().subtract(const Duration(days: 365 * 25));
     _selectedDay = defaultDate.day;
     _selectedMonth = _months[defaultDate.month - 1];
     _selectedYear = defaultDate.year;
@@ -88,29 +91,23 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
 
   Future<void> _loadExisting() async {
     try {
-      final notifier = ref.read(onboardingStageProvider.notifier);
-
+      final profileData = await ref.watch(onboardingStageProvider.future);
       if (!mounted) return;
 
-      final response = await notifier.fetchProfile();
-
-      if (response['full_name'] != null) {
-        _nameController.text = response['full_name'];
+      if (profileData != null) {
+        _nameController.text = profileData.fullName;
       }
 
-      final country = response['country'];
+      final country = profileData?.country;
       if (country != null && _countries.contains(country)) {
         _selectedCountry = country;
       }
 
-      final dobStr = response['dob'];
-      if (dobStr != null) {
-        final dob = DateTime.tryParse(dobStr);
-        if (dob != null) {
-          _selectedDay = dob.day;
-          _selectedMonth = _months[dob.month - 1];
-          _selectedYear = dob.year;
-        }
+      final dob = profileData?.dob;
+      if (dob != null) {
+        _selectedDay = dob.day;
+        _selectedMonth = _months[dob.month - 1];
+        _selectedYear = dob.year;
       }
     } catch (e) {
       print("Profile restore failed: $e");
@@ -130,16 +127,18 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
 
     try {
       final notifier = ref.read(onboardingStageProvider.notifier);
-
-      await notifier.updateBasicInfo(
+      final profileData = await ref.watch(onboardingStageProvider.future);
+      final newProfile = profileData!.copyWith(
         fullName: _nameController.text,
         country: _selectedCountry!,
         dob: DateTime(
           _selectedYear,
           _months.indexOf(_selectedMonth) + 1,
           _selectedDay,
-        ).toIso8601String(),
+        ),
+        onboardingStage: max(profileData.onboardingStage, 1),
       );
+      await notifier.updateProfileInfo(profileData: newProfile);
     } catch (e, st) {
       logError('BasicInfoScreen error: $e', st);
       _showErrorSnackBar('Failed to save information. Please try again.');
@@ -163,9 +162,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     if (_loadingProfile) {
       return const Scaffold(
         backgroundColor: Color(0xFF1C1C1C),
-        body: Center(
-          child: CircularProgressIndicator(color: Colors.white),
-        ),
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
       );
     }
 
@@ -189,11 +186,11 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         Text(
           'BASIC INFO',
           style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
-                letterSpacing: 1.5,
-                fontSize: 36,
-              ),
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            letterSpacing: 1.5,
+            fontSize: 36,
+          ),
         ),
         const SizedBox(height: 32),
 
@@ -204,9 +201,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
                 constraints: BoxConstraints(
                   maxHeight: constraints.maxHeight * 0.8,
                 ),
-                child: SingleChildScrollView(
-                  child: _buildForm(),
-                ),
+                child: SingleChildScrollView(child: _buildForm()),
               );
             },
           ),
@@ -243,10 +238,10 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     return Text(
       label,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w500,
-            fontSize: 18,
-          ),
+        color: Colors.white,
+        fontWeight: FontWeight.w500,
+        fontSize: 18,
+      ),
     );
   }
 
@@ -258,17 +253,20 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         hintText: 'John Doe',
         hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
         filled: true,
-        fillColor: const Color(0xFF2C2C2C),
+        fillColor: AppColors.black200,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 18,
+        ),
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) return 'Name is required';
-        if (value.trim().length < 2) return 'Name must be at least 2 characters';
+        if (value.trim().length < 2)
+          return 'Name must be at least 2 characters';
         return null;
       },
     );
@@ -316,18 +314,20 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
   }
 
   Widget _buildCountryDropdown() {
-    final safeValue = (_selectedCountry != null &&
-            _countries.contains(_selectedCountry))
+    final safeValue =
+        (_selectedCountry != null && _countries.contains(_selectedCountry))
         ? _selectedCountry
         : null;
 
     return DropdownButtonFormField<String>(
       value: safeValue,
       items: _countries
-          .map((c) => DropdownMenuItem(
-                value: c,
-                child: Text(c, style: const TextStyle(color: Colors.white)),
-              ))
+          .map(
+            (c) => DropdownMenuItem(
+              value: c,
+              child: Text(c, style: const TextStyle(color: Colors.white)),
+            ),
+          )
           .toList(),
       onChanged: (value) => setState(() => _selectedCountry = value),
       dropdownColor: const Color(0xFF2C2C2C),
@@ -335,8 +335,10 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         filled: true,
         fillColor: const Color(0xFF2C2C2C),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 18,
+        ),
       ),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
     );
@@ -370,8 +372,10 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         filled: true,
         fillColor: const Color(0xFF2C2C2C),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
       ),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
     );
@@ -386,19 +390,24 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           elevation: 0,
         ),
         child: _isLoading
             ? const SizedBox(
                 width: 24,
                 height: 24,
-                child:
-                    CircularProgressIndicator(color: Colors.black, strokeWidth: 2),
+                child: CircularProgressIndicator(
+                  color: Colors.black,
+                  strokeWidth: 2,
+                ),
               )
-            : const Text('Next',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            : const Text(
+                'Next',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
       ),
     );
   }
@@ -425,8 +434,9 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
               Expanded(
                 child: Container(
                   decoration: const BoxDecoration(
-                    borderRadius:
-                        BorderRadius.horizontal(left: Radius.circular(3)),
+                    borderRadius: BorderRadius.horizontal(
+                      left: Radius.circular(3),
+                    ),
                     color: Color(0xFF4CAF50),
                   ),
                 ),
@@ -434,8 +444,9 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    borderRadius:
-                        const BorderRadius.horizontal(right: Radius.circular(3)),
+                    borderRadius: const BorderRadius.horizontal(
+                      right: Radius.circular(3),
+                    ),
                     color: Colors.grey.withOpacity(0.3),
                   ),
                 ),

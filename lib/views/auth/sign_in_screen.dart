@@ -4,6 +4,7 @@ import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/views/auth/sign_up_page.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
+  static final String route = '/';
   const SignInScreen({super.key});
 
   @override
@@ -29,9 +30,19 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     }
   }
 
+  Future<void> _signInGoogle() async {
+    setState(() => _isLoading = true);
+    try {
+      await ref.read(authProviderProvider.notifier).signInWithGoogle();
+    } catch (e) {
+      setState(() => error = e.toString());
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -43,7 +54,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             // So we let Flutter size it naturally
             return Column(
               children: [
-
                 // -------- TOP IMAGE (fills remaining space) --------
                 Expanded(
                   child: Container(
@@ -59,10 +69,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Colors.black87,
-                          ],
+                          colors: [Colors.transparent, Colors.black87],
                         ),
                       ),
                     ),
@@ -78,14 +85,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min, // VERY IMPORTANT
                     children: [
-
                       Text(
                         'LOGIN',
-                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.5,
-                              color: Colors.white,
-                            ),
+                        style: Theme.of(context).textTheme.headlineLarge
+                            ?.copyWith(letterSpacing: 1.5, color: Colors.white),
                       ),
 
                       const SizedBox(height: 20),
@@ -111,10 +114,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           onPressed: () {},
                           child: Text(
                             'Forget Password',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: const Color(0xFF4CAF50),
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            style: Theme.of(context).textTheme.labelLarge
+                                ?.copyWith(color: const Color(0xFF79E089)),
                           ),
                         ),
                       ),
@@ -127,14 +128,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           decoration: BoxDecoration(
                             color: Colors.red.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.red.withOpacity(0.3)),
+                            border: Border.all(
+                              color: Colors.red.withOpacity(0.3),
+                            ),
                           ),
                           child: Text(
                             error!,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(color: Colors.red),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(color: Colors.red),
                           ),
                         ),
 
@@ -145,14 +147,14 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         height: 56,
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _signIn,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF4CAF50),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
+                          // style: ElevatedButton.styleFrom(
+                          //   backgroundColor: const Color(0xFF4CAF50),
+                          //   foregroundColor: Colors.white,
+                          //   shape: RoundedRectangleBorder(
+                          //     borderRadius: BorderRadius.circular(12),
+                          //   ),
+                          //   elevation: 0,
+                          // ),
                           child: _isLoading
                               ? const SizedBox(
                                   width: 24,
@@ -162,36 +164,16 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                     strokeWidth: 2,
                                   ),
                                 )
-                              : Text(
-                                  'Submit',
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white,
-                                      ),
-                                ),
+                              : Text('Submit'),
                         ),
                       ),
 
                       const SizedBox(height: 16),
 
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildSocialButton(
-                              icon: Icons.g_mobiledata,
-                              label: 'Google',
-                              onPressed: () {},
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildSocialButton(
-                              icon: Icons.facebook,
-                              label: 'Facebook',
-                              onPressed: () {},
-                            ),
-                          ),
-                        ],
+                      _buildSocialButton(
+                        image: Image.asset('assets/images/google.png'),
+                        label: 'Continue with Google',
+                        onPressed: _signInGoogle,
                       ),
 
                       const SizedBox(height: 12),
@@ -206,15 +188,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                               ),
                             );
                           },
-                          child: Text(
-                            'Create an Account',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: Colors.white,
-                                ),
-                          ),
+                          child: Text('Create an Account'),
                         ),
                       ),
                     ],
@@ -237,72 +211,30 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-        ),
-        const SizedBox(height: 8),
+        Text(label, style: Theme.of(context).textTheme.labelSmall),
+        const SizedBox(height: 6),
         TextFormField(
           controller: controller,
           obscureText: isPassword,
-          style:
-              Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white),
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: Colors.white.withValues(alpha: 0.6)),
-            filled: true,
-            fillColor: Colors.black.withValues(alpha: 0.4),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(color: Colors.white),
+          decoration: InputDecoration(hintText: hintText),
         ),
       ],
     );
   }
 
   Widget _buildSocialButton({
-    required IconData icon,
+    required Widget image,
     required String label,
     required VoidCallback onPressed,
   }) {
-    return SizedBox(
-      height: 44,
-      child: OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          backgroundColor: Colors.black.withValues(alpha: 0.2),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white, size: 18),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: Theme.of(context)
-                  .textTheme
-                  .labelLarge
-                  ?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-          ],
-        ),
+    return FilledButton(
+      onPressed: onPressed,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [image, const SizedBox(width: 12), Text(label)],
       ),
     );
   }

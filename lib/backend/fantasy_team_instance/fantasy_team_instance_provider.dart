@@ -1,15 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../auth/auth_provider.dart';
 import '../fantasy_team/fantasy_team_provider.dart';
 import 'fantasy_team_instance_model.dart';
 import 'fantasy_team_instance_service.dart';
 
-final fantasyTeamInstanceProvider = AsyncNotifierProvider<
-    FantasyTeamInstanceNotifier,
-    FantasyTeamInstance?>(FantasyTeamInstanceNotifier.new);
+final fantasyTeamInstanceProvider =
+    AsyncNotifierProvider<FantasyTeamInstanceNotifier, FantasyTeamInstance?>(
+      FantasyTeamInstanceNotifier.new,
+    );
 
-class FantasyTeamInstanceNotifier
-    extends AsyncNotifier<FantasyTeamInstance?> {
+class FantasyTeamInstanceNotifier extends AsyncNotifier<FantasyTeamInstance?> {
   late final FantasyTeamInstanceService _service;
 
   @override
@@ -42,8 +41,9 @@ class FantasyTeamInstanceNotifier
     required String leagueId,
     required int matchNum,
   }) async {
-    final userTeam =
-        await ref.read(fantasyTeamsProvider.notifier).getTeamForLeague(leagueId);
+    final userTeam = await ref
+        .read(fantasyTeamsProvider.notifier)
+        .getTeamForLeague(leagueId);
 
     if (userTeam == null) {
       state = const AsyncData(null);

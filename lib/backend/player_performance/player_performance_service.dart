@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:sixers/backend/auth/dio_client.dart';
 import 'package:sixers/backend/player_performance/player_performance_model.dart';
 

@@ -30,6 +30,11 @@ class AuthProvider extends _$AuthProvider {
     await _authService.signUp(email, password);
   }
 
+  Future<void> signInWithGoogle() async {
+    final session = await _authService.signInWithGoogle();
+    state = AsyncData(session);
+  }
+
   // LOGOUT
   Future<void> signOut() async {
     await _authService.signOut();

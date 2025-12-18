@@ -45,7 +45,10 @@ class AppTheme {
       textSelected: AppColors.black100,
     );
 
-    const fields = FieldColors(fill: AppColors.black200, border: AppColors.black400);
+    const fields = FieldColors(
+      fill: AppColors.black200,
+      border: AppColors.black400,
+    );
 
     const nav = NavColors(
       icon: AppColors.black600,
@@ -78,7 +81,9 @@ class AppTheme {
         backgroundColor: surfaces.foreground,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
-        titleTextStyle: buildTextTheme(brightness).headlineLarge?.copyWith(letterSpacing: 0.2, color: scheme.onSurface),
+        titleTextStyle: buildTextTheme(
+          brightness,
+        ).headlineLarge?.copyWith(letterSpacing: 0.2, color: scheme.onSurface),
         iconTheme: IconThemeData(color: scheme.onSurface),
         leadingWidth: 40,
         titleSpacing: -8,
@@ -90,19 +95,22 @@ class AppTheme {
       // TextFields
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: fields.fill,
+        fillColor: Color.fromRGBO(34, 34, 34, 1),
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: fields.border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: fields.border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: fields.border),
         ),
         hintStyle: TextStyle(color: scheme.onSurfaceVariant),
@@ -141,6 +149,58 @@ class AppTheme {
         // }),
       ),
 
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.black800,
+          foregroundColor: AppColors.black100,
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          alignment: Alignment.center,
+          textStyle: TextStyle(
+            fontFamily: 'InstrumentSans',
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(8),
+          ),
+        ),
+      ),
+
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.black300,
+          foregroundColor: AppColors.black800,
+          textStyle: TextStyle(
+            fontFamily: 'InstrumentSans',
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          alignment: Alignment.center,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(8),
+          ),
+        ),
+      ),
+
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.black800,
+          textStyle: TextStyle(
+            fontFamily: 'InstrumentSans',
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          alignment: Alignment.center,
+        ),
+      ),
       // Register your tokens
       extensions: const <ThemeExtension<dynamic>>[surfaces, chips, fields, nav],
     );

@@ -10,8 +10,8 @@ import 'package:sixers/views/components/matches/match_feed.dart';
 import 'package:sixers/views/components/matchup_card/matchup_card.dart';
 import 'package:sixers/theme/colors.dart';
 
-
 class HomeScreen extends ConsumerWidget {
+  static final route = "/home";
   const HomeScreen({super.key});
 
   double _parseScore(String? raw) {
@@ -60,10 +60,9 @@ class HomeScreen extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             LeagueDropdown(
-                              onSelected: (league) =>
-                                  GoRouter.of(context).push('/league', extra: {
-                                "leagueId": league.id,
-                              }),
+                              onSelected: (league) => GoRouter.of(
+                                context,
+                              ).push('/league', extra: {"leagueId": league.id}),
                             ),
                             SizedBox(
                               width: 40,
@@ -78,8 +77,11 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                                 onPressed: () =>
                                     GoRouter.of(context).push('/settings'),
-                                child: Icon(Icons.settings,
-                                    color: AppColors.black800, size: 25),
+                                child: Icon(
+                                  Icons.settings,
+                                  color: AppColors.black800,
+                                  size: 25,
+                                ),
                               ),
                             ),
                           ],
@@ -87,9 +89,7 @@ class HomeScreen extends ConsumerWidget {
                         const SizedBox(height: 20),
                         Text(
                           "Your Matches",
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
+                          style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: AppColors.black600),
                         ),
                         const SizedBox(height: 10),
@@ -104,15 +104,15 @@ class HomeScreen extends ConsumerWidget {
                       loading: () => const Center(
                         child: CircularProgressIndicator(strokeWidth: 2),
                       ),
-                      error: (err, _) => Center(
-                        child: Text("Failed to load matches: $err"),
-                      ),
+                      error: (err, _) =>
+                          Center(child: Text("Failed to load matches: $err")),
                       data: (matchups) {
                         final leagues = leaguesAsync.value ?? [];
 
                         final pendingLeagues = leagues
                             .where(
-                                (l) => l.status == LeagueStatus.draft_pending)
+                              (l) => l.status == LeagueStatus.draft_pending,
+                            )
                             .toList();
 
                         final itemCount =
@@ -136,13 +136,13 @@ class HomeScreen extends ConsumerWidget {
                               return Padding(
                                 padding: pad,
                                 child: PreDraftCard(
-                                    league: pendingLeagues[index]),
+                                  league: pendingLeagues[index],
+                                ),
                               );
                             }
 
                             // ---------- Matchups ----------
-                            final m =
-                                matchups[index - pendingLeagues.length];
+                            final m = matchups[index - pendingLeagues.length];
 
                             final league = leagues.firstWhere(
                               (l) => l.id == m.leagueId,
@@ -158,16 +158,17 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             );
 
-                            final team1Score =
-                                _parseScore(m.fantasyTeamInstance1Score);
-                            final team2Score =
-                                _parseScore(m.fantasyTeamInstance2Score);
+                            final team1Score = _parseScore(
+                              m.fantasyTeamInstance1Score,
+                            );
+                            final team2Score = _parseScore(
+                              m.fantasyTeamInstance2Score,
+                            );
 
                             return Padding(
                               padding: pad,
                               child: MatchupCard(
-                                team1Name:
-                                    m.fantasyTeam1Name ?? "Team 1",
+                                team1Name: m.fantasyTeam1Name ?? "Team 1",
                                 team1Score: team1Score.toStringAsFixed(1),
                                 team1PlayersLeft: 0,
                                 team1WinProbability: 50,
@@ -176,8 +177,7 @@ class HomeScreen extends ConsumerWidget {
                                   color: Colors.white,
                                   size: 25,
                                 ),
-                                team2Name:
-                                    m.fantasyTeam2Name ?? "Team 2",
+                                team2Name: m.fantasyTeam2Name ?? "Team 2",
                                 team2Score: team2Score.toStringAsFixed(1),
                                 team2PlayersLeft: 0,
                                 team2WinProbability: 50,
@@ -191,7 +191,8 @@ class HomeScreen extends ConsumerWidget {
                                 isLive: false,
                                 matchupId: m.id,
                                 leagueId: m.leagueId,
-                               team1FtiId: m.fantasyTeamInstance1Id, team2FtiId: m.fantasyTeamInstance2Id,
+                                team1FtiId: m.fantasyTeamInstance1Id,
+                                team2FtiId: m.fantasyTeamInstance2Id,
                               ),
                             );
                           },
@@ -207,10 +208,9 @@ class HomeScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(12),
                     child: Text(
                       "Live/Upcoming Games",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(color: AppColors.black600),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.black600,
+                      ),
                     ),
                   ),
 
