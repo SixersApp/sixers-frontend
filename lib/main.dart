@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sixers/amplifyconfiguration.dart';
+import 'package:sixers/backend/auth/auth_service.dart';
 import 'package:sixers/theme/app_theme.dart';
 import 'package:sixers/views/router.dart';
 
@@ -28,8 +29,12 @@ Future<void> _configureAmplify() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+
   await dotenv.load(fileName: '.env');
   await _configureAmplify();
+  final _authService = new AuthService();
+
+  _authService.signOut();
   matchupPatternImage = await loadUiImage('assets/matchup_pattern.png');
   runApp(const ProviderScope(child: SixersApp()));
 }

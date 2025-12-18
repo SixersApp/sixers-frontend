@@ -7,11 +7,10 @@ part 'onboarding_provider.g.dart';
 
 @riverpod
 class OnboardingStage extends _$OnboardingStage {
-  late final OnboardingService _service;
+  final OnboardingService _service = OnboardingService();
 
   @override
   Future<ProfileModel?> build() async {
-    _service = OnboardingService();
 
     // SAFE AUTH FETCH
     final auth = await ref.watch(authProviderProvider.future);
