@@ -51,6 +51,8 @@ dependencies:
     amplify_auth_cognito: ^2.6.5
     dio: ^5.9.0
     async: ^2.13.0
+    flutter_native_splash: ^2.4.7
+    flutter_launcher_icons: ^0.14.4
 dev_dependencies:
     flutter_test:
         sdk: flutter
@@ -79,6 +81,8 @@ flutter:
     # To add assets to your application, add an assets section, like this:
     assets:
         - .env
+        - assets/
+        - assets/app_icon.png
         - assets/sixers_logo.png
         - assets/matchup_pattern.png
         - assets/splash_logo.png
@@ -138,3 +142,28 @@ flutter:
     #
     # For details regarding fonts from package dependencies,
     # see https://flutter.dev/to/font-from-package
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/app_icon.png"
+  # Adaptive icons for Android 8.0+
+  adaptive_icon_background: "#191919"
+  adaptive_icon_foreground: "assets/foreground_icon.png"
+  # Optional: monochrome icon for Android 13+ themed icons
+  monochrome_white: "assets/monochrome_app_icon.png"
+
+
+flutter_native_splash:
+  color: "#191919"
+  image: assets/app_icon.png
+  
+  # Android 12+ specific settings
+  android_12:
+    image: assets/app_icon.png
+    icon_background_color: "#191919"
+    
+  # Dark Mode Support
+  color_dark: "#191919"
+  image_dark: assets/app_icon.png
+  fullscreen: true

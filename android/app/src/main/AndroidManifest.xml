@@ -5,9 +5,9 @@
         </intent>
     </queries>
     <application
-        android:label="sixers"
+        android:label="Sixers"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name="com.amplifyframework.auth.cognito.activities.HostedUIRedirectActivity"
             android:exported="true">
