@@ -6,7 +6,7 @@ class FantasyPlayerService {
   final Dio _dio = ApiClient.dio;
 
   Future<List<FantasyPlayer>> fetchFantasyPlayers(String ftiId) async {
-    final res = await _dio.get("/fantasyTeamInstance/$ftiId/performances");
+    final res = await _dio.get("/fantasy-team-instance/performances/$ftiId");
 
     final raw = res.data as List;
 

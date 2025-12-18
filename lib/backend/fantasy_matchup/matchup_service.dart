@@ -5,7 +5,7 @@ class MatchupService {
   final _dio = ApiClient.dio;
 
   Future<List<Matchup>> getMatchups({required int matchNum}) async {
-    final res = await _dio.get("/matchups/match_num", queryParameters: {
+    final res = await _dio.get("/matchups", queryParameters: {
       "match_num": matchNum,
     });
 

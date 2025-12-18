@@ -4,7 +4,7 @@ import 'package:sixers/backend/player_performance/player_performance_model.dart'
 class PlayerPerformanceService {
   Future<List<PlayerPerformance>> fetchPerformances(String ftiId) async {
     final response = await ApiClient.dio.get(
-      "/fantasyTeamInstance/$ftiId/performances",
+      "/fantasyTeamInstance/performances/$ftiId",
     );
 
     final data = response.data;
