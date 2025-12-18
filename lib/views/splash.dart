@@ -11,15 +11,7 @@ class SplashScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.black100,
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Image.asset("assets/splash_logo.png", width: 100),
-            const SizedBox(height: 40),
-            Text("SIXERS", style: Theme.of(context).textTheme.headlineLarge),
-          ],
-        ),
+        child: Image.asset("assets/app_icon.png", width: 288, height: 288, fit: BoxFit.contain)
       ),
     );
   }
