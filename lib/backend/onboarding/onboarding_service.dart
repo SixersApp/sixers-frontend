@@ -9,7 +9,8 @@ class OnboardingService {
   Future<ProfileModel?> fetchProfile(String userId) async {
     try {
       final res = await _dio.get("/users/profile");
-      return ProfileModel.fromJson(res.data);
+      print(res.data["profile"]);
+      return ProfileModel.fromJson(res.data["profile"]);
     } on DioException catch (e) {
       print("gay5 ${e.response!.data.toString()}");
       throw handleDioException(e);
@@ -20,10 +21,11 @@ class OnboardingService {
   }
 
   Future<void> updateProfileData({required ProfileModel profileData}) async {
+    final profileJson = profileData.toJson();
     try {
-      await _dio.put(
+      await _dio.patch(
         '/users/profile',
-        data: profileData.toJson(),
+        data: profileJson,
       );
     } on DioException catch (e) {
       print("gay6 ${e.response!.data.toString()}");
