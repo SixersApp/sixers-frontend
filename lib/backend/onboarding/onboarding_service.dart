@@ -20,7 +20,7 @@ class OnboardingService {
   Future<void> updateProfileData({required ProfileModel profileData}) async {
     try {
       await _dio.put(
-        '/profile/${profileData.userId}',
+        '/users/profile/${profileData.userId}',
         data: profileData.toJson(),
       );
     } on DioException catch (e) {
