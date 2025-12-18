@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/backend/onboarding/onboarding_provider.dart';
 import 'package:sixers/utils/logger.dart';
+import 'package:sixers/views/onboarding/basic_info_screen.dart';
 
 class ExperienceScreen extends ConsumerStatefulWidget {
+  static final String route = '/onboarding/2';
   const ExperienceScreen({super.key});
 
   @override
@@ -64,17 +67,16 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
   Future<void> _loadExisting() async {
     try {
       final notifier = ref.read(onboardingStageProvider.notifier);
+      final profile = await ref.read(onboardingStageProvider.future);
 
-      final profile = await notifier.fetchProfile();
+      if (!mounted || profile == null) return;
 
-      if (!mounted || profile.isEmpty) return;
-
-      final exp = profile['experience'];
+      final exp = profile.experience;
 
       final experienceId = {
         1: 'new_to_cricket',
         2: 'casual_fan',
-        3: 'die_hard_fan'
+        3: 'die_hard_fan',
       }[exp];
 
       if (experienceId != null) {
@@ -85,9 +87,8 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
     }
   }
 
-  void _handleBack() async {
-    final notifier = ref.read(onboardingStageProvider.notifier);
-    await notifier.advanceTo(0);
+  void _handleBack() {
+    context.go(BasicInfoScreen.route);
   }
 
   Future<void> _handleNext() async {
@@ -101,13 +102,20 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
     try {
       final notifier = ref.read(onboardingStageProvider.notifier);
 
+      final profile = await ref.read(onboardingStageProvider.future);
+
       final expValue = {
         'new_to_cricket': 1,
         'casual_fan': 2,
         'die_hard_fan': 3,
       }[_selectedExperience]!;
 
-      await notifier.updateExperience(expValue);
+      final profileData = profile!.copyWith(
+        experience: expValue,
+        onboardingStage: 2,
+      );
+
+      await notifier.updateProfileInfo(profileData: profileData);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -153,18 +161,19 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
               Text(
                 'EXPERIENCE',
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                    letterSpacing: 1.5,
-                    fontSize: 36),
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  letterSpacing: 1.5,
+                  fontSize: 36,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 'How much cricket do you know?',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge
-                    ?.copyWith(color: Colors.white70, fontSize: 18),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Colors.white70,
+                  fontSize: 18,
+                ),
               ),
               const SizedBox(height: 32),
 
@@ -174,7 +183,8 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
                   final ex = entry.value;
                   return Padding(
                     padding: EdgeInsets.only(
-                        bottom: index < _experiences.length - 1 ? 12 : 0),
+                      bottom: index < _experiences.length - 1 ? 12 : 0,
+                    ),
                     child: _buildExperienceOption(ex),
                   );
                 }).toList(),
@@ -200,19 +210,23 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(20)),
-                child: const Icon(Icons.arrow_back_ios,
-                    color: Colors.white, size: 20),
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ),
             const Spacer(),
             Text(
               '2 of 2',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: Colors.white, fontSize: 16),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.white,
+                fontSize: 16,
+              ),
             ),
           ],
         ),
@@ -241,8 +255,9 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
           color: const Color(0xFF2C2C2C),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-              color: isSelected ? const Color(0xFF4CAF50) : Colors.transparent,
-              width: 2),
+            color: isSelected ? const Color(0xFF4CAF50) : Colors.transparent,
+            width: 2,
+          ),
         ),
         child: Row(
           children: [
@@ -262,16 +277,18 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
                 children: [
                   Text(
                     exp['title'],
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(color: Colors.white, fontSize: 18),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     exp['description'],
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.white70, fontSize: 14),
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),
@@ -294,7 +311,8 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 elevation: 0,
               ),
               child: _isLoading
@@ -302,11 +320,17 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
-                          color: Colors.black, strokeWidth: 2),
+                        color: Colors.black,
+                        strokeWidth: 2,
+                      ),
                     )
-                  : const Text('Next',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  : const Text(
+                      'Next',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
             ),
           ),
         ),

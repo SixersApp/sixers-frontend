@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sixers/amplifyconfiguration.dart';
-import 'package:sixers/views/auth/auth_gate.dart';
+import 'package:sixers/backend/auth/auth_service.dart';
 import 'package:sixers/theme/app_theme.dart';
 import 'package:sixers/views/router.dart';
 
@@ -29,29 +29,30 @@ Future<void> _configureAmplify() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  //await dotenv.load(fileName: '.env');
 
+  await dotenv.load(fileName: '.env');
   await _configureAmplify();
+  // final _authService = new AuthService();
 
+  // _authService.signOut();
   matchupPatternImage = await loadUiImage('assets/matchup_pattern.png');
-
-  //await Amplify.Auth.signOut();
-
   runApp(const ProviderScope(child: SixersApp()));
 }
 
-class SixersApp extends StatelessWidget {
+class SixersApp extends ConsumerWidget {
   const SixersApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+
+    final router = ref.watch(routerProvider);
+
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Sixers',
       theme: AppTheme.dark,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.dark,
-
       routerConfig: router,
     );
   }

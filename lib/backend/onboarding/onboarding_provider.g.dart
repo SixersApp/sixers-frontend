@@ -13,7 +13,7 @@ part of 'onboarding_provider.dart';
 const onboardingStageProvider = OnboardingStageProvider._();
 
 final class OnboardingStageProvider
-    extends $AsyncNotifierProvider<OnboardingStage, int> {
+    extends $AsyncNotifierProvider<OnboardingStage, ProfileModel?> {
   const OnboardingStageProvider._()
     : super(
         from: null,
@@ -33,20 +33,20 @@ final class OnboardingStageProvider
   OnboardingStage create() => OnboardingStage();
 }
 
-String _$onboardingStageHash() => r'fedd427f03ba00da84ab9ff4c161466bf4a599af';
+String _$onboardingStageHash() => r'4e9a0bd3ddf7ce50d1791feb96d9211bc015e59b';
 
-abstract class _$OnboardingStage extends $AsyncNotifier<int> {
-  FutureOr<int> build();
+abstract class _$OnboardingStage extends $AsyncNotifier<ProfileModel?> {
+  FutureOr<ProfileModel?> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<int>, int>;
+    final ref = this.ref as $Ref<AsyncValue<ProfileModel?>, ProfileModel?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<int>, int>,
-              AsyncValue<int>,
+              AnyNotifier<AsyncValue<ProfileModel?>, ProfileModel?>,
+              AsyncValue<ProfileModel?>,
               Object?,
               Object?
             >;
