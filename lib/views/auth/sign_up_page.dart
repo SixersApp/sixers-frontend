@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
+import 'package:sixers/views/auth/sign_in_screen.dart';
 import 'package:sixers/views/auth/verify_code_page.dart';
 import 'package:sixers/theme/colors.dart';
+import 'package:sixers/views/router.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
   static final String route = "/sign-up";
@@ -51,6 +53,17 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
   }
 
+  Future<void> _signInGoogle() async {
+    setState(() => _isLoading = true);
+    try {
+      await ref.read(authProviderProvider.notifier).signInWithGoogle();
+    } catch (e) {
+      setState(() => error = e.toString());
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,33 +90,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       Colors.transparent,
                       Colors.black.withValues(alpha: 0.7),
                     ],
-                  ),
-                ),
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Back Button
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Icon(
-                              Icons.arrow_back_ios,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
               ),
@@ -208,9 +194,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     _buildSocialButton(
                       image: Image.asset('assets/images/google.png'),
                       label: 'Continue with Google',
-                      onPressed: () {
-                        // Handle Google sign up
-                      },
+                      onPressed: _signInGoogle
                     ),
 
                     const SizedBox(height: 12),
@@ -219,7 +203,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     Center(
                       child: TextButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          context.go(SignInScreen.route);
                         },
                         child: Text('Already Have an Account'),
                       ),

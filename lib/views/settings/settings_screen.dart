@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
+  static final String route = "/settings";
   const SettingsScreen({super.key});
 
   @override
@@ -14,9 +15,6 @@ class SettingsScreen extends ConsumerWidget {
         child: TextButton(
           onPressed: () async {
             await ref.read(authProviderProvider.notifier).signOut();
-            if (context.mounted) {
-              GoRouter.of(context).go('/');
-            }
           },
           child: const Text('Sign Out'),
         ),

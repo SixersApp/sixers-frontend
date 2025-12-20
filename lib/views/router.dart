@@ -12,26 +12,45 @@ import 'package:sixers/views/onboarding/basic_info_screen.dart';
 import 'package:sixers/views/onboarding/experience_screen.dart';
 import 'package:sixers/views/settings/settings_screen.dart';
 import 'package:sixers/views/splash.dart';
-import 'package:async/async.dart';
-import 'dart:async';
+
+
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: SplashScreen.route,
-    refreshListenable: GoRouterRefreshStream(
-      StreamGroup.merge([
-        ref.watch(authProviderProvider.future).asStream(),
-        ref.watch(onboardingStageProvider.future).asStream(),
-      ]),
-    ),
+    refreshListenable: _RouterNotifier(ref),
     redirect: (context, state) {
       // READ (do not watch) providers here to avoid recreating the router
       final authState = ref.read(authProviderProvider);
       final onboardingState = ref.read(onboardingStageProvider);
 
       final location = state.matchedLocation;
+      final uri = state.uri;
+
 
       if (authState.isLoading || onboardingState.isLoading) return null;
+      if (uri.toString().contains('auth')) {
+        if (authState.value != null) {
+          if (onboardingState.isLoading) return SignInScreen.route;
+          if (onboardingState.value == null) return SignInScreen.route;
+          switch (onboardingState.value!.onboardingStage) {
+            case 0:
+              return BasicInfoScreen.route;
+            case 1:
+              return ExperienceScreen.route;
+            case 2:
+              return HomeScreen.route;
+            default:
+              return BasicInfoScreen.route;
+          }
+        }
+        return SignInScreen.route;
+      }
+
+      if (uri.host == 'sign-out' || uri.toString().contains('sign-out')) {
+        if (authState.value == null) return SignInScreen.route;
+        return SettingsScreen.route;
+      }
 
       if (location == (SplashScreen.route)) {
         if (authState.value == null) return SignInScreen.route;
@@ -112,7 +131,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => ExperienceScreen(),
       ),
       GoRoute(
-        path: '/settings',
+        path: SettingsScreen.route,
         builder: (context, state) => const SettingsScreen(),
       ),
       GoRoute(
@@ -129,19 +148,27 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<dynamic> stream) {
-    notifyListeners();
-    _subscription = stream.asBroadcastStream().listen(
-      (dynamic _) => notifyListeners(),
-    );
-  }
-
-  late final StreamSubscription<dynamic> _subscription;
-  StreamSubscription<dynamic> get subscription => _subscription;
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
+class _RouterNotifier extends ChangeNotifier {
+  _RouterNotifier(Ref ref) {
+    // Listen to providers without rebuilding the routerProvider
+    ref.listen(authProviderProvider, (_, _) => notifyListeners());
+    ref.listen(onboardingStageProvider, (_, _) => notifyListeners());
   }
 }
+
+// class GoRouterRefreshStream extends ChangeNotifier {
+//   GoRouterRefreshStream(Stream<dynamic> stream) {
+//     notifyListeners();
+//     _subscription = stream.asBroadcastStream().listen(
+//       (dynamic _) => notifyListeners(),
+//     );
+//   }
+
+//   late final StreamSubscription<dynamic> _subscription;
+//   StreamSubscription<dynamic> get subscription => _subscription;
+//   @override
+//   void dispose() {
+//     _subscription.cancel();
+//     super.dispose();
+//   }
+// }

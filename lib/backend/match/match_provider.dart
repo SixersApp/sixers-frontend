@@ -11,11 +11,14 @@ class MatchFeed extends _$MatchFeed {
   final MatchService _service = MatchService();
   Timer? _timer;
   bool _pollingStarted = false;
+  bool _mounted = true;
 
   @override
   Future<List<MatchModel>> build({String? matchId}) async {
     // Cleanup
+    _mounted = true;
     ref.onDispose(() {
+      _mounted = false;
       _timer?.cancel();
       _timer = null;
       _pollingStarted = false;
@@ -46,6 +49,8 @@ class MatchFeed extends _$MatchFeed {
   // -------------------------------------------------------------
   void _startPolling(String? matchId) {
     _timer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if(!_mounted) return;
+
       if (matchId == null) {
         refreshFeed();
       } else {
@@ -63,6 +68,7 @@ class MatchFeed extends _$MatchFeed {
     final nextState = await AsyncValue.guard(() async {
       return _service.fetchHomeFeed();
     });
+    if (!_mounted) return;
 
     state = nextState.copyWithPrevious(previous);
   }
@@ -77,6 +83,8 @@ class MatchFeed extends _$MatchFeed {
       final match = await _service.fetchMatchById(matchId);
       return [match];
     });
+
+    if(!_mounted) return;
 
     state = nextState.copyWithPrevious(previous);
   }

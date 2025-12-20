@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/views/auth/sign_up_page.dart';
+import 'package:sixers/views/router.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
-  static final String route = '/';
+  static final String route = '/auth';
   const SignInScreen({super.key});
 
   @override
@@ -181,12 +183,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                       Center(
                         child: TextButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SignUpScreen(),
-                              ),
-                            );
+                            context.go(SignUpScreen.route);
                           },
                           child: Text('Create an Account'),
                         ),
