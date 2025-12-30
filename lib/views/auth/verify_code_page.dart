@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
+import 'package:sixers/theme/colors.dart';
 
 class VerifyCodeSheet extends ConsumerStatefulWidget {
   final String email;
@@ -44,13 +46,9 @@ class _VerifyCodeSheetState extends ConsumerState<VerifyCodeSheet> {
       await ref
           .read(authProviderProvider.notifier)
           .signIn(widget.email, widget.password, true);
-
-      if (mounted) {
-        Navigator.pop(context); // Close the sheet
-      }
     } catch (e) {
       if (mounted) {
-        setState(() => error = e.toString());
+        _showError(e.toString());
       }
     } finally {
       if (mounted) {
@@ -58,6 +56,32 @@ class _VerifyCodeSheetState extends ConsumerState<VerifyCodeSheet> {
       }
     }
   }
+
+  void _showError(String message) {
+    // Clear any existing snackbars first (optional but recommended for errors)
+    ScaffoldMessenger.of(context).clearSnackBars();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Expanded(child: Text(message)),
+            GestureDetector(
+              onTap: () {
+                ScaffoldMessenger.of(context).clearSnackBars();
+              },
+              child: PhosphorIcon(PhosphorIcons.x(), color: AppColors.black100),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.red100,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -125,11 +149,6 @@ class _VerifyCodeSheetState extends ConsumerState<VerifyCodeSheet> {
               ),
             ),
           ),
-
-          if (error != null) ...[
-            const SizedBox(height: 12),
-            Text(error!, style: const TextStyle(color: Colors.red)),
-          ],
 
           const SizedBox(height: 24),
 

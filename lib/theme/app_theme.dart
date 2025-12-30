@@ -111,9 +111,18 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: fields.border),
+          borderSide: BorderSide(color: AppColors.green300),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: AppColors.red100),
         ),
         hintStyle: TextStyle(color: scheme.onSurfaceVariant),
+        errorStyle: TextStyle(
+          fontFamily: "Instrument Sans",
+          fontSize: 12,
+          color: AppColors.red100
+        )
       ),
 
       // Chips (back-compat for older SDKs):

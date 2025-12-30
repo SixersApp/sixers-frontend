@@ -2,10 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/backend/onboarding/onboarding_provider.dart';
 import 'package:sixers/utils/logger.dart';
-import 'package:sixers/theme/colors.dart';
+import 'package:sixers/views/onboarding/experience_screen.dart';
 
 class BasicInfoScreen extends ConsumerStatefulWidget {
   static final String route = '/onboarding/1';
@@ -120,7 +121,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     super.dispose();
   }
 
-  Future<void> _handleNext() async {
+  Future<void> _handleNext(BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
@@ -139,6 +140,9 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         onboardingStage: max(profileData.onboardingStage, 1),
       );
       await notifier.updateProfileInfo(profileData: newProfile);
+      if (context.mounted) {
+        context.go(ExperienceScreen.route);
+      }
     } catch (e, st) {
       logError('BasicInfoScreen error: $e', st);
       _showErrorSnackBar('Failed to save information. Please try again.');
@@ -171,105 +175,95 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: _buildBody(context),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBody(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildHeader(),
-        const SizedBox(height: 32),
-        Text(
-          'BASIC INFO',
-          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-            fontWeight: FontWeight.w900,
-            color: Colors.white,
-            letterSpacing: 1.5,
-            fontSize: 36,
-          ),
-        ),
-        const SizedBox(height: 32),
-
-        Expanded(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: constraints.maxHeight * 0.8,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 32),
+              Text(
+                'BASIC INFO',
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  fontSize: 48,
                 ),
-                child: SingleChildScrollView(child: _buildForm()),
-              );
-            },
+              ),
+              const SizedBox(height: 15),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildFieldLabel('Name'),
+                        const SizedBox(height: 6),
+                        TextFormField(
+                          controller: _nameController,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                          decoration: InputDecoration(hintText: 'John Doe'),
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [AutofillHints.name],
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty)
+                              return 'Name is required';
+                            if (value.trim().length < 2)
+                              return 'Name must be at least 2 characters';
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        _buildFieldLabel('Date of Birth'),
+                        const SizedBox(height: 6),
+                        _buildDateSelectors(),
+                        const SizedBox(height: 12),
+                        _buildFieldLabel('Country'),
+                        const SizedBox(height: 6),
+                        _buildCountryDropdown(),
+                        const SizedBox(height: 48),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 56,
+                          child: ElevatedButton(
+                            onPressed: _isLoading
+                                ? null
+                                : () => _handleNext(context),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.black,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Next',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildForm() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildFieldLabel('Name'),
-          const SizedBox(height: 12),
-          _buildNameField(),
-          const SizedBox(height: 32),
-          _buildFieldLabel('Date of Birth'),
-          const SizedBox(height: 12),
-          _buildDateSelectors(),
-          const SizedBox(height: 32),
-          _buildFieldLabel('Country'),
-          const SizedBox(height: 12),
-          _buildCountryDropdown(),
-          const SizedBox(height: 48),
-          _buildNextButton(),
-        ],
       ),
     );
   }
 
   Widget _buildFieldLabel(String label) {
-    return Text(
-      label,
-      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-        color: Colors.white,
-        fontWeight: FontWeight.w500,
-        fontSize: 18,
-      ),
-    );
-  }
-
-  Widget _buildNameField() {
-    return TextFormField(
-      controller: _nameController,
-      style: const TextStyle(color: Colors.white, fontSize: 16),
-      decoration: InputDecoration(
-        hintText: 'John Doe',
-        hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
-        filled: true,
-        fillColor: AppColors.black200,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.trim().isEmpty) return 'Name is required';
-        if (value.trim().length < 2)
-          return 'Name must be at least 2 characters';
-        return null;
-      },
-    );
+    return Text(label, style: Theme.of(context).textTheme.labelSmall);
   }
 
   Widget _buildDateSelectors() {
@@ -280,9 +274,10 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
           child: _buildDropdownField(
             value: _selectedDay.toString(),
             items: List.generate(31, (i) => (i + 1).toString()),
-            onChanged: (value) =>
-                setState(() => _selectedDay = int.parse(value!)),
-            fontSize: 14,
+            onChanged: (value) {
+              setState(() => _selectedDay = int.parse(value!));
+              FocusScope.of(context).nextFocus();
+            },
           ),
         ),
         const SizedBox(width: 8),
@@ -291,8 +286,10 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
           child: _buildDropdownField(
             value: _selectedMonth,
             items: _months,
-            onChanged: (value) => setState(() => _selectedMonth = value!),
-            fontSize: 14,
+            onChanged: (value) {
+              setState(() => _selectedMonth = value!);
+              FocusScope.of(context).nextFocus();
+            },
           ),
         ),
         const SizedBox(width: 8),
@@ -304,9 +301,10 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
               80,
               (i) => (DateTime.now().year - i).toString(),
             ),
-            onChanged: (value) =>
-                setState(() => _selectedYear = int.parse(value!)),
-            fontSize: 14,
+            onChanged: (value) {
+              setState(() => _selectedYear = int.parse(value!));
+              FocusScope.of(context).nextFocus();
+            },
           ),
         ),
       ],
@@ -325,21 +323,15 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
           .map(
             (c) => DropdownMenuItem(
               value: c,
-              child: Text(c, style: const TextStyle(color: Colors.white)),
+              child: Text(c, style: Theme.of(context).textTheme.bodyLarge),
             ),
           )
           .toList(),
-      onChanged: (value) => setState(() => _selectedCountry = value),
+      onChanged: (value) {
+        setState(() => _selectedCountry = value);
+        FocusScope.of(context).nextFocus();
+      },
       dropdownColor: const Color(0xFF2C2C2C),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: const Color(0xFF2C2C2C),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
-      ),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
     );
   }
@@ -361,54 +353,14 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
                 item,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.white, fontSize: fontSize),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
             ),
           )
           .toList(),
       onChanged: onChanged,
       dropdownColor: const Color(0xFF2C2C2C),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: const Color(0xFF2C2C2C),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
-        ),
-      ),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-    );
-  }
-
-  Widget _buildNextButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _handleNext,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 0,
-        ),
-        child: _isLoading
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  color: Colors.black,
-                  strokeWidth: 2,
-                ),
-              )
-            : const Text(
-                'Next',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-      ),
     );
   }
 
