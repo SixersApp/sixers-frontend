@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:sixers/backend/auth/auth_provider.dart';
+import 'package:sixers/backend/auth/g_auth_origin_provider.dart';
 import 'package:sixers/backend/onboarding/onboarding_provider.dart';
 import 'package:sixers/views/auth/sign_in_screen.dart';
 import 'package:sixers/views/auth/sign_up_page.dart';
@@ -23,16 +24,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       // READ (do not watch) providers here to avoid recreating the router
       final authState = ref.read(authProviderProvider);
       final onboardingState = ref.read(onboardingStageProvider);
+      final gAuthOrigin = ref.read(gAuthOriginProvider);
 
       final location = state.matchedLocation;
       final uri = state.uri;
 
+      print("Redirecting!");
 
       if (authState.isLoading || onboardingState.isLoading) return null;
       if (uri.toString().contains('auth')) {
         if (authState.value != null) {
-          if (onboardingState.isLoading) return SignInScreen.route;
-          if (onboardingState.value == null) return SignInScreen.route;
+          if (onboardingState.isLoading) return gAuthOrigin;
+          if (onboardingState.value == null) return gAuthOrigin;
           switch (onboardingState.value!.onboardingStage) {
             case 0:
               return BasicInfoScreen.route;
@@ -44,11 +47,11 @@ final routerProvider = Provider<GoRouter>((ref) {
               return BasicInfoScreen.route;
           }
         }
-        return SignInScreen.route;
+        return gAuthOrigin;
       }
 
       if (uri.host == 'sign-out' || uri.toString().contains('sign-out')) {
-        if (authState.value == null) return SignInScreen.route;
+        if (authState.value == null) return gAuthOrigin;
         return SettingsScreen.route;
       }
 
@@ -83,7 +86,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         }
       }
 
-      if (location.startsWith("/onboarding")) {
+      if(location == BasicInfoScreen.route) {
+        if (authState.value == null) return SignInScreen.route;
+        if (onboardingState.value == null) return BasicInfoScreen.route;
+        if(onboardingState.value!.onboardingStage == 2) {
+          return HomeScreen.route;
+        }
+        return null;
+      }
+
+      if (location == ExperienceScreen.route) {
         if (authState.value == null) return SignInScreen.route;
         if (onboardingState.value == null) return BasicInfoScreen.route;
         switch (onboardingState.value!.onboardingStage) {
@@ -101,7 +113,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (authState.value == null &&
           !(location == (SignInScreen.route) ||
               location == (SignUpScreen.route))) {
-        return SignInScreen.route;
+        return gAuthOrigin;
       }
       return null;
     },

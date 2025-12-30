@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/backend/onboarding/onboarding_provider.dart';
+import 'package:sixers/theme/colors.dart';
 import 'package:sixers/utils/logger.dart';
 import 'package:sixers/views/onboarding/basic_info_screen.dart';
 
@@ -22,23 +24,23 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
     {
       'id': 'new_to_cricket',
       'title': 'New to Cricket',
-      'description': 'Just started out. Still learning teams and rules.',
-      'icon': Icons.star_outline,
-      'color': Color(0xFF2196F3),
+      'description': 'Just starting out.',
+      'icon': PhosphorIcons.personSimpleThrow(),
+      'color': AppColors.green300,
     },
     {
       'id': 'casual_fan',
       'title': 'Casual Fan',
-      'description': 'I watch the big games and follow the popular players.',
-      'icon': Icons.sports_cricket,
-      'color': Color(0xFFFFC107),
+      'description': 'I follow big games & players.',
+      'icon': PhosphorIcons.cricket(),
+      'color': AppColors.yellow300,
     },
     {
       'id': 'die_hard_fan',
       'title': 'Die-Hard Fan',
-      'description': 'I know the squads and stats by heart.',
-      'icon': Icons.favorite,
-      'color': Color(0xFFE91E63),
+      'description': 'I know the squads and stats.',
+      'icon': PhosphorIcons.trophy(),
+      'color': AppColors.red100,
     },
   ];
 
@@ -159,23 +161,21 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
               _buildHeader(),
               const SizedBox(height: 32),
               Text(
-                'EXPERIENCE',
+                'ABOUT YOU',
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w700,
                   color: Colors.white,
-                  letterSpacing: 1.5,
-                  fontSize: 36,
+                  fontSize: 48,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Text(
                 'How much cricket do you know?',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.white70,
-                  fontSize: 18,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(color: Colors.white70),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
 
               Column(
                 children: _experiences.asMap().entries.map((entry) {
@@ -191,7 +191,7 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
               ),
 
               const Spacer(),
-              _buildNavigationButtons(),
+              _buildNavigationButtons(context),
             ],
           ),
         ),
@@ -252,43 +252,32 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF2C2C2C),
-          borderRadius: BorderRadius.circular(16),
+          color: isSelected ? AppColors.black300 : AppColors.black200,
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? const Color(0xFF4CAF50) : Colors.transparent,
+            color: isSelected ? exp['color'] : AppColors.black400,
             width: 2,
           ),
         ),
         child: Row(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: (exp['color'] as Color).withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(exp['icon'], color: exp['color'], size: 20),
-            ),
-            const SizedBox(width: 12),
+            PhosphorIcon(exp['icon'], color: exp['color'], size: 24),
+            const SizedBox(width: 15),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     exp['title'],
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.headlineSmall?.copyWith(color: Colors.white),
                   ),
-                  const SizedBox(height: 4),
                   Text(
                     exp['description'],
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(color: Colors.white70),
                   ),
                 ],
               ),
@@ -299,22 +288,24 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
     );
   }
 
-  Widget _buildNavigationButtons() {
+  Widget _buildNavigationButtons(BuildContext context) {
     return Row(
       children: [
         Expanded(
           child: SizedBox(
             height: 56,
+            child: FilledButton(
+              onPressed: () => context.go(BasicInfoScreen.route),
+              child: const Text('Back'),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: SizedBox(
+            height: 56,
             child: ElevatedButton(
               onPressed: _isLoading ? null : _handleNext,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
               child: _isLoading
                   ? const SizedBox(
                       width: 24,
@@ -324,13 +315,7 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
                         strokeWidth: 2,
                       ),
                     )
-                  : const Text(
-                      'Next',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                  : const Text('Next'),
             ),
           ),
         ),
