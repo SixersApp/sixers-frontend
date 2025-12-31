@@ -27,11 +27,15 @@ class LeagueDropdown extends ConsumerWidget {
     final leaguesAv = ref.watch(leaguesProvider);
 
     return PopupMenuButton<League?>(
+      // Set menu background color + shape/elevation
+      color: AppColors.black200,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       onSelected: (value) {
         if (value != null) {
           onSelected?.call(value);
         }
       },
+      
       itemBuilder: (ctx) {
         final List<PopupMenuEntry<League?>> menuItems = [];
 
@@ -85,9 +89,7 @@ class LeagueDropdown extends ConsumerWidget {
                           data: (teams) {
                             // find THIS USER's team for this league
                             final userTeam = teams
-                                .firstWhereOrNull(
-                                  (t) => t.leagueId == l.id,
-                                )
+                                .firstWhereOrNull((t) => t.leagueId == l.id)
                                 ?.teamName;
 
                             return LeagueItem(
@@ -141,19 +143,25 @@ class LeagueDropdown extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.only(right: 8),
         child: Row(
-          mainAxisSize:
-              width == "auto" ? MainAxisSize.min : MainAxisSize.max,
+          mainAxisSize: width == "auto" ? MainAxisSize.min : MainAxisSize.max,
           children: [
-            selectedLeague != null
-                ? Text(
-                    selectedLeague!.name,
-                    style: const TextStyle(color: Colors.white, fontSize: 18),
-                  )
-                : Text(
-                    label,
-                    style: const TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-            const Icon(Icons.arrow_drop_down, color: Colors.white),
+            if (selectedLeague != null)
+              Text(
+                selectedLeague!.name,
+                style: const TextStyle(color: Colors.white, fontSize: 18),
+              )
+            else ...[
+              Image.asset("assets/splash_logo.png", height: 24,),
+              const SizedBox(
+                width: 10,
+              ),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              const SizedBox(width: 10,)
+            ],
+            PhosphorIcon(PhosphorIcons.caretDown(PhosphorIconsStyle.fill), size: 24, color: Colors.white),
           ],
         ),
       ),
@@ -180,18 +188,17 @@ class LeagueItem extends StatelessWidget {
               Text(
                 league.name,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      height: 1.0,
-                    ),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  height: 1.0,
+                ),
               ),
               const SizedBox(height: 2),
               Text(
                 teamName,
-                style: Theme.of(context)
-                    .textTheme
-                    .labelSmall
-                    ?.copyWith(fontSize: 12, height: 1.0),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelSmall?.copyWith(fontSize: 12, height: 1.0),
               ),
             ],
           ),
@@ -222,9 +229,9 @@ class _LeagueAvatar extends StatelessWidget {
       child: Text(
         initials,
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: AppColors.black800,
-              fontWeight: FontWeight.bold,
-            ),
+          color: AppColors.black800,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
