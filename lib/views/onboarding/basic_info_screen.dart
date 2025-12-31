@@ -361,7 +361,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
       onChanged: onChanged,
       dropdownColor: const Color(0xFF2C2C2C),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-    );
+   );
   }
 
   Widget _buildHeader() {
