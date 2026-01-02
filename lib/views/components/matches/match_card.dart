@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:sixers/theme/colors.dart';
 
 class MatchCard extends StatelessWidget {
   final String homeTeamName;
@@ -8,6 +10,8 @@ class MatchCard extends StatelessWidget {
   final String awayScore;
   final String tournamentLabel;
   final bool isLive;
+  final String? homeTeamLogo;
+  final String? awayTeamLogo;
 
   const MatchCard({
     super.key,
@@ -18,16 +22,9 @@ class MatchCard extends StatelessWidget {
     required this.awayScore,
     required this.tournamentLabel,
     required this.isLive,
+    required this.homeTeamLogo,
+    required this.awayTeamLogo
   });
-
-  // -------------------------------------------------------------
-  // Helper: truncate text (15 chars max)
-  // -------------------------------------------------------------
-  String _truncate(String? s) {
-    if (s == null) return "";
-    return s.length <= 15 ? s : "${s.substring(0, 15)}…";
-  }
-
   // -------------------------------------------------------------
   // Helper: convert raw date into "Jun 12"
   // -------------------------------------------------------------
@@ -42,10 +39,31 @@ class MatchCard extends StatelessWidget {
 
   String _month(int m) {
     const months = [
-      "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      "",
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
     ];
     return months[m];
+  }
+
+  List<String> _separateScoreStrings(String s) {
+    final reg = RegExp(r'^(\d{1,3}/\d{1,2})\s*\((\d{1,2}\.\d)\)$');
+    final match = reg.firstMatch(s);
+
+    if (match != null) {
+      return [match.group(1)!, match.group(2)!];
+    }
+    return ["", ""];
   }
 
   // -------------------------------------------------------------
@@ -53,12 +71,14 @@ class MatchCard extends StatelessWidget {
   // -------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
+    var homeTeamScoreValues = _separateScoreStrings(homeScore);
+    var awayTeamScoreValues = _separateScoreStrings(awayScore);
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.black300,
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,78 +89,94 @@ class MatchCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(children: [
-                const Icon(Icons.sports_cricket, color: Colors.white, size: 22),
-                const SizedBox(width: 6),
-                Text(
-                  _truncate(homeTeamName),
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ]),
-              const Text("vs",
-                  style: TextStyle(color: Colors.grey, fontSize: 14)),
-              Row(children: [
-                Text(
-                  _truncate(awayTeamName),
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                ),
-                const SizedBox(width: 6),
-                const Icon(Icons.sports_cricket, color: Colors.white, size: 22),
-              ]),
-            ],
-          ),
-
-          const SizedBox(height: 8),
-
-          // ---------------------------------------------------------
-          // ROW 2 — Match Date + Status Badge
-          // ---------------------------------------------------------
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
               Text(
                 _formatDate(matchDateFormatted),
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(color: AppColors.black600),
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isLive
-                      ? Colors.red.withOpacity(0.2)
-                      : Colors.grey.withOpacity(0.25),
-                  borderRadius: BorderRadius.circular(10),
+              if (isLive) ...[
+                PhosphorIcon(
+                  PhosphorIcons.record(),
+                  size: 14,
+                  color: AppColors.red100,
                 ),
-                child: Text(
-                  isLive ? "Live" : "Upcoming",
-                  style: TextStyle(
-                    color: isLive ? Colors.redAccent : Colors.white70,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
+                const SizedBox(width: 4),
+              ],
+
+              Text(
+                isLive ? "Live" : "Upcoming",
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: isLive ? AppColors.red100 : AppColors.black600,
                 ),
               ),
             ],
           ),
-
-          const SizedBox(height: 12),
-
-          // ---------------------------------------------------------
-          // ROW 3 — Scores
-          // ---------------------------------------------------------
+          const SizedBox(height: 10),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: AppColors.black400,
+                  borderRadius: BorderRadius.circular(36),
+                ),
+                alignment: Alignment.center,
+                child: Uri.tryParse(homeTeamLogo ?? "") != null ? Image.network(homeTeamLogo!, width: 16, height: 16,) : Center()
+              ),
+              const SizedBox(width: 6),
               Text(
-                homeScore,
-                style: const TextStyle(color: Colors.white, fontSize: 18),
+                homeTeamName,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              const Spacer(),
+              Text(
+                homeTeamScoreValues[0],
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineSmall?.copyWith(color: AppColors.black800),
               ),
               Text(
-                awayScore,
-                style: const TextStyle(color: Colors.white, fontSize: 18),
+                " (${homeTeamScoreValues[1]})",
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineSmall?.copyWith(color: AppColors.black600),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          Row(
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: AppColors.black400,
+                  borderRadius: BorderRadius.circular(36),
+                ),
+                alignment: Alignment.center,
+                child: Uri.tryParse(awayTeamLogo ?? "") != null ? Image.network(awayTeamLogo!, width: 16, height: 16,) : Center()
+              ),
+              const SizedBox(width: 6),
+              Text(
+                awayTeamName,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              const Spacer(),
+              Text(
+                awayTeamScoreValues[0],
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineSmall?.copyWith(color: AppColors.black800),
+              ),
+              Text(
+                " (${awayTeamScoreValues[1]})",
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineSmall?.copyWith(color: AppColors.black600),
               ),
             ],
           ),
@@ -153,16 +189,14 @@ class MatchCard extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
+                color: AppColors.black400,
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 tournamentLabel,
-                style:
-                    const TextStyle(color: Colors.white70, fontSize: 13),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.black700),
               ),
             ),
           ),

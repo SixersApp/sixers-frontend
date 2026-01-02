@@ -15,7 +15,6 @@ class MatchFeedSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         //_header(context),
-        const SizedBox(height: 12),
 
         matchesAsync.when(
           loading: () => const Center(
@@ -50,8 +49,9 @@ class MatchFeedSection extends ConsumerWidget {
                   return MatchCard(
                     homeTeamName: m.homeTeamName ?? "Home Team",
                     awayTeamName: m.awayTeamName ?? "Away Team",
+                    homeTeamLogo: m.homeTeamImage,
+                    awayTeamLogo: m.awayTeamImage,
                     matchDateFormatted: m.matchDate ?? "TBD",
-
                     homeScore: _formatScore(
                       m.homeTeamScore,
                       m.homeTeamWickets,
