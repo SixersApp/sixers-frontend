@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
+import 'package:sixers/backend/match/feed_group_model.dart';
 import 'match_service.dart';
 import 'match_model.dart';
 
@@ -14,7 +15,7 @@ class MatchFeed extends _$MatchFeed {
   bool _mounted = true;
 
   @override
-  Future<List<MatchModel>> build({String? matchId}) async {
+  Future<List<FeedGroupModel>> build() async {
     // Cleanup
     _mounted = true;
     ref.onDispose(() {
@@ -32,30 +33,21 @@ class MatchFeed extends _$MatchFeed {
     // Start polling AFTER first successful build
     if (!_pollingStarted) {
       _pollingStarted = true;
-      _startPolling(matchId);
+      _startPolling();
     }
 
     // Initial fetch
-    if (matchId == null) {
-      return _service.fetchHomeFeed();
-    }
-
-    final match = await _service.fetchMatchById(matchId);
-    return [match];
+    return _service.fetchHomeFeed();
   }
 
   // -------------------------------------------------------------
   // Polling
   // -------------------------------------------------------------
-  void _startPolling(String? matchId) {
+  void _startPolling() {
     _timer = Timer.periodic(const Duration(seconds: 5), (_) {
-      if(!_mounted) return;
+      if (!_mounted) return;
 
-      if (matchId == null) {
-        refreshFeed();
-      } else {
-        refreshMatch(matchId);
-      }
+      refreshFeed();
     });
   }
 
@@ -63,29 +55,11 @@ class MatchFeed extends _$MatchFeed {
   // Smooth feed refresh
   // -------------------------------------------------------------
   Future<void> refreshFeed() async {
-    final previous = state;
-
     final nextState = await AsyncValue.guard(() async {
       return _service.fetchHomeFeed();
     });
     if (!_mounted) return;
 
-    state = nextState.copyWithPrevious(previous);
-  }
-
-  // -------------------------------------------------------------
-  // Smooth single match refresh
-  // -------------------------------------------------------------
-  Future<void> refreshMatch(String matchId) async {
-    final previous = state;
-
-    final nextState = await AsyncValue.guard(() async {
-      final match = await _service.fetchMatchById(matchId);
-      return [match];
-    });
-
-    if(!_mounted) return;
-
-    state = nextState.copyWithPrevious(previous);
+    state = nextState;
   }
 }

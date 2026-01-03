@@ -23,7 +23,7 @@ class MatchCard extends StatelessWidget {
     required this.tournamentLabel,
     required this.isLive,
     required this.homeTeamLogo,
-    required this.awayTeamLogo
+    required this.awayTeamLogo,
   });
   // -------------------------------------------------------------
   // Helper: convert raw date into "Jun 12"
@@ -123,7 +123,9 @@ class MatchCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(36),
                 ),
                 alignment: Alignment.center,
-                child: Uri.tryParse(homeTeamLogo ?? "") != null ? Image.network(homeTeamLogo!, width: 16, height: 16,) : Center()
+                child: Uri.tryParse(homeTeamLogo ?? "") != null
+                    ? Image.network(homeTeamLogo!, width: 16, height: 16)
+                    : Center(),
               ),
               const SizedBox(width: 6),
               Text(
@@ -158,7 +160,9 @@ class MatchCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(36),
                 ),
                 alignment: Alignment.center,
-                child: Uri.tryParse(awayTeamLogo ?? "") != null ? Image.network(awayTeamLogo!, width: 16, height: 16,) : Center()
+                child: Uri.tryParse(awayTeamLogo ?? "") != null
+                    ? Image.network(awayTeamLogo!, width: 16, height: 16)
+                    : Center(),
               ),
               const SizedBox(width: 6),
               Text(
@@ -196,7 +200,9 @@ class MatchCard extends StatelessWidget {
               ),
               child: Text(
                 tournamentLabel,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.black700),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppColors.black700),
               ),
             ),
           ),

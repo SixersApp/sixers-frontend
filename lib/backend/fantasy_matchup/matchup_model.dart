@@ -17,11 +17,8 @@ sealed class Matchup with _$Matchup {
     @JsonKey(name: "fantasy_team1_id")
     required String fantasyTeam1Id,
 
-    @JsonKey(name: "fantasy_team1_name")
-    String? fantasyTeam1Name,
-
     @JsonKey(name: "fantasy_team_instance1_score")
-    String? fantasyTeamInstance1Score,
+    required int fantasyTeamInstance1Score,
 
     // TEAM 2
     @JsonKey(name: "fantasy_team_instance2_id")
@@ -30,11 +27,8 @@ sealed class Matchup with _$Matchup {
     @JsonKey(name: "fantasy_team2_id")
     required String fantasyTeam2Id,
 
-    @JsonKey(name: "fantasy_team2_name")
-    String? fantasyTeam2Name,
-
     @JsonKey(name: "fantasy_team_instance2_score")
-    String? fantasyTeamInstance2Score,
+    required int fantasyTeamInstance2Score,
   }) = _Matchup;
 
   factory Matchup.fromJson(Map<String, dynamic> json) =>

@@ -4,10 +4,8 @@ import 'matchup_model.dart';
 class MatchupService {
   final _dio = ApiClient.dio;
 
-  Future<List<Matchup>> getMatchups({required int matchNum}) async {
-    final res = await _dio.get("/matchups/match_num", queryParameters: {
-      "match_num": matchNum,
-    });
+  Future<List<Matchup>> getMatchups() async {
+    final res = await _dio.get("/matchups/feed");
 
     if (res.statusCode != 200 || res.data is! List) return [];
 

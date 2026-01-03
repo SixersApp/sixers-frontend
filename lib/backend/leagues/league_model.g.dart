@@ -11,10 +11,17 @@ _League _$LeagueFromJson(Map<String, dynamic> json) => _League(
   name: json['name'] as String,
   tournamentId: json['tournament_id'] as String,
   creatorId: json['creator_id'] as String,
+  userTeamId: json['user_team_id'] as String? ?? '',
   status: const LeagueStatusConverter().fromJson(json['status'] as String),
   maxTeams: (json['max_teams'] as num).toInt(),
   joinCode: json['join_code'] as String,
   seasonId: json['season_id'] as String,
+  latestGame: (json['latest_game'] as num?)?.toInt() ?? 0,
+  teams: (json['teams'] as List<dynamic>)
+      .map((e) => FantasyTeam.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  tournamentAbbr: json['tournament_abbr'] as String?,
+  seasonYear: (json['season_year'] as num).toInt(),
 );
 
 Map<String, dynamic> _$LeagueToJson(_League instance) => <String, dynamic>{
@@ -22,8 +29,13 @@ Map<String, dynamic> _$LeagueToJson(_League instance) => <String, dynamic>{
   'name': instance.name,
   'tournament_id': instance.tournamentId,
   'creator_id': instance.creatorId,
+  'user_team_id': instance.userTeamId,
   'status': const LeagueStatusConverter().toJson(instance.status),
   'max_teams': instance.maxTeams,
   'join_code': instance.joinCode,
   'season_id': instance.seasonId,
+  'latest_game': instance.latestGame,
+  'teams': instance.teams,
+  'tournament_abbr': instance.tournamentAbbr,
+  'season_year': instance.seasonYear,
 };

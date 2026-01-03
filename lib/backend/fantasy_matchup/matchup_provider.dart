@@ -12,7 +12,7 @@ part 'matchup_provider.g.dart';
 @riverpod
 class UserMatchups extends _$UserMatchups {
   @override
-  Future<List<Matchup>> build(int matchNum) async {
+  Future<List<Matchup>> build() async {
     final timer = Timer.periodic(const Duration(seconds: 5), (_) {
       refresh();
     });
@@ -21,18 +21,17 @@ class UserMatchups extends _$UserMatchups {
     final auth = await ref.watch(authProviderProvider.future);
     if (auth == null) return [];
 
-    return MatchupService().getMatchups(matchNum: matchNum);
+    return MatchupService().getMatchups();
   }
 
   Future<void> refresh() async {
-    final previous = state;
+    final auth = await ref.watch(authProviderProvider.future);
 
     final newState = await AsyncValue.guard(() async {
-      final auth = await ref.watch(authProviderProvider.future);
       if (auth == null) return <Matchup>[];
-      return MatchupService().getMatchups(matchNum: matchNum);
+      return MatchupService().getMatchups();
     });
 
-    state = newState.copyWithPrevious(previous);
+    state = newState;
   }
 }

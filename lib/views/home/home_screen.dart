@@ -3,9 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
+import 'package:sixers/backend/fantasy_matchup/matchup_model.dart';
+import 'package:sixers/backend/fantasy_team/fantasy_team_model.dart';
 import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/fantasy_matchup/matchup_provider.dart';
+import 'package:sixers/utils/string_to_avatar.dart';
 import 'package:sixers/views/components/league_dropdown/league_dropdown.dart';
 import 'package:sixers/views/components/league_dropdown/league_dropdown_v2.dart';
 import 'package:sixers/views/components/matches/match_feed.dart';
@@ -37,9 +40,9 @@ class HomeScreen extends ConsumerWidget {
         final leaguesAsync = ref.watch(leaguesProvider);
 
         // Fetch matchups (match 2)
-        final matchupsAsync = userId.isEmpty
+        final matchupsAsync = (userId.isEmpty
             ? const AsyncValue.data([])
-            : ref.watch(userMatchupsProvider(0));
+            : ref.watch(userMatchupsProvider)) as AsyncValue<List<Matchup>>;
 
         return Scaffold(
           backgroundColor: AppColors.black100,
@@ -101,7 +104,7 @@ class HomeScreen extends ConsumerWidget {
                   onRefresh: () async {
                     await ref.read(leaguesProvider.notifier).refresh();
                     if (userId.isNotEmpty) {
-                      ref.refresh(userMatchupsProvider(0));
+                      ref.refresh(userMatchupsProvider);
                     }
                   },
                   child: Column(
@@ -188,41 +191,42 @@ class HomeScreen extends ConsumerWidget {
                                           maxTeams: 0,
                                           joinCode: "",
                                           seasonId: "",
+                                          latestGame: 1,
+                                          teams: [],
+                                          tournamentAbbr: "UKL",
+                                          seasonYear: 2025,
                                         ),
                                       );
 
-                                      final team1Score = _parseScore(
-                                        m.fantasyTeamInstance1Score,
-                                      );
-                                      final team2Score = _parseScore(
-                                        m.fantasyTeamInstance2Score,
-                                      );
+                                      late FantasyTeam team1;
+                                      late FantasyTeam team2;
+
+                                      for(var team in league.teams) {
+                                        if(team.id == m.fantasyTeam1Id) {
+                                          team1 = team;
+                                        }
+                                        if(team.id == m.fantasyTeam2Id) {
+                                          team2 = team;
+                                        }
+                                      }
 
                                       return Padding(
                                         padding: pad,
                                         child: MatchupCard(
                                           team1Name:
-                                              m.fantasyTeam1Name ?? "Team 1",
-                                          team1Score: team1Score
-                                              .toStringAsFixed(1),
+                                              team1.teamName,
+                                          team1Score: m.fantasyTeamInstance1Score.toString(),
                                           team1PlayersLeft: 0,
                                           team1WinProbability: 50,
-                                          team1Logo: const Icon(
-                                            Icons.sports_cricket,
-                                            color: Colors.white,
-                                            size: 25,
-                                          ),
+                                          team1Logo: Image.asset(stringToAvatar(team1.teamIcon)),
+                                          team1Color: stringToColor(team1.teamColor),
                                           team2Name:
-                                              m.fantasyTeam2Name ?? "Team 2",
-                                          team2Score: team2Score
-                                              .toStringAsFixed(1),
+                                              team2.teamName,
+                                          team2Score: m.fantasyTeamInstance2Score.toString(),
                                           team2PlayersLeft: 0,
                                           team2WinProbability: 50,
-                                          team2Logo: const Icon(
-                                            Icons.sports_cricket,
-                                            color: Colors.white,
-                                            size: 25,
-                                          ),
+                                          team2Logo: Image.asset(stringToAvatar(team2.teamIcon)),
+                                          team2Color: stringToColor(team2.teamColor),
                                           leagueName: league.name,
                                           gameNumber: "Game ${m.matchNum}",
                                           isLive: false,

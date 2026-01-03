@@ -18,7 +18,8 @@ class Leagues extends _$Leagues {
     final service = LeagueService();
 
     try {
-      return await service.getLeagues();
+      final leagues = await service.getLeagues();
+      return leagues;
     } catch (e, st) {
       print("❌ Error loading leagues: $e\n$st");
       rethrow;
@@ -27,7 +28,6 @@ class Leagues extends _$Leagues {
 
   /// Allows manual refreshing just like matchups
   Future<void> refresh() async {
-    state = const AsyncLoading();
     state = await AsyncValue.guard(() => build());
   }
 }

@@ -10,89 +10,48 @@ part of 'match_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(MatchFeed)
-const matchFeedProvider = MatchFeedFamily._();
+const matchFeedProvider = MatchFeedProvider._();
 
 final class MatchFeedProvider
-    extends $AsyncNotifierProvider<MatchFeed, List<MatchModel>> {
-  const MatchFeedProvider._({
-    required MatchFeedFamily super.from,
-    required String? super.argument,
-  }) : super(
-         retry: null,
-         name: r'matchFeedProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         $allTransitiveDependencies: null,
-       );
+    extends $AsyncNotifierProvider<MatchFeed, List<FeedGroupModel>> {
+  const MatchFeedProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'matchFeedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$matchFeedHash();
 
-  @override
-  String toString() {
-    return r'matchFeedProvider'
-        ''
-        '($argument)';
-  }
-
   @$internal
   @override
   MatchFeed create() => MatchFeed();
-
-  @override
-  bool operator ==(Object other) {
-    return other is MatchFeedProvider && other.argument == argument;
-  }
-
-  @override
-  int get hashCode {
-    return argument.hashCode;
-  }
 }
 
-String _$matchFeedHash() => r'8bd3412b259df2c4bb5870077d071b54b626612c';
+String _$matchFeedHash() => r'41789ccd991ea215ba6a86e2154bf3e02e5fa61a';
 
-final class MatchFeedFamily extends $Family
-    with
-        $ClassFamilyOverride<
-          MatchFeed,
-          AsyncValue<List<MatchModel>>,
-          List<MatchModel>,
-          FutureOr<List<MatchModel>>,
-          String?
-        > {
-  const MatchFeedFamily._()
-    : super(
-        retry: null,
-        name: r'matchFeedProvider',
-        dependencies: null,
-        $allTransitiveDependencies: null,
-        isAutoDispose: true,
-      );
-
-  MatchFeedProvider call({String? matchId}) =>
-      MatchFeedProvider._(argument: matchId, from: this);
-
-  @override
-  String toString() => r'matchFeedProvider';
-}
-
-abstract class _$MatchFeed extends $AsyncNotifier<List<MatchModel>> {
-  late final _$args = ref.$arg as String?;
-  String? get matchId => _$args;
-
-  FutureOr<List<MatchModel>> build({String? matchId});
+abstract class _$MatchFeed extends $AsyncNotifier<List<FeedGroupModel>> {
+  FutureOr<List<FeedGroupModel>> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(matchId: _$args);
+    final created = build();
     final ref =
-        this.ref as $Ref<AsyncValue<List<MatchModel>>, List<MatchModel>>;
+        this.ref
+            as $Ref<AsyncValue<List<FeedGroupModel>>, List<FeedGroupModel>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<List<MatchModel>>, List<MatchModel>>,
-              AsyncValue<List<MatchModel>>,
+              AnyNotifier<
+                AsyncValue<List<FeedGroupModel>>,
+                List<FeedGroupModel>
+              >,
+              AsyncValue<List<FeedGroupModel>>,
               Object?,
               Object?
             >;
