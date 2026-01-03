@@ -12,7 +12,7 @@ import 'package:sixers/theme/colors.dart';
   ),
   "All-Rounder" => (
     icon: PhosphorIcons.star(),
-    color: AppColors.pink200,
+    color: AppColors.pink600,
   ), // amber-ish
   // TODO: Handle this case.
   String() => (
