@@ -87,7 +87,6 @@ class MatchCard extends StatelessWidget {
           // ROW 1 — Home Team vs Away Team
           // ---------------------------------------------------------
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 _formatDate(matchDateFormatted),
@@ -95,9 +94,10 @@ class MatchCard extends StatelessWidget {
                   context,
                 ).textTheme.bodyLarge?.copyWith(color: AppColors.black600),
               ),
+              const Spacer(),
               if (isLive) ...[
                 PhosphorIcon(
-                  PhosphorIcons.record(),
+                  PhosphorIcons.record(PhosphorIconsStyle.fill),
                   size: 14,
                   color: AppColors.red100,
                 ),
