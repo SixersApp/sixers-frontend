@@ -17,6 +17,8 @@ class AuthService {
       // ✅ IMPORTANT: set token on restore too
       ApiClient.setAuthToken(appSession.idToken);
 
+      printIdToken(appSession.idToken);
+
       return appSession;
     } on AuthException catch (e) {
       return null;

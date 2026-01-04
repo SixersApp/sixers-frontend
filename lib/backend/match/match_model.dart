@@ -3,6 +3,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'match_model.freezed.dart';
 part 'match_model.g.dart';
 
+
+
 @freezed
 sealed class MatchModel with _$MatchModel {
   const factory MatchModel({

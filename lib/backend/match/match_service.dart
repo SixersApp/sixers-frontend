@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:sixers/backend/auth/dio_client.dart';
+import 'package:sixers/backend/match/feed_group_model.dart';
 import 'match_model.dart';
 
 class MatchService {
@@ -8,11 +9,11 @@ class MatchService {
   MatchService() : _dio = ApiClient.dio;
 
   /// Get home feed matches (list)
-  Future<List<MatchModel>> fetchHomeFeed() async {
+  Future<List<FeedGroupModel>> fetchHomeFeed() async {
     final response = await _dio.get("/matches/feed");
 
     final data = response.data as List;
-    return data.map((e) => MatchModel.fromJson(e)).toList();
+    return data.map((e) => FeedGroupModel.fromJson(e["tournament_data"])).toList();
   }
 
   /// Get match by ID (single)

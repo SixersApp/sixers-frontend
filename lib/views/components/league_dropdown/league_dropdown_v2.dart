@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:sixers/backend/fantasy_team/fantasy_team_model.dart';
 import 'package:sixers/backend/fantasy_team/fantasy_team_provider.dart';
+import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/theme/colors.dart';
+import 'package:sixers/utils/string_to_avatar.dart';
 import 'package:sixers/views/home/home_screen.dart';
 
 void showLeagueDropDown(BuildContext context) {
@@ -16,9 +19,8 @@ void showLeagueDropDown(BuildContext context) {
       return Consumer(
         builder: (context, ref, child) {
           final userLeagues = ref.watch(leaguesProvider);
-          final userTeams = ref.watch(fantasyTeamsProvider);
-          
-          final val = userLeagues.value ?? [];
+
+          final leagues = userLeagues.value ?? [];
           return Align(
             alignment: Alignment.topCenter,
             child: Padding(
@@ -48,17 +50,21 @@ void showLeagueDropDown(BuildContext context) {
                         title: "FANTASY HUB",
                         path: HomeScreen.route,
                       ),
+                      ..._renderLeagueOptions(
+                        context,
+                        leagues: leagues,
+                      ),
                       _buildNavOption(
                         context,
                         iconBg: AppColors.black400,
-                        icon: PhosphorIcon(PhosphorIcons.plus(), size: 20,),
+                        icon: PhosphorIcon(PhosphorIcons.plus(), size: 20),
                         title: "CREATE NEW LEAGUE",
                         path: "/create",
                       ),
                       _buildNavOption(
                         context,
                         iconBg: AppColors.black400,
-                        icon: PhosphorIcon(PhosphorIcons.signIn(), size: 20,),
+                        icon: PhosphorIcon(PhosphorIcons.signIn(), size: 20),
                         title: "JOIN NEW LEAGUE",
                         path: "/join",
                       ),
@@ -72,6 +78,27 @@ void showLeagueDropDown(BuildContext context) {
       );
     },
   );
+}
+
+List<Widget> _renderLeagueOptions(
+  BuildContext context, {
+  required List<League> leagues,
+}) {
+  return leagues.map((league) {
+    late FantasyTeam associatedTeam;
+    for (var team in league.teams) {
+      if (team.id == league.userTeamId) associatedTeam = team;
+    }
+    return _buildNavOption(
+      context,
+      iconBg:  stringToColor(associatedTeam.teamColor),
+      icon: Image.asset(stringToAvatar(associatedTeam.teamIcon)),
+      title: league.name,
+      path: "/leagues/${league.id}",
+      subtitle: associatedTeam.teamName,
+      chipText: "${league.tournamentAbbr} ${league.seasonYear}"
+    );
+  }).toList();
 }
 
 Widget _buildNavOption(
@@ -103,19 +130,23 @@ Widget _buildNavOption(
             child: icon,
           ),
           const SizedBox(width: 10),
-          Column(
-            children: [
-              Text(title, style: Theme.of(context).textTheme.headlineSmall),
-              if (subtitle != null)
-                Text(
-                  subtitle,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: AppColors.black600),
-                ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(title, style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  overflow: TextOverflow.ellipsis
+                )),
+                if (subtitle != null)
+                  Text(
+                    subtitle,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: AppColors.black600),
+                  ),
+              ],
+            ),
           ),
-          const Spacer(),
           if (chipText != null)
             Container(
               decoration: BoxDecoration(

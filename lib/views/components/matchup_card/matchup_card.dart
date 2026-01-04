@@ -15,11 +15,13 @@ class MatchupCard extends StatelessWidget {
     required this.team1PlayersLeft,
     required this.team1WinProbability,
     required this.team1Logo,
+    required this.team1Color,
     required this.team2Name,
     required this.team2Score,
     required this.team2PlayersLeft,
     required this.team2WinProbability,
     required this.team2Logo,
+    required this.team2Color,
     required this.leagueName,
     required this.gameNumber,
     required this.matchupId,
@@ -36,11 +38,13 @@ class MatchupCard extends StatelessWidget {
   final int team1PlayersLeft;
   final int team1WinProbability;
   final Widget team1Logo;
+  final Color team1Color;
   final String team2Name;
   final String team2Score;
   final int team2PlayersLeft;
   final int team2WinProbability;
   final Widget team2Logo;
+  final Color team2Color;
   final String leagueName;
   final String gameNumber;
   final String matchupId;
@@ -64,8 +68,8 @@ class MatchupCard extends StatelessWidget {
         );
       },
       child: Container(
-        width: 341,
-        decoration: BoxDecoration(color: AppColors.black300, borderRadius: BorderRadius.circular(16)),
+        width: 350,
+        decoration: BoxDecoration(color: AppColors.black200, borderRadius: BorderRadius.circular(10)),
         child: Stack(
           children: [
             // Left pattern strip - much wider
@@ -76,8 +80,8 @@ class MatchupCard extends StatelessWidget {
               child: Container(
                 width: 30,
                 decoration: BoxDecoration(
-                  color: AppColors.yellow300,
-                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), bottomLeft: Radius.circular(16)),
+                  color: team1Color,
+                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
                 ),
                 child: const PatternBackground(),
               ),
@@ -90,8 +94,8 @@ class MatchupCard extends StatelessWidget {
               child: Container(
                 width: 30,
                 decoration: BoxDecoration(
-                  color: AppColors.green300,
-                  borderRadius: const BorderRadius.only(topRight: Radius.circular(16), bottomRight: Radius.circular(16)),
+                  color: team2Color,
+                  borderRadius: const BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10)),
                 ),
                 child: const PatternBackground(),
               ),
@@ -111,13 +115,14 @@ class MatchupCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
                         decoration: BoxDecoration(
                           color: AppColors.black100,
+                          border: Border.all(color: AppColors.black100),
                           borderRadius: BorderRadius.all(Radius.circular(100)),
                         ),
                         child: Text(
                           team1Name,
                           style: Theme.of(
                             context,
-                          ).textTheme.labelLarge?.copyWith(color: AppColors.black800, fontWeight: FontWeight.w600, fontSize: 11),
+                          ).textTheme.titleSmall?.copyWith(color: AppColors.black800),
                         ),
                       ),
 
@@ -142,19 +147,20 @@ class MatchupCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
                         decoration: BoxDecoration(
                           color: AppColors.black100,
+                          border: Border.all(color: AppColors.black100),
                           borderRadius: BorderRadius.all(Radius.circular(100)),
                         ),
                         child: Text(
                           team2Name,
                           style: Theme.of(
                             context,
-                          ).textTheme.labelLarge?.copyWith(color: AppColors.black800, fontWeight: FontWeight.w600, fontSize: 11),
+                          ).textTheme.titleSmall?.copyWith(color: AppColors.black800),
                         ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 3),
 
                   // Row 2: Team logos and scores
                   Row(
@@ -162,11 +168,11 @@ class MatchupCard extends StatelessWidget {
                     children: [
                       // Team 1 logo
                       Container(
-                        width: 37,
-                        height: 37,
+                        width: 39,
+                        height: 39,
                         decoration: BoxDecoration(
-                          color: AppColors.yellow300,
-                          borderRadius: BorderRadius.circular(10),
+                          color: team1Color,
+                          borderRadius: BorderRadius.circular(5),
                           border: Border.all(color: AppColors.black100, width: 2),
                         ),
                         child: Center(child: team1Logo),
@@ -206,11 +212,11 @@ class MatchupCard extends StatelessWidget {
 
                       // Team 2 logo
                       Container(
-                        width: 37,
-                        height: 37,
+                        width: 39,
+                        height: 39,
                         decoration: BoxDecoration(
-                          color: AppColors.green300,
-                          borderRadius: BorderRadius.circular(10),
+                          color: team2Color,
+                          borderRadius: BorderRadius.circular(5),
                           border: Border.all(color: AppColors.black100, width: 2),
                         ),
                         child: Center(child: team2Logo),
@@ -288,7 +294,7 @@ class MatchupCard extends StatelessWidget {
                                 flex: team1WinProbability,
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: AppColors.yellow300,
+                                    color: team1Color,
                                     borderRadius: const BorderRadius.only(
                                       topLeft: Radius.circular(2),
                                       bottomLeft: Radius.circular(2),
@@ -296,11 +302,12 @@ class MatchupCard extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                              const SizedBox(width: 1),
                               Expanded(
                                 flex: team2WinProbability,
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: AppColors.green300,
+                                    color: team2Color,
                                     borderRadius: const BorderRadius.only(
                                       topRight: Radius.circular(2),
                                       bottomRight: Radius.circular(2),

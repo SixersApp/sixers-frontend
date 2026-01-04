@@ -2,111 +2,179 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:sixers/backend/match/match_provider.dart';
+import 'package:sixers/theme/colors.dart';
 import 'package:sixers/views/components/matches/match_card.dart';
 
+// Public wrapper that keeps the original API as ConsumerWidget
 class MatchFeedSection extends ConsumerWidget {
   const MatchFeedSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final matchesAsync = ref.watch(matchFeedProvider());
+    return const _MatchFeedSectionImpl();
+  }
+}
+
+// Renamed stateful implementation (private)
+class _MatchFeedSectionImpl extends ConsumerStatefulWidget {
+  const _MatchFeedSectionImpl({super.key});
+
+  @override
+  ConsumerState<_MatchFeedSectionImpl> createState() =>
+      _MatchFeedSectionImplState();
+}
+
+class _MatchFeedSectionImplState extends ConsumerState<_MatchFeedSectionImpl> {
+  String currentTournament = "";
+
+  @override
+  Widget build(BuildContext context) {
+    final feedData = ref.watch(matchFeedProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         //_header(context),
-        const SizedBox(height: 12),
-
-        matchesAsync.when(
+        feedData.when(
           loading: () => const Center(
             child: CircularProgressIndicator(color: Colors.white),
           ),
-          error: (e, _) => Text(
-            "Error: $e",
-            style: const TextStyle(color: Colors.red),
-          ),
+          error: (e, _) =>
+              Text("Error: $e", style: const TextStyle(color: Colors.red)),
 
           data: (list) {
             if (list.isEmpty) {
               return const Text(
-                "No upcoming games.",
+                "Join a league to see relevant real life matches",
                 style: TextStyle(color: Colors.white70),
               );
             }
 
-            // NULL-SAFE filtering
-            final live = list.where(
-              (m) => (m.status ?? "").toLowerCase() == "live",
-            );
+            // Combine all matches with tournament metadata
+            final combined = <Map<String, dynamic>>[];
+            for (final fg in list) {
+              final matches = fg.matches;
+              if (matches != null) {
+                for (final m in matches) {
+                  combined.add({
+                    'match': m,
+                    'tournamentId': fg.tournamentId,
+                    'tournamentName': fg.tournamentName,
+                  });
+                }
+              }
+            }
 
-            final upcoming = list
-                .where((m) => (m.status ?? "").toLowerCase() != "live");
+            // Sort: live matches first, then by start date (earliest first)
+            combined.sort((a, b) {
+              final aMatch = a['match'];
+              final bMatch = b['match'];
 
-            final combined = [...live, ...upcoming];
+              final aLive = (aMatch?.status ?? '').toString().toLowerCase() == 'live';
+              final bLive = (bMatch?.status ?? '').toString().toLowerCase() == 'live';
+              if (aLive != bLive) return aLive ? -1 : 1;
+
+              final aDt = DateTime.tryParse(aMatch?.matchDate ?? '') ?? DateTime(9999);
+              final bDt = DateTime.tryParse(bMatch?.matchDate ?? '') ?? DateTime(9999);
+              return aDt.compareTo(bDt);
+            });
+
+            // Apply tournament filter
+            final matchupsToRender = currentTournament == ""
+                ? combined
+                : combined.where((c) => c['tournamentId'] == currentTournament).toList();
 
             return Column(
-              children: combined.map(
-                (m) {
-                  return MatchCard(
-                    homeTeamName: m.homeTeamName ?? "Home Team",
-                    awayTeamName: m.awayTeamName ?? "Away Team",
-                    matchDateFormatted: m.matchDate ?? "TBD",
-
-                    homeScore: _formatScore(
-                      m.homeTeamScore,
-                      m.homeTeamWickets,
-                      m.homeTeamBalls,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Material(
+                      color: currentTournament == "" ? AppColors.black800 : AppColors.black300,
+                      borderRadius: BorderRadius.circular(5),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(5),
+                        splashColor: AppColors.black500.withAlpha(25),
+                        onTap: () {
+                          setState(() {
+                            currentTournament = "";
+                          });
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          child: Text(
+                            "All",
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: currentTournament == "" ? AppColors.black100 : AppColors.black600),
+                          ),
+                        ),
+                      ),
                     ),
-
-                    awayScore: _formatScore(
-                      m.awayTeamScore,
-                      m.awayTeamWickets,
-                      m.awayTeamBalls,
+                    const SizedBox(width: 10),
+                    ...list.map(
+                      (fg) => Container(
+                        margin: EdgeInsets.only(right: 10),
+                        child: Material(
+                          color: currentTournament == fg.tournamentId ? AppColors.black800 : AppColors.black300,
+                          borderRadius: BorderRadius.circular(5),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(5),
+                            splashColor: AppColors.black500.withAlpha(25),
+                            onTap: () {
+                              setState(() {
+                                currentTournament = fg.tournamentId;
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              child: Text(
+                                fg.abbreviation,
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: currentTournament == fg.tournamentId ? AppColors.black100 : AppColors.black600),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 10),
 
-                    tournamentLabel: m.tournamentName ?? "",
-                    isLive: (m.status ?? "").toLowerCase() == "live",
-                  );
-                },
-              ).toList(),
+                // Render matches or show empty message
+                if (matchupsToRender.isEmpty)
+                  const Text("No matches found for this tournament", style: TextStyle(color: Colors.white70))
+                else
+                  Column(
+                    children: matchupsToRender.map((c) {
+                      final m = c['match'];
+                      final tournamentLabel = c['tournamentName'] ?? m?.tournamentName ?? "";
+                      return MatchCard(
+                        homeTeamName: m?.homeTeamName ?? "Home Team",
+                        awayTeamName: m?.awayTeamName ?? "Away Team",
+                        homeTeamLogo: m?.homeTeamImage,
+                        awayTeamLogo: m?.awayTeamImage,
+                        matchDateFormatted: m?.matchDate,
+                        homeScore: _formatScore(m?.homeTeamScore, m?.homeTeamWickets, m?.homeTeamBalls),
+                        awayScore: _formatScore(m?.awayTeamScore, m?.awayTeamWickets, m?.awayTeamBalls),
+                        tournamentLabel: tournamentLabel,
+                        isLive: (m?.status ?? "").toString().toLowerCase() == "live",
+                      );
+                    }).toList(),
+                  ),
+              ],
             );
           },
         ),
       ],
     );
   }
-
-  // ---------------------------------------------------------------------------
-  // HEADER ROW
-  // ---------------------------------------------------------------------------
-  // Widget _header(BuildContext context) {
-  //   return Row(
-  //     children: [
-  //       const Text(
-  //         "Live/Upcoming Games",
-  //         style: TextStyle(
-  //           color: Colors.white,
-  //           fontSize: 20,
-  //           fontWeight: FontWeight.w700,
-  //         ),
-  //       ),
-  //       const Spacer(),
-  //       GestureDetector(
-  //         onTap: () {
-  //           // TODO: navigate to full match list
-  //         },
-  //         child: Text(
-  //           "View All →",
-  //           style: TextStyle(
-  //             color: Colors.green.shade400,
-  //             fontSize: 14,
-  //             fontWeight: FontWeight.w500,
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
 
   // ---------------------------------------------------------------------------
   // DATE FORMATTER — fully null & parse safe

@@ -6,6 +6,7 @@ part 'fantasy_team_model.g.dart';
 @freezed
 sealed class FantasyTeam with _$FantasyTeam {
   const factory FantasyTeam({
+    @JsonKey(name: "id")
     required String id,
 
     @JsonKey(name: "league_id")
@@ -16,6 +17,9 @@ sealed class FantasyTeam with _$FantasyTeam {
 
     @JsonKey(name: "team_name")
     required String teamName,
+
+    @JsonKey(name: "user_name")
+    required String userName,
 
     // ❗ These can be null in your API → MUST be nullable
     @JsonKey(name: "draft_order")

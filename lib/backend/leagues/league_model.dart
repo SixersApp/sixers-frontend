@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sixers/backend/fantasy_team/fantasy_team_model.dart';
 
 part 'league_model.freezed.dart';
 part 'league_model.g.dart';
@@ -41,18 +42,23 @@ class LeagueStatusConverter implements JsonConverter<LeagueStatus, String> {
 @freezed
 sealed class League with _$League {
   const factory League({
-    required String id,
-    required String name,
+    @JsonKey(name: "id") required String id,
+    @JsonKey(name: "name") required String name,
     @JsonKey(name: "tournament_id") required String tournamentId,
     @JsonKey(name: "creator_id") required String creatorId,
+    @JsonKey(name: "user_team_id", defaultValue: "")
+    @Default("") String userTeamId,
     @LeagueStatusConverter()
     @JsonKey(name: "status")
     required LeagueStatus status,
     @JsonKey(name: "max_teams") required int maxTeams,
     @JsonKey(name: "join_code") required String joinCode,
     @JsonKey(name: "season_id") required String seasonId,
+    @JsonKey(name: "latest_game") @Default(0) int latestGame,
+    @JsonKey(name: "teams") required List<FantasyTeam> teams,
+    @JsonKey(name: "tournament_abbr") required String? tournamentAbbr,
+    @JsonKey(name: "season_year") required int seasonYear
   }) = _League;
 
-  factory League.fromJson(Map<String, dynamic> json) =>
-      _$LeagueFromJson(json);
+  factory League.fromJson(Map<String, dynamic> json) => _$LeagueFromJson(json);
 }
