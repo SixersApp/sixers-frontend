@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sixers/backend/fantasy_player/fantasy_player_model.dart';
+import 'package:sixers/theme/colors.dart';
 
 class PlayerRow extends StatelessWidget {
   final FantasyPlayer p;
@@ -15,7 +16,7 @@ class PlayerRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
+            color: AppColors.black100,
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -29,7 +30,7 @@ class PlayerRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  p.fullName ?? "PLAYER NAME",
+                  p.fullName,
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,

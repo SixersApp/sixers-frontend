@@ -64,7 +64,7 @@ final class DraftPicksProvider
   }
 }
 
-String _$draftPicksHash() => r'3e005469476bb05e50b38100ceaebbc55b4a3fe7';
+String _$draftPicksHash() => r'9156683ca9f4acacb0f0fc77fc47a011530d193b';
 
 final class DraftPicksFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<DraftPick>>, String> {

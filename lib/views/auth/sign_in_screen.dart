@@ -268,31 +268,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required String label,
-    required FormFieldValidator<String?> validator,
-    bool isPassword = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: Theme.of(context).textTheme.labelSmall),
-        const SizedBox(height: 6),
-        TextFormField(
-          controller: controller,
-          obscureText: isPassword,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyLarge?.copyWith(color: Colors.white),
-          decoration: InputDecoration(hintText: hintText),
-          validator: validator,
-        ),
-      ],
-    );
-  }
-
   Widget _buildSocialButton({
     required Widget image,
     required String label,

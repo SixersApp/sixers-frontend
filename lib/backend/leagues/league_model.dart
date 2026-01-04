@@ -5,7 +5,9 @@ part 'league_model.freezed.dart';
 part 'league_model.g.dart';
 
 enum LeagueStatus {
+  // ignore: constant_identifier_names
   draft_pending,
+  // ignore: constant_identifier_names
   draft_in_progress,
   active,
   completed,

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/backend/onboarding/onboarding_provider.dart';
+import 'package:sixers/theme/colors.dart';
 import 'package:sixers/utils/logger.dart';
 import 'package:sixers/views/onboarding/experience_screen.dart';
 
@@ -111,7 +112,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
         _selectedYear = dob.year;
       }
     } catch (e) {
-      print("Profile restore failed: $e");
+      logError("Profile restore failed: $e");
     }
   }
 
@@ -209,10 +210,12 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
                           textInputAction: TextInputAction.next,
                           autofillHints: const [AutofillHints.name],
                           validator: (value) {
-                            if (value == null || value.trim().isEmpty)
+                            if (value == null || value.trim().isEmpty) {
                               return 'Name is required';
-                            if (value.trim().length < 2)
+                            }
+                            if (value.trim().length < 2) {
                               return 'Name must be at least 2 characters';
+                            }
                             return null;
                           },
                         ),
@@ -340,7 +343,6 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     required String? value,
     required List<String> items,
     required void Function(String?) onChanged,
-    double fontSize = 16,
   }) {
     return DropdownButtonFormField<String>(
       value: items.contains(value) ? value : null,
@@ -379,7 +381,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
           height: 6,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(3),
-            color: Colors.grey.withOpacity(0.3),
+            color: AppColors.black500,
           ),
           child: Row(
             children: [
@@ -399,7 +401,7 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
                     borderRadius: const BorderRadius.horizontal(
                       right: Radius.circular(3),
                     ),
-                    color: Colors.grey.withOpacity(0.3),
+                    color: AppColors.black500,
                   ),
                 ),
               ),

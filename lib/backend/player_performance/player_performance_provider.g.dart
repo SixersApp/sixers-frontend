@@ -55,7 +55,7 @@ final class PlayerPerformanceServiceProvider
 }
 
 String _$playerPerformanceServiceHash() =>
-    r'bc4e15a3f829a79afa86b57a231b223a9d100658';
+    r'9ff80988c6787f09f31709efa230cccb221ea77f';
 
 @ProviderFor(PlayerPerformanceController)
 const playerPerformanceControllerProvider =

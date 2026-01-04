@@ -33,7 +33,7 @@ final class MatchFeedProvider
   MatchFeed create() => MatchFeed();
 }
 
-String _$matchFeedHash() => r'41789ccd991ea215ba6a86e2154bf3e02e5fa61a';
+String _$matchFeedHash() => r'47d8464d116d02c22c048783a7e7baec472903b4';
 
 abstract class _$MatchFeed extends $AsyncNotifier<List<FeedGroupModel>> {
   FutureOr<List<FeedGroupModel>> build();

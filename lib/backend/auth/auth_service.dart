@@ -2,6 +2,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:sixers/backend/auth/dio_client.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart' as cognito;
+import 'package:sixers/utils/logger.dart';
 import 'app_session.dart';
 
 class AuthService {
@@ -20,7 +21,7 @@ class AuthService {
       printIdToken(appSession.idToken);
 
       return appSession;
-    } on AuthException catch (e) {
+    } on AuthException catch (_) {
       return null;
     } catch (_) {
       return null;
@@ -38,8 +39,8 @@ class AuthService {
       final appSession = await _buildSessionFromCognito();
       ApiClient.setAuthToken(appSession.idToken);
 
-      print(appSession.userId);
-      printIdToken(appSession.idToken);
+      // print(appSession.userId);
+      logInfo(appSession.idToken);
 
       if (firstTime){
         initUserInBackend(appSession);
@@ -57,7 +58,7 @@ class AuthService {
     final text = idToken;
     const chunkSize = 800;
     for (var i = 0; i < text.length; i += chunkSize) {
-      print(
+      logInfo(
         text.substring(
           i,
           i + chunkSize > text.length ? text.length : i + chunkSize,

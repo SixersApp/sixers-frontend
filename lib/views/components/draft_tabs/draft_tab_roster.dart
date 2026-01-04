@@ -69,7 +69,7 @@ class DraftTabRoster extends ConsumerWidget {
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
             itemCount: myPicks.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            separatorBuilder: (_, _) => const SizedBox(height: 12),
             itemBuilder: (context, i) {
               final pick = myPicks[i];
               final player = playersById[pick.playerId];

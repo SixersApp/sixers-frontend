@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sixers/backend/fantasy_team/fantasy_team_model.dart';
-import 'package:sixers/backend/fantasy_team/fantasy_team_provider.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/theme/colors.dart';
@@ -50,10 +49,7 @@ void showLeagueDropDown(BuildContext context) {
                         title: "FANTASY HUB",
                         path: HomeScreen.route,
                       ),
-                      ..._renderLeagueOptions(
-                        context,
-                        leagues: leagues,
-                      ),
+                      ..._renderLeagueOptions(context, leagues: leagues),
                       _buildNavOption(
                         context,
                         iconBg: AppColors.black400,
@@ -91,12 +87,12 @@ List<Widget> _renderLeagueOptions(
     }
     return _buildNavOption(
       context,
-      iconBg:  stringToColor(associatedTeam.teamColor),
+      iconBg: stringToColor(associatedTeam.teamColor),
       icon: Image.asset(stringToAvatar(associatedTeam.teamIcon)),
       title: league.name,
       path: "/leagues/${league.id}",
       subtitle: associatedTeam.teamName,
-      chipText: "${league.tournamentAbbr} ${league.seasonYear}"
+      chipText: "${league.tournamentAbbr} ${league.seasonYear}",
     );
   }).toList();
 }
@@ -114,7 +110,9 @@ Widget _buildNavOption(
     onTap: () {
       // Close the dialog first, then navigate.
       Navigator.of(context, rootNavigator: true).pop();
-      Future.microtask(() => context.go(path));
+      Future.microtask(() {
+        if (context.mounted) context.go(path);
+      });
     },
     child: Padding(
       padding: EdgeInsets.all(10),
@@ -134,9 +132,12 @@ Widget _buildNavOption(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(title, style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  overflow: TextOverflow.ellipsis
-                )),
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
                 if (subtitle != null)
                   Text(
                     subtitle,

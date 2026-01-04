@@ -1,6 +1,7 @@
 // lib/backend/leagues/league_provider.dart
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sixers/utils/logger.dart';
 import '../auth/auth_provider.dart';
 import 'league_model.dart';
 import 'league_service.dart';
@@ -21,7 +22,7 @@ class Leagues extends _$Leagues {
       final leagues = await service.getLeagues();
       return leagues;
     } catch (e, st) {
-      print("❌ Error loading leagues: $e\n$st");
+      logError("❌ Error loading leagues: $e\n$st");
       rethrow;
     }
   }

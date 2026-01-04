@@ -3,7 +3,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/backend/match/feed_group_model.dart';
 import 'match_service.dart';
-import 'match_model.dart';
 
 part 'match_provider.g.dart';
 
@@ -26,7 +25,7 @@ class MatchFeed extends _$MatchFeed {
     });
 
     final auth = await ref.watch(authProviderProvider.future);
-    if (auth == null || auth.idToken == null) {
+    if (auth == null) {
       return [];
     }
 

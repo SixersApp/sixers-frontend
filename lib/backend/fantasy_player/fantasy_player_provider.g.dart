@@ -53,7 +53,7 @@ final class FantasyPlayerControllerProvider
 }
 
 String _$fantasyPlayerControllerHash() =>
-    r'27f97385f6ff1367c397acc27a3ff4a723887c24';
+    r'258b842882d75a516ce341fd9bc6c506a4a111a0';
 
 final class FantasyPlayerControllerFamily extends $Family
     with

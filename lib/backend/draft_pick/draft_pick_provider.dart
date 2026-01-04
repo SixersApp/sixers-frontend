@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sixers/backend/draft_pick/draft_pick_service.dart';
 import 'package:sixers/backend/draft_state/draft_state_provider.dart';
@@ -9,7 +10,7 @@ import 'draft_pick_model.dart';
 part 'draft_pick_provider.g.dart';
 
 @riverpod
-Future<List<DraftPick>> draftPicks(ref, String leagueId) async {
+Future<List<DraftPick>> draftPicks(WidgetRef ref, String leagueId) async {
   final rows = await Supabase.instance.client.from('draft_picks').select().eq('league_id', leagueId).order('pick_number');
   return (rows as List).map((r) => DraftPick.fromJson(r as Map<String, dynamic>)).toList();
 }

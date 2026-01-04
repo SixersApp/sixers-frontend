@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/backend/auth/g_auth_origin_provider.dart';
 import 'package:sixers/backend/onboarding/onboarding_provider.dart';
+import 'package:sixers/utils/logger.dart';
 import 'package:sixers/views/auth/sign_in_screen.dart';
 import 'package:sixers/views/auth/sign_up_page.dart';
 import 'package:sixers/views/fantasy_matchup/fantasy_matchup_screen.dart';
@@ -29,7 +30,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
       final uri = state.uri;
 
-      print("Redirecting!");
+      logDebug("Redirecting!");
 
       if (authState.isLoading || onboardingState.isLoading) return null;
       if (uri.toString().contains('auth')) {
