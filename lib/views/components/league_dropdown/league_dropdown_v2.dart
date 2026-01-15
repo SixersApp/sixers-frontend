@@ -7,6 +7,7 @@ import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/utils/string_to_avatar.dart';
+import 'package:sixers/views/create_league/join_league_screen.dart';
 import 'package:sixers/views/home/home_screen.dart';
 
 void showLeagueDropDown(BuildContext context) {
@@ -55,14 +56,14 @@ void showLeagueDropDown(BuildContext context) {
                         iconBg: AppColors.black400,
                         icon: PhosphorIcon(PhosphorIcons.plus(), size: 20),
                         title: "CREATE NEW LEAGUE",
-                        path: "/create",
+                        path: "/create-league",
                       ),
                       _buildNavOption(
                         context,
                         iconBg: AppColors.black400,
                         icon: PhosphorIcon(PhosphorIcons.signIn(), size: 20),
                         title: "JOIN NEW LEAGUE",
-                        path: "/join",
+                        path: JoinLeagueScreen.route,
                       ),
                     ],
                   ),
@@ -111,7 +112,7 @@ Widget _buildNavOption(
       // Close the dialog first, then navigate.
       Navigator.of(context, rootNavigator: true).pop();
       Future.microtask(() {
-        if (context.mounted) context.go(path);
+        if (context.mounted) context.push(path);
       });
     },
     child: Padding(

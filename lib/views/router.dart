@@ -4,18 +4,26 @@ import 'package:go_router/go_router.dart';
 
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/backend/auth/g_auth_origin_provider.dart';
+import 'package:sixers/backend/leagues/league_model.dart';
+import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/backend/onboarding/onboarding_provider.dart';
 import 'package:sixers/utils/logger.dart';
 import 'package:sixers/views/auth/sign_in_screen.dart';
 import 'package:sixers/views/auth/sign_up_page.dart';
+import 'package:sixers/views/create_league/create_league_screen.dart';
+import 'package:sixers/views/create_league/create_team_screen.dart';
+import 'package:sixers/views/create_league/customize_scoring_screen.dart';
+import 'package:sixers/views/create_league/commissioner_pre_draft_screen.dart';
+import 'package:sixers/views/create_league/league_settings_screen.dart';
+import 'package:sixers/views/create_league/join_league_screen.dart';
+import 'package:sixers/views/create_league/league_preview_screen.dart';
+import 'package:sixers/views/error_screen.dart';
 import 'package:sixers/views/fantasy_matchup/fantasy_matchup_screen.dart';
 import 'package:sixers/views/home/home_screen.dart';
 import 'package:sixers/views/onboarding/basic_info_screen.dart';
 import 'package:sixers/views/onboarding/experience_screen.dart';
 import 'package:sixers/views/settings/settings_screen.dart';
 import 'package:sixers/views/splash.dart';
-
-
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -157,6 +165,64 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
+      GoRoute(
+        path: CreateLeagueScreen.route,
+        builder: (context, state) => const CreateLeagueScreen(),
+      ),
+      GoRoute(
+        path: CustomizeScoringScreen.route,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return CustomizeScoringScreen(leagueData: extra);
+        },
+      ),
+      GoRoute(
+        path: CreateTeamScreen.route,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return CreateTeamScreen(
+            leagueName: extra['leagueName'] as String,
+            tournamentId: extra['tournamentId'] as String,
+            scoringRules: extra['scoringRules'],
+          );
+        },
+      ),
+      GoRoute(
+        path: "/leagues/:id",
+        builder: (context, state) {
+          final leagueId = state.pathParameters["id"]!;
+          return LeagueLoader(leagueId: leagueId);
+        },
+      ),
+      GoRoute(
+        path: "/league/:id/settings",
+        builder: (context, state) {
+          final leagueId = state.pathParameters["id"]!;
+          return LeagueSettingsScreen(leagueId: leagueId);
+        },
+      ),
+      GoRoute(
+        path: JoinLeagueScreen.route,
+        builder: (context, state) => const JoinLeagueScreen(),
+      ),
+      GoRoute(
+        path: LeaguePreviewScreen.route,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return LeaguePreviewScreen(league: extra['league'] as League);
+        },
+      ),
+      GoRoute(
+        path: '/join-league/:id/team',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          final league = extra['league'] as League;
+          return CreateTeamScreen(
+            leagueToJoin: league,
+            joinCode: league.joinCode,
+          );
+        },
+      ),
     ],
   );
 });
@@ -169,19 +235,33 @@ class _RouterNotifier extends ChangeNotifier {
   }
 }
 
-// class GoRouterRefreshStream extends ChangeNotifier {
-//   GoRouterRefreshStream(Stream<dynamic> stream) {
-//     notifyListeners();
-//     _subscription = stream.asBroadcastStream().listen(
-//       (dynamic _) => notifyListeners(),
-//     );
-//   }
 
-//   late final StreamSubscription<dynamic> _subscription;
-//   StreamSubscription<dynamic> get subscription => _subscription;
-//   @override
-//   void dispose() {
-//     _subscription.cancel();
-//     super.dispose();
-//   }
-// }
+class LeagueLoader extends ConsumerWidget {
+  final String leagueId;
+  const LeagueLoader({Key? key, required this.leagueId}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final leaguesAsync = ref.watch(leaguesProvider);
+
+    return leaguesAsync.when(
+      data: (leagues) {
+        final matching = leagues.where((e) => e.id == leagueId);
+        if (matching.isEmpty) {
+          return const ErrorScreen(error: "League Not Found");
+        }
+        final currentLeague = matching.first;
+        switch (currentLeague.status) {
+          case LeagueStatus.draft_pending:
+            return CommissionerPreDraftScreen(leagueId: leagueId);
+          case LeagueStatus.draft_in_progress:
+            return CommissionerPreDraftScreen(leagueId: leagueId);
+          default:
+            return CommissionerPreDraftScreen(leagueId: leagueId);
+        }
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, _) => ErrorScreen(error: err.toString()),
+    );
+  }
+}

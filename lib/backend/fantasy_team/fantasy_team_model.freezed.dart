@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FantasyTeam {
 
-@JsonKey(name: "id") String get id;@JsonKey(name: "league_id") String get leagueId;@JsonKey(name: "user_id") String get userId;@JsonKey(name: "team_name") String get teamName;@JsonKey(name: "user_name") String get userName;// ❗ These can be null in your API → MUST be nullable
+@JsonKey(name: "id") String get id;@JsonKey(name: "league_id") String get leagueId;@JsonKey(name: "user_id") String get userId;@JsonKey(name: "team_name") String get teamName;@JsonKey(name: "user_name") String? get userName;// ❗ These can be null in your API → MUST be nullable
 @JsonKey(name: "draft_order") int? get draftOrder;@JsonKey(name: "team_color") String? get teamColor;@JsonKey(name: "team_icon") String? get teamIcon;@JsonKey(name: "created_at") String? get createdAt;
 /// Create a copy of FantasyTeam
 /// with the given fields replaced by the non-null parameter values.
@@ -49,7 +49,7 @@ abstract mixin class $FantasyTeamCopyWith<$Res>  {
   factory $FantasyTeamCopyWith(FantasyTeam value, $Res Function(FantasyTeam) _then) = _$FantasyTeamCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: "id") String id,@JsonKey(name: "league_id") String leagueId,@JsonKey(name: "user_id") String userId,@JsonKey(name: "team_name") String teamName,@JsonKey(name: "user_name") String userName,@JsonKey(name: "draft_order") int? draftOrder,@JsonKey(name: "team_color") String? teamColor,@JsonKey(name: "team_icon") String? teamIcon,@JsonKey(name: "created_at") String? createdAt
+@JsonKey(name: "id") String id,@JsonKey(name: "league_id") String leagueId,@JsonKey(name: "user_id") String userId,@JsonKey(name: "team_name") String teamName,@JsonKey(name: "user_name") String? userName,@JsonKey(name: "draft_order") int? draftOrder,@JsonKey(name: "team_color") String? teamColor,@JsonKey(name: "team_icon") String? teamIcon,@JsonKey(name: "created_at") String? createdAt
 });
 
 
@@ -66,14 +66,14 @@ class _$FantasyTeamCopyWithImpl<$Res>
 
 /// Create a copy of FantasyTeam
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? leagueId = null,Object? userId = null,Object? teamName = null,Object? userName = null,Object? draftOrder = freezed,Object? teamColor = freezed,Object? teamIcon = freezed,Object? createdAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? leagueId = null,Object? userId = null,Object? teamName = null,Object? userName = freezed,Object? draftOrder = freezed,Object? teamColor = freezed,Object? teamIcon = freezed,Object? createdAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,leagueId: null == leagueId ? _self.leagueId : leagueId // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,teamName: null == teamName ? _self.teamName : teamName // ignore: cast_nullable_to_non_nullable
-as String,userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
-as String,draftOrder: freezed == draftOrder ? _self.draftOrder : draftOrder // ignore: cast_nullable_to_non_nullable
+as String,userName: freezed == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
+as String?,draftOrder: freezed == draftOrder ? _self.draftOrder : draftOrder // ignore: cast_nullable_to_non_nullable
 as int?,teamColor: freezed == teamColor ? _self.teamColor : teamColor // ignore: cast_nullable_to_non_nullable
 as String?,teamIcon: freezed == teamIcon ? _self.teamIcon : teamIcon // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
@@ -159,7 +159,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: "id")  String id, @JsonKey(name: "league_id")  String leagueId, @JsonKey(name: "user_id")  String userId, @JsonKey(name: "team_name")  String teamName, @JsonKey(name: "user_name")  String userName, @JsonKey(name: "draft_order")  int? draftOrder, @JsonKey(name: "team_color")  String? teamColor, @JsonKey(name: "team_icon")  String? teamIcon, @JsonKey(name: "created_at")  String? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: "id")  String id, @JsonKey(name: "league_id")  String leagueId, @JsonKey(name: "user_id")  String userId, @JsonKey(name: "team_name")  String teamName, @JsonKey(name: "user_name")  String? userName, @JsonKey(name: "draft_order")  int? draftOrder, @JsonKey(name: "team_color")  String? teamColor, @JsonKey(name: "team_icon")  String? teamIcon, @JsonKey(name: "created_at")  String? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FantasyTeam() when $default != null:
 return $default(_that.id,_that.leagueId,_that.userId,_that.teamName,_that.userName,_that.draftOrder,_that.teamColor,_that.teamIcon,_that.createdAt);case _:
@@ -180,7 +180,7 @@ return $default(_that.id,_that.leagueId,_that.userId,_that.teamName,_that.userNa
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: "id")  String id, @JsonKey(name: "league_id")  String leagueId, @JsonKey(name: "user_id")  String userId, @JsonKey(name: "team_name")  String teamName, @JsonKey(name: "user_name")  String userName, @JsonKey(name: "draft_order")  int? draftOrder, @JsonKey(name: "team_color")  String? teamColor, @JsonKey(name: "team_icon")  String? teamIcon, @JsonKey(name: "created_at")  String? createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: "id")  String id, @JsonKey(name: "league_id")  String leagueId, @JsonKey(name: "user_id")  String userId, @JsonKey(name: "team_name")  String teamName, @JsonKey(name: "user_name")  String? userName, @JsonKey(name: "draft_order")  int? draftOrder, @JsonKey(name: "team_color")  String? teamColor, @JsonKey(name: "team_icon")  String? teamIcon, @JsonKey(name: "created_at")  String? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _FantasyTeam():
 return $default(_that.id,_that.leagueId,_that.userId,_that.teamName,_that.userName,_that.draftOrder,_that.teamColor,_that.teamIcon,_that.createdAt);}
@@ -197,7 +197,7 @@ return $default(_that.id,_that.leagueId,_that.userId,_that.teamName,_that.userNa
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: "id")  String id, @JsonKey(name: "league_id")  String leagueId, @JsonKey(name: "user_id")  String userId, @JsonKey(name: "team_name")  String teamName, @JsonKey(name: "user_name")  String userName, @JsonKey(name: "draft_order")  int? draftOrder, @JsonKey(name: "team_color")  String? teamColor, @JsonKey(name: "team_icon")  String? teamIcon, @JsonKey(name: "created_at")  String? createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: "id")  String id, @JsonKey(name: "league_id")  String leagueId, @JsonKey(name: "user_id")  String userId, @JsonKey(name: "team_name")  String teamName, @JsonKey(name: "user_name")  String? userName, @JsonKey(name: "draft_order")  int? draftOrder, @JsonKey(name: "team_color")  String? teamColor, @JsonKey(name: "team_icon")  String? teamIcon, @JsonKey(name: "created_at")  String? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _FantasyTeam() when $default != null:
 return $default(_that.id,_that.leagueId,_that.userId,_that.teamName,_that.userName,_that.draftOrder,_that.teamColor,_that.teamIcon,_that.createdAt);case _:
@@ -212,14 +212,14 @@ return $default(_that.id,_that.leagueId,_that.userId,_that.teamName,_that.userNa
 @JsonSerializable()
 
 class _FantasyTeam implements FantasyTeam {
-  const _FantasyTeam({@JsonKey(name: "id") required this.id, @JsonKey(name: "league_id") required this.leagueId, @JsonKey(name: "user_id") required this.userId, @JsonKey(name: "team_name") required this.teamName, @JsonKey(name: "user_name") required this.userName, @JsonKey(name: "draft_order") this.draftOrder, @JsonKey(name: "team_color") this.teamColor, @JsonKey(name: "team_icon") this.teamIcon, @JsonKey(name: "created_at") this.createdAt});
+  const _FantasyTeam({@JsonKey(name: "id") required this.id, @JsonKey(name: "league_id") required this.leagueId, @JsonKey(name: "user_id") required this.userId, @JsonKey(name: "team_name") required this.teamName, @JsonKey(name: "user_name") this.userName, @JsonKey(name: "draft_order") this.draftOrder, @JsonKey(name: "team_color") this.teamColor, @JsonKey(name: "team_icon") this.teamIcon, @JsonKey(name: "created_at") this.createdAt});
   factory _FantasyTeam.fromJson(Map<String, dynamic> json) => _$FantasyTeamFromJson(json);
 
 @override@JsonKey(name: "id") final  String id;
 @override@JsonKey(name: "league_id") final  String leagueId;
 @override@JsonKey(name: "user_id") final  String userId;
 @override@JsonKey(name: "team_name") final  String teamName;
-@override@JsonKey(name: "user_name") final  String userName;
+@override@JsonKey(name: "user_name") final  String? userName;
 // ❗ These can be null in your API → MUST be nullable
 @override@JsonKey(name: "draft_order") final  int? draftOrder;
 @override@JsonKey(name: "team_color") final  String? teamColor;
@@ -259,7 +259,7 @@ abstract mixin class _$FantasyTeamCopyWith<$Res> implements $FantasyTeamCopyWith
   factory _$FantasyTeamCopyWith(_FantasyTeam value, $Res Function(_FantasyTeam) _then) = __$FantasyTeamCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: "id") String id,@JsonKey(name: "league_id") String leagueId,@JsonKey(name: "user_id") String userId,@JsonKey(name: "team_name") String teamName,@JsonKey(name: "user_name") String userName,@JsonKey(name: "draft_order") int? draftOrder,@JsonKey(name: "team_color") String? teamColor,@JsonKey(name: "team_icon") String? teamIcon,@JsonKey(name: "created_at") String? createdAt
+@JsonKey(name: "id") String id,@JsonKey(name: "league_id") String leagueId,@JsonKey(name: "user_id") String userId,@JsonKey(name: "team_name") String teamName,@JsonKey(name: "user_name") String? userName,@JsonKey(name: "draft_order") int? draftOrder,@JsonKey(name: "team_color") String? teamColor,@JsonKey(name: "team_icon") String? teamIcon,@JsonKey(name: "created_at") String? createdAt
 });
 
 
@@ -276,14 +276,14 @@ class __$FantasyTeamCopyWithImpl<$Res>
 
 /// Create a copy of FantasyTeam
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? leagueId = null,Object? userId = null,Object? teamName = null,Object? userName = null,Object? draftOrder = freezed,Object? teamColor = freezed,Object? teamIcon = freezed,Object? createdAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? leagueId = null,Object? userId = null,Object? teamName = null,Object? userName = freezed,Object? draftOrder = freezed,Object? teamColor = freezed,Object? teamIcon = freezed,Object? createdAt = freezed,}) {
   return _then(_FantasyTeam(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,leagueId: null == leagueId ? _self.leagueId : leagueId // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,teamName: null == teamName ? _self.teamName : teamName // ignore: cast_nullable_to_non_nullable
-as String,userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
-as String,draftOrder: freezed == draftOrder ? _self.draftOrder : draftOrder // ignore: cast_nullable_to_non_nullable
+as String,userName: freezed == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
+as String?,draftOrder: freezed == draftOrder ? _self.draftOrder : draftOrder // ignore: cast_nullable_to_non_nullable
 as int?,teamColor: freezed == teamColor ? _self.teamColor : teamColor // ignore: cast_nullable_to_non_nullable
 as String?,teamIcon: freezed == teamIcon ? _self.teamIcon : teamIcon // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable

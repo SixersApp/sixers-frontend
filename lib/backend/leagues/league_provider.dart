@@ -31,4 +31,19 @@ class Leagues extends _$Leagues {
   Future<void> refresh() async {
     state = await AsyncValue.guard(() => build());
   }
+
+  /// Updates a specific league in the local state
+  void updateLeague(League updatedLeague) {
+    final currentState = state;
+    if (currentState is AsyncData<List<League>>) {
+      final leagues = currentState.value;
+      final updatedLeagues = leagues.map((league) {
+        if (league.id == updatedLeague.id) {
+          return updatedLeague;
+        }
+        return league;
+      }).toList();
+      state = AsyncData(updatedLeagues);
+    }
+  }
 }

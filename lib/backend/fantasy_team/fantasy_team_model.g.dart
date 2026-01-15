@@ -11,7 +11,7 @@ _FantasyTeam _$FantasyTeamFromJson(Map<String, dynamic> json) => _FantasyTeam(
   leagueId: json['league_id'] as String,
   userId: json['user_id'] as String,
   teamName: json['team_name'] as String,
-  userName: json['user_name'] as String,
+  userName: json['user_name'] as String?,
   draftOrder: (json['draft_order'] as num?)?.toInt(),
   teamColor: json['team_color'] as String?,
   teamIcon: json['team_icon'] as String?,

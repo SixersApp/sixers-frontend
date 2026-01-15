@@ -1,174 +1,277 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:sixers/backend/leagues/league_model.dart';
-// import 'package:sixers/backend/leagues/league_provider.dart';
-// import 'package:sixers/backend/scoring_rule/scoring_rule_model.dart';
-// import 'package:sixers/backend/scoring_rule/scoring_rule_provider.dart';
-// import 'package:sixers/backend/tournament/tournament_provider.dart';
-// import 'package:sixers/theme/colors.dart';
-// import 'package:sixers/views/components/create_league_widgets/header.dart';
-// import 'package:sixers/views/components/create_league_widgets/scoring_section.dart';
-// import 'package:sixers/views/components/draft_tabs/pre_draft_board.dart';
-// import 'package:supabase_flutter/supabase_flutter.dart';
-// import 'package:sixers/utils/logger.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:sixers/backend/auth/auth_provider.dart';
+import 'package:sixers/backend/leagues/league_scoring_rule_model.dart';
+import 'package:sixers/backend/leagues/league_service.dart';
+import 'package:sixers/theme/colors.dart';
+import 'package:sixers/utils/logger.dart';
+import 'package:sixers/views/create_league/create_team_screen.dart';
+import 'package:sixers/views/create_league/customize_scoring_screen.dart';
 
-// class CreateLeagueScreen extends ConsumerStatefulWidget {
-//   const CreateLeagueScreen({super.key});
+class CreateLeagueScreen extends ConsumerStatefulWidget {
+  static const String route = '/create-league';
 
-//   @override
-//   ConsumerState<CreateLeagueScreen> createState() => _CreateLeagueScreenState();
-// }
+  const CreateLeagueScreen({super.key});
 
-// class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
-//   final TextEditingController _nameCtrl = TextEditingController();
-//   String? _tournamentId;
-//   bool _showScoring = false;
-//   List<ScoringRule> _rules = [];
-//   final uid = Supabase.instance.client.auth.currentUser?.id;
+  @override
+  ConsumerState<CreateLeagueScreen> createState() => _CreateLeagueScreenState();
+}
 
-//   @override
-//   void dispose() {
-//     _nameCtrl.dispose();
-//     super.dispose();
-//   }
+class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
+  final _nameController = TextEditingController();
+  final _leagueService = LeagueService();
 
-//   @override
-//   Widget build(BuildContext context) {
-//     ref.listen<AsyncValue<List<ScoringRule>>>(scoringRulesProvider(), (prev, next) {
-//       next.whenData((rs) {
-//         if (mounted && _rules.isEmpty && rs.isNotEmpty) {
-//           setState(() => _rules = rs);
-//         }
-//       });
-//     });
+  List<Tournament>? _tournaments;
+  Tournament? _selectedTournament;
+  bool _isLoading = true;
+  List<LeagueScoringRule>? _scoringRules;
 
-//     final tournamentsAv = ref.watch(tournamentsProvider);
-//     final defaultsAv = ref.watch(scoringRulesProvider());
-//     final leaguesA = ref.read(leaguesProvider.notifier);
-//     logDebug('rules: $_rules');
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_onNameChanged);
+    _waitForAuthAndLoad();
+  }
 
-//     return Scaffold(
-//       body: SafeArea(
-//         child: CustomScrollView(
-//           slivers: [
-//             const SliverToBoxAdapter(child: CreateLeagueHeader()),
-//             SliverToBoxAdapter(
-//               child: Padding(
-//                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     // League name
-//                     const SizedBox(height: 8),
-//                     Text('League Name', style: Theme.of(context).textTheme.labelMedium),
-//                     const SizedBox(height: 6),
-//                     TextField(
-//                       controller: _nameCtrl,
-//                       textInputAction: TextInputAction.next,
-//                       decoration: InputDecoration(
-//                         hintText: 'Awesome People League',
-//                         hintStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(color: AppColors.black500),
-//                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-//                         filled: true,
-//                       ),
-//                     ),
+  void _onNameChanged() {
+    setState(() {});
+  }
 
-//                     // Tournament dropdown
-//                     const SizedBox(height: 13),
-//                     Text('Tournament', style: Theme.of(context).textTheme.labelMedium),
-//                     const SizedBox(height: 6),
-//                     tournamentsAv.when(
-//                       error: (e, _) => Text('Failed to load tournaments: $e'),
-//                       data: (items) => DropdownButtonFormField<String>(
-//                         value: _tournamentId,
-//                         isExpanded: true,
-//                         items: items
-//                             .map((t) => DropdownMenuItem<String>(value: t.id, child: Text('${t.name} (S${t.season})')))
-//                             .toList(),
-//                         onChanged: (v) => setState(() => _tournamentId = v),
-//                         decoration: InputDecoration(
-//                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-//                           filled: true,
-//                         ),
-//                       ),
-//                       loading: () {
-//                         logDebug('loading');
-//                         return const Center(child: CircularProgressIndicator());
-//                       },
-//                     ),
+  Future<void> _waitForAuthAndLoad() async {
+    await Future.delayed(const Duration(milliseconds: 60));
 
-//                     // Scoring section
-//                     const SizedBox(height: 27),
-//                     Text('Scoring', style: Theme.of(context).textTheme.labelMedium),
-//                     const SizedBox(height: 13),
-//                     if (!_showScoring)
-//                       SizedBox(
-//                         height: 52,
-//                         width: double.infinity,
-//                         child: FilledButton.icon(
-//                           onPressed: defaultsAv.isLoading ? null : () => setState(() => _showScoring = true),
-//                           icon: const Icon(Icons.tune, color: AppColors.black800, size: 20),
-//                           label: Text(
-//                             'Customize Scoring',
-//                             style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold),
-//                           ),
-//                           style: ButtonStyle(
-//                             backgroundColor: WidgetStateProperty.all(AppColors.black300),
-//                             shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-//                           ),
-//                         ),
-//                       )
-//                     else ...[
-//                       const SizedBox(height: 8),
-//                       ScoringSection(
-//                         rules: _rules,
-//                         onChanged: (next) {
-//                           final key = next.key();
-//                           final idx = _rules.indexWhere((r) => r.key() == key);
-//                           if (idx == -1) return;
-//                           setState(() => _rules[idx] = next);
-//                         },
-//                       ),
-//                     ],
+    final authAsync = ref.read(authProviderProvider);
 
-//                     const SizedBox(height: 80),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
+    if (authAsync.isLoading) {
+      return _waitForAuthAndLoad();
+    }
 
-//       // Submit
-//       bottomNavigationBar: SafeArea(
-//         minimum: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-//         child: SizedBox(
-//           height: 52,
-//           child: ElevatedButton(
-//             style: ButtonStyle(
-//               backgroundColor: WidgetStateProperty.all(AppColors.black800),
-//               shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-//             ),
-//             onPressed: (_nameCtrl.text.trim().isEmpty || _tournamentId == null)
-//                 ? null
-//                 : () async {
-//                     final league = League(
-//                       id: '-1',
-//                       name: _nameCtrl.text,
-//                       tournamentId: _tournamentId!,
-//                       creatorId: uid!,
-//                       status: LeagueStatus.draft_pending,
-//                       maxTeams: 10,
-//                       joinCode: '000000',
-//                     );
-//                     final res = await leaguesA.createLeagueWithRules(league, _rules);
-//                     Navigator.of(context).push(MaterialPageRoute(builder: (_) => PreDraftLobby(leagueId: res!)));
-//                   },
-//             child: Text('Create', style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: AppColors.black100)),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+    if (authAsync.value != null) {
+      await _loadTournaments();
+    } else {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _loadTournaments() async {
+    try {
+      logInfo('Loading tournaments...');
+      final tournaments = await _leagueService.getTournaments();
+      logInfo('Loaded ${tournaments.length} tournaments');
+      if (mounted) {
+        setState(() {
+          _tournaments = tournaments;
+          _isLoading = false;
+          if (tournaments.isNotEmpty) {
+            _selectedTournament = tournaments.first;
+          }
+        });
+      }
+    } catch (e, st) {
+      logError('Failed to load tournaments: $e', st);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.removeListener(_onNameChanged);
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _navigateToCustomizeScoring() async {
+    if (_selectedTournament == null) return;
+
+    final result = await context.push<List<LeagueScoringRule>>(
+      CustomizeScoringScreen.route,
+      extra: {
+        'leagueName': _nameController.text,
+        'tournamentId': _selectedTournament!.id,
+        'tournamentName': _selectedTournament!.name,
+        'scoringRules': _scoringRules,
+      },
+    );
+
+    if (result != null && mounted) {
+      setState(() {
+        _scoringRules = result;
+      });
+    }
+  }
+
+  void _navigateToCreateTeam() {
+    if (_selectedTournament == null || _nameController.text.trim().isEmpty)
+      return;
+
+    context.push(
+      CreateTeamScreen.route,
+      extra: {
+        'leagueName': _nameController.text.trim(),
+        'tournamentId': _selectedTournament!.id,
+        'scoringRules': _scoringRules,
+      },
+    );
+  }
+
+  Widget _buildDropdownField<T>({
+    required T? value,
+    required List<T> items,
+    required String Function(T) labelBuilder,
+    required void Function(T?) onChanged,
+  }) {
+    return DropdownButtonFormField<T>(
+      value: items.contains(value) ? value : null,
+      isExpanded: true,
+      items: items
+          .map(
+            (item) => DropdownMenuItem<T>(
+              value: item,
+              child: Text(
+                labelBuilder(item),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+          )
+          .toList(),
+      onChanged: onChanged,
+      dropdownColor: const Color(0xFF2C2C2C),
+      icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+    );
+  }
+
+  Widget _buildFieldLabel(String label) {
+    return Text(label, style: Theme.of(context).textTheme.labelSmall);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF1C1C1C),
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF1C1C1C),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Header
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => context.pop(),
+                    child: PhosphorIcon(PhosphorIcons.caretLeft(), size: 24),
+                  ),
+                  const SizedBox(width: 20),
+                  Text(
+                    "CREATE LEAGUE",
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              Expanded(
+                child: Form(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // League Name
+                      _buildFieldLabel('League Name'),
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        controller: _nameController,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: 'Awesome People League',
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Tournament
+                      _buildFieldLabel('Tournament'),
+                      const SizedBox(height: 6),
+                      _buildDropdownField<Tournament>(
+                        value: _selectedTournament,
+                        items: _tournaments ?? [],
+                        labelBuilder: (t) => t.abbreviation != null
+                            ? '${t.name} (${t.abbreviation})'
+                            : t.name,
+                        onChanged: (value) {
+                          setState(() => _selectedTournament = value);
+                          FocusScope.of(context).nextFocus();
+                        },
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Scoring
+                      _buildFieldLabel('Scoring'),
+                      const SizedBox(height: 6),
+                      GestureDetector(
+                        onTap: _navigateToCustomizeScoring,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.black300,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              PhosphorIcon(
+                                PhosphorIcons.slidersHorizontal(),
+                                size: 24,
+                                color: AppColors.black800,
+                              ),
+                              const SizedBox(width: 16),
+                              Text(
+                                'Customize Scoring',
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.black800,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed:
+                    (_nameController.text.trim().isEmpty ||
+                        _selectedTournament == null)
+                    ? null
+                    : _navigateToCreateTeam,
+                child: const Text(
+                  'Next',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -28,4 +28,22 @@ class FantasyTeamService {
         .map((e) => FantasyTeam.fromJson(e))
         .toList();
   }
+
+  Future<FantasyTeam> createFantasyTeam({
+    required String leagueId,
+    required String teamName,
+    required String teamColor,
+    required String teamIcon,
+  }) async {
+    final res = await ApiClient.dio.post(
+      "/fantasy-teams",
+      data: {
+        "leagueId": leagueId,
+        "teamName": teamName,
+        "teamColor": teamColor,
+        "teamIcon": teamIcon,
+      },
+    );
+    return FantasyTeam.fromJson(res.data);
+  }
 }
