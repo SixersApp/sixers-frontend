@@ -55,7 +55,7 @@ class LeagueDropdown extends ConsumerWidget {
               ),
             );
           },
-          error: (_, __) {
+          error: (_, _) {
             menuItems.add(
               const PopupMenuItem(
                 enabled: false,
@@ -84,7 +84,7 @@ class LeagueDropdown extends ConsumerWidget {
                         return teamsAv.when(
                           loading: () =>
                               LeagueItem(league: l, teamName: "Loading..."),
-                          error: (_, __) =>
+                          error: (_, _) =>
                               LeagueItem(league: l, teamName: "Error"),
                           data: (teams) {
                             // find THIS USER's team for this league

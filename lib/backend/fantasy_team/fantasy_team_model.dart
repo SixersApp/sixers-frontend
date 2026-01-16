@@ -19,7 +19,7 @@ sealed class FantasyTeam with _$FantasyTeam {
     required String teamName,
 
     @JsonKey(name: "user_name")
-    required String userName,
+    String? userName,
 
     // ❗ These can be null in your API → MUST be nullable
     @JsonKey(name: "draft_order")

@@ -64,7 +64,7 @@ final class AllPlayersProvider
   }
 }
 
-String _$allPlayersHash() => r'2af163b726a6297dd3f9fbb622e54abf88534c24';
+String _$allPlayersHash() => r'40e82146cb64574c35805ac430cbcbc4352bb105';
 
 final class AllPlayersFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Player>>, String> {

@@ -14,7 +14,7 @@ final draftStateServiceProvider = Provider<DraftStateService>((ref) {
 });
 
 @Riverpod(keepAlive: true)
-Stream<DraftState?> draftStateStream(ref, String leagueId) async* {
+Stream<DraftState?> draftStateStream(WidgetRef ref, String leagueId) async* {
   final svc = DraftStateService();
 
   final initial = await svc.fetch(leagueId); 

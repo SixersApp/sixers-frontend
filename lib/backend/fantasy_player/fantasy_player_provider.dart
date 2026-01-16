@@ -24,12 +24,11 @@ class FantasyPlayerController extends _$FantasyPlayerController {
   }
 
   Future<void> refresh() async {
-    final previous = state;          // save current UI state
 
     final newState = await AsyncValue.guard(() {
       return _service.fetchFantasyPlayers(ftiId);
     });
 
-    state = newState.copyWithPrevious(previous);
+    state = newState;
   }
 }

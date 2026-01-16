@@ -33,7 +33,7 @@ final class FantasyTeamsProvider
   FantasyTeams create() => FantasyTeams();
 }
 
-String _$fantasyTeamsHash() => r'442847ebe0491c23e980a5167e1ba5bb86b3d445';
+String _$fantasyTeamsHash() => r'f47bd75481b9547af6c3c0f4c8ea56ae7343d241';
 
 abstract class _$FantasyTeams extends $AsyncNotifier<List<FantasyTeam>> {
   FutureOr<List<FantasyTeam>> build();
@@ -112,7 +112,7 @@ final class LeagueTeamsProvider
   }
 }
 
-String _$leagueTeamsHash() => r'4b531eefed2e9208d3b8b6050f5b454c7eea54e2';
+String _$leagueTeamsHash() => r'7c3877763f7851a83b36ae97e747dc71d2ac9401';
 
 final class LeagueTeamsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<FantasyTeam>>, String> {
@@ -187,7 +187,7 @@ final class UserTeamInLeagueProvider
   }
 }
 
-String _$userTeamInLeagueHash() => r'ddc679e2736f21a1750e1dc737940ddedbce8ce7';
+String _$userTeamInLeagueHash() => r'8107b525f9cceacc9f5c77d685ae198d058eb05c';
 
 final class UserTeamInLeagueFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<FantasyTeam?>, String> {

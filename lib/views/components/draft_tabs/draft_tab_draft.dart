@@ -89,7 +89,7 @@ class DraftTabDraft extends ConsumerWidget {
             child: ListView.separated(
               padding: const EdgeInsets.only(bottom: 10),
               itemCount: filteredPlayers.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (_, i) {
                 final pl = filteredPlayers[i];
                 final rank = i + 1; // placeholder rank

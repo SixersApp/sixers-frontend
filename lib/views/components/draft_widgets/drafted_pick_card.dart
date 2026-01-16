@@ -12,7 +12,7 @@ class DraftedPickCard extends StatelessWidget {
     required this.roundNumber,
     required this.pickNumber,
     this.role,
-    this.avatarUrl, // TODO: headshot later
+    this.avatarUrl, 
     this.width = 232,
   });
 

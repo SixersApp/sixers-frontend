@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter analyze:*)",
+      "Bash(dart run build_runner build:*)",
+      "Bash(cat:*)",
+      "WebFetch(domain:www.figma.com)",
+      "Bash(flutter run)",
+      "Bash(flutter emulators:*)",
+      "mcp__ide__getDiagnostics"
+    ]
+  }
+}

@@ -68,7 +68,6 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
 
   Future<void> _loadExisting() async {
     try {
-      final notifier = ref.read(onboardingStageProvider.notifier);
       final profile = await ref.read(onboardingStageProvider.future);
 
       if (!mounted || profile == null) return;
@@ -85,7 +84,7 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
         setState(() => _selectedExperience = experienceId);
       }
     } catch (e) {
-      print("Prefill experience failed: $e");
+      logError("Prefill experience failed: $e");
     }
   }
 

@@ -14,7 +14,6 @@ import 'package:sixers/theme/colors.dart';
     icon: PhosphorIcons.star(),
     color: AppColors.pink600,
   ), // amber-ish
-  // TODO: Handle this case.
   String() => (
     icon: PhosphorIcons.arrowsClockwise(),
     color: AppColors.black200,

@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sixers/amplifyconfiguration.dart';
-import 'package:sixers/backend/auth/auth_service.dart';
 import 'package:sixers/theme/app_theme.dart';
 import 'package:sixers/views/router.dart';
 

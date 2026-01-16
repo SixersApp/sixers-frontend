@@ -33,7 +33,7 @@ final class LeaguesProvider
   Leagues create() => Leagues();
 }
 
-String _$leaguesHash() => r'68455c2e357f9287e71229c1214be57183311dc1';
+String _$leaguesHash() => r'16eba3b2f57b21d84766f0fe8d9b75e2790f0711';
 
 abstract class _$Leagues extends $AsyncNotifier<List<League>> {
   FutureOr<List<League>> build();

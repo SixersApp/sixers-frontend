@@ -9,8 +9,8 @@ class PlayerDraftTile extends StatelessWidget {
     super.key,
     required this.rank,
     required this.playerName,
-    required this.realTeamName, // TODO: wire real team
-    this.stat1Label = 'Avg', // TODO: wire stat values
+    required this.realTeamName, 
+    this.stat1Label = 'Avg',
     this.stat1Value = '—',
     this.stat2Label = 'SR',
     this.stat2Value = '—',

@@ -1,4 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sixers/utils/logger.dart';
 import '../auth/auth_provider.dart';
 import 'fantasy_team_model.dart';
 import 'fantasy_team_service.dart';
@@ -20,7 +22,7 @@ class FantasyTeams extends _$FantasyTeams {
     try {
       return await _service.getAllUsersTeams();
     } catch (e, st) {
-      print("❌ Error loading fantasy teams: $e\n$st");
+      logError("❌ Error loading fantasy teams: $e\n$st");
       rethrow;
     }
   }
@@ -55,11 +57,11 @@ class FantasyTeams extends _$FantasyTeams {
 // -------------------- Helper Providers (unchanged) --------------------
 //
 @riverpod
-Future<List<FantasyTeam>> leagueTeams(ref, String leagueId) {
+Future<List<FantasyTeam>> leagueTeams(WidgetRef ref, String leagueId) {
   return ref.watch(fantasyTeamsProvider.notifier).getTeamsInLeague(leagueId);
 }
 
 @riverpod
-Future<FantasyTeam?> userTeamInLeague(ref, String leagueId) {
+Future<FantasyTeam?> userTeamInLeague(WidgetRef ref, String leagueId) {
   return ref.watch(fantasyTeamsProvider.notifier).getTeamForLeague(leagueId);
 }

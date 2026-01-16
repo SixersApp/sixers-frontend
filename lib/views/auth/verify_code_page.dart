@@ -100,7 +100,7 @@ class _VerifyCodeSheetState extends ConsumerState<VerifyCodeSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.3),
+              color: AppColors.black500,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
