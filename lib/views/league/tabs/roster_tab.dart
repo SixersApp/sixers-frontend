@@ -8,13 +8,8 @@ import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/views/league/components/player_roster_card.dart';
 import 'package:sixers/views/league/components/team_selector.dart';
 
-class TeamTab extends ConsumerWidget {
-  const TeamTab({
-    super.key,
-    required this.league,
-    required this.selectedTeamIndex,
-    required this.onTeamSelected,
-  });
+class RosterTab extends ConsumerWidget {
+  const RosterTab({super.key, required this.league, required this.selectedTeamIndex, required this.onTeamSelected});
 
   final League league;
   final int selectedTeamIndex;
@@ -28,20 +23,14 @@ class TeamTab extends ConsumerWidget {
       data: (fti) {
         if (fti == null) {
           return const Center(
-            child: Text(
-              'No team instance found for this game',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: Text('No team instance found for this game', style: TextStyle(color: Colors.white)),
           );
         }
         return _buildRosterView(context, ref, fti);
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, stack) => Center(
-        child: Text(
-          'Error: $err',
-          style: const TextStyle(color: Colors.white),
-        ),
+        child: Text('Error: $err', style: const TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -55,10 +44,7 @@ class TeamTab extends ConsumerWidget {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(32.0),
-              child: Text(
-                'No players found for this team',
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
+              child: Text('No players found for this team', style: TextStyle(color: Colors.white, fontSize: 16)),
             ),
           );
         }
@@ -96,11 +82,7 @@ class TeamTab extends ConsumerWidget {
           child: Column(
             children: [
               // Team selector with horizontal scroll
-              TeamSelector(
-                teams: league.teams,
-                selectedIndex: selectedTeamIndex,
-                onTeamSelected: onTeamSelected,
-              ),
+              TeamSelector(teams: league.teams, selectedIndex: selectedTeamIndex, onTeamSelected: onTeamSelected),
 
               const SizedBox(height: 16),
 
@@ -110,24 +92,12 @@ class TeamTab extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, size: 16),
-                      onPressed: () {},
-                      color: Colors.white,
-                    ),
+                    IconButton(icon: const Icon(Icons.arrow_back_ios, size: 16), onPressed: () {}, color: Colors.white),
                     Text(
                       'Game ${league.latestGame}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.arrow_forward_ios, size: 16),
-                      onPressed: () {},
-                      color: Colors.white,
-                    ),
+                    IconButton(icon: const Icon(Icons.arrow_forward_ios, size: 16), onPressed: () {}, color: Colors.white),
                   ],
                 ),
               ),
@@ -135,10 +105,7 @@ class TeamTab extends ConsumerWidget {
               const SizedBox(height: 20),
 
               // If no players are organized, show all players
-              if (batsmen.isEmpty &&
-                  bowlers.isEmpty &&
-                  allRounders.isEmpty &&
-                  wicketKeepers.isEmpty) ...[
+              if (batsmen.isEmpty && bowlers.isEmpty && allRounders.isEmpty && wicketKeepers.isEmpty) ...[
                 _buildSection('ALL PLAYERS', players),
                 const SizedBox(height: 24),
               ] else ...[
@@ -155,10 +122,7 @@ class TeamTab extends ConsumerWidget {
                 const SizedBox(height: 24),
 
                 // Wicket-Keepers Section (if any)
-                if (wicketKeepers.isNotEmpty) ...[
-                  _buildSection('WICKET-KEEPERS', wicketKeepers),
-                  const SizedBox(height: 24),
-                ],
+                if (wicketKeepers.isNotEmpty) ...[_buildSection('WICKET-KEEPERS', wicketKeepers), const SizedBox(height: 24)],
               ],
             ],
           ),
@@ -166,10 +130,7 @@ class TeamTab extends ConsumerWidget {
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, stack) => Center(
-        child: Text(
-          'Error loading players: $err',
-          style: const TextStyle(color: Colors.white),
-        ),
+        child: Text('Error loading players: $err', style: const TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -188,12 +149,7 @@ class TeamTab extends ConsumerWidget {
               const SizedBox(width: 8),
               Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.2,
-                ),
+                style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 1.2),
               ),
             ],
           ),
@@ -224,4 +180,3 @@ class TeamTab extends ConsumerWidget {
     }
   }
 }
-

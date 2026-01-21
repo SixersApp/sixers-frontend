@@ -20,7 +20,7 @@ import 'package:sixers/views/create_league/league_preview_screen.dart';
 import 'package:sixers/views/error_screen.dart';
 import 'package:sixers/views/fantasy_matchup/fantasy_matchup_screen.dart';
 import 'package:sixers/views/home/home_screen.dart';
-import 'package:sixers/views/league/active_league_screen.dart';
+import 'package:sixers/views/league/league_screen.dart';
 import 'package:sixers/views/onboarding/basic_info_screen.dart';
 import 'package:sixers/views/onboarding/experience_screen.dart';
 import 'package:sixers/views/settings/settings_screen.dart';
