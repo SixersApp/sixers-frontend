@@ -12,8 +12,23 @@ sealed class FantasyPlayer with _$FantasyPlayer {
     @JsonKey(name: "player_id", defaultValue: "")
     required String playerId,
 
+    @JsonKey(name: "name", defaultValue: "")
+    @Default("") String name,
+
     @JsonKey(name: "full_name", defaultValue: "")
-    required String fullName,
+    @Default("") String fullName,
+
+    @JsonKey(name: "player_image", defaultValue: "")
+    @Default("") String playerImage,
+
+    @JsonKey(name: "role", defaultValue: "")
+    @Default("") String role,
+
+    @JsonKey(name: "country_name", defaultValue: "")
+    @Default("") String countryName,
+
+    @JsonKey(name: "country_image", defaultValue: "")
+    @Default("") String countryImage,
 
     @JsonKey(name: "performance_id", defaultValue: "")
     required String performanceId,

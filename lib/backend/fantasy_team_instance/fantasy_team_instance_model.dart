@@ -7,9 +7,9 @@ part 'fantasy_team_instance_model.g.dart';
 sealed class FantasyTeamInstance with _$FantasyTeamInstance {
   const factory FantasyTeamInstance({
     required String id,
-    required String fantasyTeamId,
-    required int matchNum,
-    required bool isLocked,
+    required String fantasy_team_id,
+    required int match_num,
+    required bool is_locked,
 
     // You can keep players as raw fields for now
     String? bat1,
@@ -37,10 +37,9 @@ sealed class FantasyTeamInstance with _$FantasyTeamInstance {
     String? flex2,
     String? flex3,
     String? flex4,
-
-    required DateTime createdAt,
+    String? captain,
+    String? vice_captain,
   }) = _FantasyTeamInstance;
 
-  factory FantasyTeamInstance.fromJson(Map<String, dynamic> json) =>
-      _$FantasyTeamInstanceFromJson(json);
+  factory FantasyTeamInstance.fromJson(Map<String, dynamic> json) => _$FantasyTeamInstanceFromJson(json);
 }

@@ -3,10 +3,9 @@ import '../fantasy_team/fantasy_team_provider.dart';
 import 'fantasy_team_instance_model.dart';
 import 'fantasy_team_instance_service.dart';
 
-final fantasyTeamInstanceProvider =
-    AsyncNotifierProvider<FantasyTeamInstanceNotifier, FantasyTeamInstance?>(
-      FantasyTeamInstanceNotifier.new,
-    );
+final fantasyTeamInstanceProvider = AsyncNotifierProvider<FantasyTeamInstanceNotifier, FantasyTeamInstance?>(
+  FantasyTeamInstanceNotifier.new,
+);
 
 class FantasyTeamInstanceNotifier extends AsyncNotifier<FantasyTeamInstance?> {
   late final FantasyTeamInstanceService _service;
@@ -21,14 +20,8 @@ class FantasyTeamInstanceNotifier extends AsyncNotifier<FantasyTeamInstance?> {
   // ============================================================
   // 🔹 FUNCTION 1: Direct lookup by fantasyTeamId + matchNum
   // ============================================================
-  Future<FantasyTeamInstance?> getInstance({
-    required String fantasyTeamId,
-    required int matchNum,
-  }) async {
-    final instance = await _service.getInstance(
-      fantasyTeamId: fantasyTeamId,
-      matchNum: matchNum,
-    );
+  Future<FantasyTeamInstance?> getInstance({required String fantasy_team_id, required int match_num}) async {
+    final instance = await _service.getInstance(fantasy_team_id: fantasy_team_id, match_num: match_num);
     state = AsyncData(instance);
     return instance;
   }
@@ -37,23 +30,15 @@ class FantasyTeamInstanceNotifier extends AsyncNotifier<FantasyTeamInstance?> {
   // 🔹 FUNCTION 2: Lookup instance using leagueId + matchNum
   //    → Automatically finds the user's fantasy team
   // ============================================================
-  Future<FantasyTeamInstance?> getInstanceForLeague({
-    required String leagueId,
-    required int matchNum,
-  }) async {
-    final userTeam = await ref
-        .read(fantasyTeamsProvider.notifier)
-        .getTeamForLeague(leagueId);
+  Future<FantasyTeamInstance?> getInstanceForLeague({required String leagueId, required int match_num}) async {
+    final userTeam = await ref.read(fantasyTeamsProvider.notifier).getTeamForLeague(leagueId);
 
     if (userTeam == null) {
       state = const AsyncData(null);
       return null;
     }
 
-    final instance = await _service.getInstance(
-      fantasyTeamId: userTeam.id,
-      matchNum: matchNum,
-    );
+    final instance = await _service.getInstance(fantasy_team_id: userTeam.id, match_num: match_num);
 
     state = AsyncData(instance);
     return instance;
@@ -67,9 +52,6 @@ class FantasyTeamInstanceNotifier extends AsyncNotifier<FantasyTeamInstance?> {
 
     if (previous == null) return;
 
-    await getInstance(
-      fantasyTeamId: previous.fantasyTeamId,
-      matchNum: previous.matchNum,
-    );
+    await getInstance(fantasy_team_id: previous.fantasy_team_id, match_num: previous.match_num);
   }
 }

@@ -9,9 +9,9 @@ part of 'fantasy_team_instance_model.dart';
 _FantasyTeamInstance _$FantasyTeamInstanceFromJson(Map<String, dynamic> json) =>
     _FantasyTeamInstance(
       id: json['id'] as String,
-      fantasyTeamId: json['fantasyTeamId'] as String,
-      matchNum: (json['matchNum'] as num).toInt(),
-      isLocked: json['isLocked'] as bool,
+      fantasy_team_id: json['fantasy_team_id'] as String,
+      match_num: (json['match_num'] as num).toInt(),
+      is_locked: json['is_locked'] as bool,
       bat1: json['bat1'] as String?,
       bat2: json['bat2'] as String?,
       bat3: json['bat3'] as String?,
@@ -37,16 +37,17 @@ _FantasyTeamInstance _$FantasyTeamInstanceFromJson(Map<String, dynamic> json) =>
       flex2: json['flex2'] as String?,
       flex3: json['flex3'] as String?,
       flex4: json['flex4'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      captain: json['captain'] as String?,
+      vice_captain: json['vice_captain'] as String?,
     );
 
 Map<String, dynamic> _$FantasyTeamInstanceToJson(
   _FantasyTeamInstance instance,
 ) => <String, dynamic>{
   'id': instance.id,
-  'fantasyTeamId': instance.fantasyTeamId,
-  'matchNum': instance.matchNum,
-  'isLocked': instance.isLocked,
+  'fantasy_team_id': instance.fantasy_team_id,
+  'match_num': instance.match_num,
+  'is_locked': instance.is_locked,
   'bat1': instance.bat1,
   'bat2': instance.bat2,
   'bat3': instance.bat3,
@@ -72,5 +73,6 @@ Map<String, dynamic> _$FantasyTeamInstanceToJson(
   'flex2': instance.flex2,
   'flex3': instance.flex3,
   'flex4': instance.flex4,
-  'createdAt': instance.createdAt.toIso8601String(),
+  'captain': instance.captain,
+  'vice_captain': instance.vice_captain,
 };
