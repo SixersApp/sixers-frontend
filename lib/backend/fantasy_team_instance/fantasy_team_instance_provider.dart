@@ -3,55 +3,67 @@ import '../fantasy_team/fantasy_team_provider.dart';
 import 'fantasy_team_instance_model.dart';
 import 'fantasy_team_instance_service.dart';
 
-final fantasyTeamInstanceProvider = AsyncNotifierProvider<FantasyTeamInstanceNotifier, FantasyTeamInstance?>(
-  FantasyTeamInstanceNotifier.new,
+final fantasyTeamInstancesProvider = AsyncNotifierProvider<FantasyTeamInstancesNotifier, List<FantasyTeamInstance>>(
+  FantasyTeamInstancesNotifier.new,
 );
 
-class FantasyTeamInstanceNotifier extends AsyncNotifier<FantasyTeamInstance?> {
+class FantasyTeamInstancesNotifier extends AsyncNotifier<List<FantasyTeamInstance>> {
   late final FantasyTeamInstanceService _service;
+  String? _currentTeamId;
 
   @override
-  Future<FantasyTeamInstance?> build() async {
-    // default state is null
+  Future<List<FantasyTeamInstance>> build() async {
+    // default state is empty list
     _service = FantasyTeamInstanceService();
-    return null;
+    return [];
   }
 
   // ============================================================
-  // 🔹 FUNCTION 1: Direct lookup by fantasyTeamId + matchNum
+  // 🔹 FUNCTION 1: Load all instances for a fantasy team
   // ============================================================
-  Future<FantasyTeamInstance?> getInstance({required String fantasy_team_id, required int match_num}) async {
-    final instance = await _service.getInstance(fantasy_team_id: fantasy_team_id, match_num: match_num);
-    state = AsyncData(instance);
-    return instance;
+  Future<List<FantasyTeamInstance>> loadAllInstances({required String fantasy_team_id}) async {
+    state = const AsyncLoading();
+    _currentTeamId = fantasy_team_id;
+    final instances = await _service.getAllInstances(fantasy_team_id: fantasy_team_id);
+    state = AsyncData(instances);
+    return instances;
   }
 
   // ============================================================
-  // 🔹 FUNCTION 2: Lookup instance using leagueId + matchNum
-  //    → Automatically finds the user's fantasy team
+  // 🔹 FUNCTION 2: Load all instances for a league (finds user's team first)
   // ============================================================
-  Future<FantasyTeamInstance?> getInstanceForLeague({required String leagueId, required int match_num}) async {
+  Future<List<FantasyTeamInstance>> loadAllInstancesForLeague({required String leagueId}) async {
+    state = const AsyncLoading();
+
     final userTeam = await ref.read(fantasyTeamsProvider.notifier).getTeamForLeague(leagueId);
 
     if (userTeam == null) {
-      state = const AsyncData(null);
-      return null;
+      state = const AsyncData([]);
+      return [];
     }
 
-    final instance = await _service.getInstance(fantasy_team_id: userTeam.id, match_num: match_num);
-
-    state = AsyncData(instance);
-    return instance;
+    return await loadAllInstances(fantasy_team_id: userTeam.id);
   }
 
   // ============================================================
-  // 🔹 FUNCTION 3: Refresh last-loaded instance
+  // 🔹 FUNCTION 3: Get a specific instance by match number from loaded instances
+  // ============================================================
+  FantasyTeamInstance? getInstanceByMatchNum(int match_num) {
+    final instances = state.value;
+    if (instances == null) return null;
+
+    try {
+      return instances.firstWhere((instance) => instance.match_num == match_num);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // ============================================================
+  // 🔹 FUNCTION 4: Refresh all instances
   // ============================================================
   Future<void> refresh() async {
-    final previous = state.value;
-
-    if (previous == null) return;
-
-    await getInstance(fantasy_team_id: previous.fantasy_team_id, match_num: previous.match_num);
+    if (_currentTeamId == null) return;
+    await loadAllInstances(fantasy_team_id: _currentTeamId!);
   }
 }

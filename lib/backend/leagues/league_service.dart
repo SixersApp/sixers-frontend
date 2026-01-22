@@ -1,5 +1,6 @@
 import 'package:sixers/backend/auth/dio_client.dart';
 import 'package:sixers/backend/leagues/league_scoring_rule_model.dart';
+import 'package:sixers/backend/leagues/league_position_rule_model.dart';
 import 'package:sixers/utils/logger.dart';
 import 'league_model.dart';
 
@@ -193,6 +194,30 @@ class LeagueService {
     } catch (e) {
       logError('Update scoring rules error: $e');
       rethrow;
+    }
+  }
+
+  Future<List<LeaguePositionRule>> getLeaguePositionRules({
+    required String leagueId,
+  }) async {
+    logInfo('Fetching position rules for league $leagueId');
+
+    try {
+      final res = await _dio.get("/leagues/$leagueId/position-rules");
+      
+      if (res.statusCode != 200 || res.data is! List) {
+        logInfo('No position rules found, returning empty list');
+        return [];
+      }
+
+      logInfo('Raw position rules response: ${res.data}');
+
+      return (res.data as List)
+          .map((e) => LeaguePositionRule.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      logError('Get league position rules error: $e');
+      return [];
     }
   }
 }

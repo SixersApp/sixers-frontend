@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sixers/backend/players/player_model.dart';
 import 'package:sixers/theme/colors.dart';
 
@@ -13,19 +12,19 @@ class PositionFilterButton extends StatelessWidget {
   final PositionFilter selected;
   final ValueChanged<PositionFilter> onChanged;
 
-  // Map each filter to an icon (pick any you like)
-  PhosphorIconData _iconFor(PositionFilter f) {
+  // Map each filter to an icon path
+  String? _iconPathFor(PositionFilter f) {
     switch (f) {
       case PositionFilter.all:
-        return PhosphorIcons.arrowCounterClockwise(); // generic “all/filters”
+        return null; // No icon for "all"
       case PositionFilter.batsman:
-        return PhosphorIcons.cricket(); // cricket bat
+        return 'assets/images/player_icons/Batsmen.png';
       case PositionFilter.bowler:
-        return PhosphorIcons.boules(); // ball/target-ish
+        return 'assets/images/player_icons/Bowler.png';
       case PositionFilter.wicketKeeper:
-        return PhosphorIcons.boxingGlove(); // glove/hand
+        return 'assets/images/player_icons/Batsmen.png'; // Using Batsmen as placeholder
       case PositionFilter.allRounder:
-        return PhosphorIcons.star(); // all-round
+        return 'assets/images/player_icons/AllRounder.png';
     }
   }
 
@@ -35,6 +34,7 @@ class PositionFilterButton extends StatelessWidget {
     String label,
   ) {
     final textStyle = Theme.of(context).textTheme.bodyMedium;
+    final iconPath = _iconPathFor(value);
 
     // Plain Row instead of ListTile to avoid pill background
     return PopupMenuItem<PositionFilter>(
@@ -43,11 +43,15 @@ class PositionFilterButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            _iconFor(value),
-            size: 18,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
+          if (iconPath != null)
+            Image.asset(
+              iconPath,
+              width: 18,
+              height: 18,
+              fit: BoxFit.contain,
+            )
+          else
+            const Icon(Icons.filter_list, size: 18),
           const SizedBox(width: 12),
           Text(label, style: textStyle),
         ],
@@ -57,7 +61,6 @@ class PositionFilterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
     final showLeadingIcon = selected != PositionFilter.all;
 
@@ -91,7 +94,12 @@ class PositionFilterButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (showLeadingIcon) ...[
-                Icon(_iconFor(selected), size: 16, color: scheme.onSurface),
+                Image.asset(
+                  _iconPathFor(selected)!,
+                  width: 16,
+                  height: 16,
+                  fit: BoxFit.contain,
+                ),
                 const SizedBox(width: 8),
               ],
               Text(labelForFilter(selected), style: text.bodyMedium),

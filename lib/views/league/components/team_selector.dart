@@ -12,11 +12,11 @@ class TeamSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 70,
+    return Container(
+      height: 26,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         itemCount: teams.length,
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
@@ -25,31 +25,35 @@ class TeamSelector extends StatelessWidget {
 
           return GestureDetector(
             onTap: () => onTeamSelected(index),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: isSelected ? stringToColor(team.teamColor) : AppColors.black300,
-                    borderRadius: BorderRadius.circular(12),
-                    border: isSelected ? Border.all(color: stringToColor(team.teamColor), width: 2) : null,
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(color: AppColors.black400, borderRadius: BorderRadius.circular(5)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 16,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: isSelected ? stringToColor(team.teamColor) : AppColors.black300,
+                      borderRadius: BorderRadius.circular(5),
+                      border: isSelected ? Border.all(color: stringToColor(team.teamColor), width: 2) : null,
+                    ),
+                    child: ClipRRect(borderRadius: BorderRadius.circular(12), child: _buildTeamIcon(team, isSelected)),
                   ),
-                  child: ClipRRect(borderRadius: BorderRadius.circular(12), child: _buildTeamIcon(team, isSelected)),
-                ),
-                const SizedBox(height: 4),
-                // Show abbreviated team name for all teams
-                Text(
-                  _getTeamAbbreviation(team.teamName),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: isSelected ? stringToColor(team.teamColor) : Colors.grey.shade500,
-                    fontSize: 11,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                  const SizedBox(width: 5),
+                  // Show abbreviated team name for all teams
+                  Text(
+                    index == selectedIndex ? team.teamName : _getTeamAbbreviation(team.teamName),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.black800,
+                      fontSize: 11,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
