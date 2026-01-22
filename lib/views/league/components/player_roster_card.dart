@@ -4,219 +4,162 @@ import 'package:sixers/theme/colors.dart';
 
 class PlayerRosterCard extends StatelessWidget {
   final FantasyPlayer player;
+  final String? slot;
+  final VoidCallback? onTap;
+  final bool isSelected;
+  final String? captainId;
+  final String? viceCaptainId;
 
-  const PlayerRosterCard({super.key, required this.player});
+  const PlayerRosterCard({
+    super.key,
+    required this.player,
+    this.slot,
+    this.onTap,
+    this.isSelected = false,
+    this.captainId,
+    this.viceCaptainId,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.black200,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.black300, width: 1),
-      ),
-      child: Row(
-        children: [
-          // Player avatar
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: AppColors.black300,
-            backgroundImage: player.playerImage.isNotEmpty
-                ? NetworkImage(player.playerImage)
-                : null,
-            child: player.playerImage.isEmpty
-                ? Text(
-                    _getInitials(player.fullName),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  )
-                : null,
-          ),
+    final bool isEditable = player.performanceId.isEmpty;
 
-          const SizedBox(width: 12),
+    return GestureDetector(
+      onTap: isEditable ? onTap : null,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(
+          color: AppColors.black200,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isSelected ? AppColors.red200 : AppColors.black300, width: isSelected ? 2 : 1),
+        ),
+        child: Row(
+          children: [
+            // Player avatar
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: AppColors.black300,
+              backgroundImage: player.playerImage.isNotEmpty ? NetworkImage(player.playerImage) : null,
+              child: player.playerImage.isEmpty
+                  ? Text(
+                      _getInitials(player.fullName),
+                      style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                    )
+                  : null,
+            ),
 
-          // Player info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      player.fullName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
+            const SizedBox(width: 5),
+
+            // Player info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        player.fullName,
+                        style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
                       ),
-                    ),
-                    const SizedBox(width: 6),
-                    // Captain/Vice-Captain badge
-                    if (_getCaptainBadge() != null) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _getCaptainBadge() == 'C'
-                              ? AppColors.red200
-                              : AppColors.yellow300,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          _getCaptainBadge()!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
+                      const SizedBox(width: 6),
+                      // Captain/Vice-Captain badge
+                      if (_getCaptainBadge() != null) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: _getCaptainBadge() == 'C' ? AppColors.red200 : AppColors.yellow300,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            _getCaptainBadge()!,
+                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800),
                           ),
                         ),
-                      ),
+                      ],
                     ],
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    // Position badge (e.g., "GT")
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.black400,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        _getTeamAbbr(),
-                        style: TextStyle(
-                          color: Colors.grey.shade300,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      // Position badge (e.g., "GT")
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(color: AppColors.black400, borderRadius: BorderRadius.circular(4)),
+                        child: Text(
+                          _getTeamAbbr(),
+                          style: TextStyle(color: Colors.grey.shade300, fontSize: 11, fontWeight: FontWeight.w600),
                         ),
                       ),
+                      const SizedBox(width: 6),
+                      // Match info
+                      Text('vs ${_getOpponentAbbr()}', style: TextStyle(color: Colors.grey.shade400, fontSize: 13)),
+                      const SizedBox(width: 4),
+                      Text('• ${_getMatchTime()}', style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // Score section
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Column(crossAxisAlignment: CrossAxisAlignment.center, children: [..._buildScoreDisplay()]),
+                const SizedBox(width: 20),
+                // Fantasy points
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (player.performanceId.isNotEmpty)
+                          Icon(
+                            player.fantasyPoints > 0 ? Icons.arrow_upward : Icons.arrow_downward,
+                            color: player.fantasyPoints > 0 ? AppColors.green300 : Colors.grey,
+                            size: 14,
+                          ),
+                        const SizedBox(width: 2),
+                        player.performanceId.isNotEmpty
+                            ? Text(
+                                '${player.fantasyPoints}',
+                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontSize: 16),
+                              )
+                            : Text(
+                                '-',
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.headlineSmall?.copyWith(color: AppColors.black600, fontSize: 16),
+                              ),
+                      ],
                     ),
-                    const SizedBox(width: 6),
-                    // Match info
                     Text(
-                      'vs ${_getOpponentAbbr()}',
-                      style: TextStyle(
-                        color: Colors.grey.shade400,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '• ${_getMatchTime()}',
-                      style: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontSize: 12,
-                      ),
+                      '33', // Expected points placeholder
+                      style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
                     ),
                   ],
                 ),
               ],
             ),
-          ),
 
-          // Score section
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (player.runsScored > 0 || player.ballsFaced > 0) ...[
-                Text(
-                  '${player.runsScored} (${player.ballsFaced})',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ] else if (player.wicketsTaken > 0 ||
-                  player.runsConceded > 0) ...[
-                Text(
-                  '${player.wicketsTaken}-${player.runsConceded} (${(player.ballsBowled / 6).toStringAsFixed(1)})',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ] else ...[
-                Text(
-                  '-',
-                  style: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-              const SizedBox(height: 4),
-              // Fantasy points
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: player.fantasyPoints > 0
-                      ? AppColors.green700
-                      : AppColors.black300,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      player.fantasyPoints > 0
-                          ? Icons.arrow_upward
-                          : Icons.remove,
-                      color: player.fantasyPoints > 0
-                          ? AppColors.green300
-                          : Colors.grey,
-                      size: 14,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${player.fantasyPoints}',
-                      style: TextStyle(
-                        color: player.fantasyPoints > 0
-                            ? AppColors.green300
-                            : Colors.grey,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
+            // Lock/Pen icon
+            const SizedBox(width: 15),
+            Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(color: AppColors.black400, borderRadius: BorderRadius.circular(5)),
+              padding: const EdgeInsets.all(5),
+              child: Image.asset(
+                player.performanceId.isNotEmpty ? 'assets/images/player_icons/Lock.png' : 'assets/images/player_icons/Pen.png',
+                width: 20,
+                height: 20,
+                fit: BoxFit.contain,
               ),
-              Text(
-                '33', // Total points placeholder
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 11,
-                ),
-              ),
-            ],
-          ),
-
-          // Edit icon
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.edit, size: 20),
-            color: Colors.grey.shade600,
-            onPressed: () {},
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -231,8 +174,11 @@ class PlayerRosterCard extends StatelessWidget {
   }
 
   String? _getCaptainBadge() {
-    // This would come from the FTI or player data
-    // For now, return null as we don't have this data yet
+    if (captainId != null && (captainId == player.playerSeasonId || captainId == player.playerId)) {
+      return 'C';
+    } else if (viceCaptainId != null && (viceCaptainId == player.playerSeasonId || viceCaptainId == player.playerId)) {
+      return 'VC';
+    }
     return null;
   }
 
@@ -275,5 +221,60 @@ class PlayerRosterCard extends StatelessWidget {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     return days[weekday - 1];
   }
-}
 
+  List<Widget> _buildScoreDisplay() {
+    final role = player.role.toLowerCase();
+    final isBatsman = role.contains('bat') || role.contains('wicket') || role.contains('keeper');
+    final isBowler = role.contains('bowl');
+    final isAllRounder = role.contains('allrounder') || role.contains('all-rounder') || role.contains('all rounder');
+
+    final hasBattingStats = player.runsScored > 0 || player.ballsFaced > 0;
+    final hasBowlingStats = player.wicketsTaken > 0 || player.runsConceded > 0 || player.ballsBowled > 0;
+
+    if (isAllRounder) {
+      // Show both batting and bowling stats for all-rounders
+      return [
+        if (hasBattingStats)
+          Text(
+            '${player.runsScored} (${player.ballsFaced})',
+            style: const TextStyle(color: AppColors.black600, fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+        if (hasBattingStats && hasBowlingStats) const SizedBox(height: 2),
+        if (hasBowlingStats)
+          Text(
+            '${player.wicketsTaken}-${player.runsConceded} (${(player.ballsBowled / 6).toStringAsFixed(1)})',
+            style: const TextStyle(color: AppColors.black600, fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+        if (!hasBattingStats && !hasBowlingStats)
+          Text(
+            '-',
+            style: TextStyle(color: AppColors.black600, fontSize: 14, fontWeight: FontWeight.w600),
+          ),
+      ];
+    } else if (isBowler && hasBowlingStats) {
+      // Show only bowling stats for bowlers
+      return [
+        Text(
+          '${player.wicketsTaken}-${player.runsConceded} (${(player.ballsBowled / 6).toStringAsFixed(1)})',
+          style: const TextStyle(color: AppColors.black600, fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+      ];
+    } else if (isBatsman && hasBattingStats) {
+      // Show only batting stats for batsmen and wicketkeepers
+      return [
+        Text(
+          '${player.runsScored} (${player.ballsFaced})',
+          style: const TextStyle(color: AppColors.black600, fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+      ];
+    } else {
+      // No stats available
+      return [
+        Text(
+          '-',
+          style: TextStyle(color: AppColors.black600, fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+      ];
+    }
+  }
+}

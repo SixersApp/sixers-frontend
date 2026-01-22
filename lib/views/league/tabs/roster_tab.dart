@@ -10,6 +10,7 @@ import 'package:sixers/backend/leagues/league_position_rule_provider.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/views/league/components/player_roster_card.dart';
 import 'package:sixers/views/league/components/team_selector.dart';
+import 'package:sixers/views/league/components/manage_player_bottom_sheet.dart';
 
 class RosterTab extends ConsumerWidget {
   const RosterTab({
@@ -174,11 +175,11 @@ class RosterTab extends ConsumerWidget {
         final players = _mergeRosterWithPerformances(baseRosterPlayers, performances);
 
         return positionRulesAsync.when(
-          data: (positionRules) => _buildRosterWithRules(context, fti, players, positionRules, availableMatchNums),
+          data: (positionRules) => _buildRosterWithRules(context, fti, players, positionRules, availableMatchNums, ref: ref),
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (err, stack) {
             // If position rules fail to load, fall back to hardcoded structure
-            return _buildRosterFallback(context, fti, players, availableMatchNums);
+            return _buildRosterFallback(context, fti, players, availableMatchNums, ref: ref);
           },
         );
       },
@@ -186,9 +187,9 @@ class RosterTab extends ConsumerWidget {
       error: (err, stack) {
         // If performances fail to load, use base roster data with zero stats
         return positionRulesAsync.when(
-          data: (positionRules) => _buildRosterWithRules(context, fti, baseRosterPlayers, positionRules, availableMatchNums),
+          data: (positionRules) => _buildRosterWithRules(context, fti, baseRosterPlayers, positionRules, availableMatchNums, ref: ref),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err2, stack2) => _buildRosterFallback(context, fti, baseRosterPlayers, availableMatchNums),
+          error: (err2, stack2) => _buildRosterFallback(context, fti, baseRosterPlayers, availableMatchNums, ref: ref),
         );
       },
     );
@@ -199,8 +200,9 @@ class RosterTab extends ConsumerWidget {
     FantasyTeamInstance fti,
     List<FantasyPlayer> players,
     List<LeaguePositionRule> positionRules,
-    List<int> availableMatchNums,
-  ) {
+    List<int> availableMatchNums, {
+    WidgetRef? ref,
+  }) {
     // Create a map of players by their ID for easy lookup
     // Map both by playerSeasonId AND by playerId for flexible matching
     final playerMap = <String, FantasyPlayer>{};
@@ -218,7 +220,7 @@ class RosterTab extends ConsumerWidget {
     final validationErrors = <String>[];
 
     // Build sections and populate validation errors
-    final sections = _buildGroupedSections(context, fti, playerMap, sortedRules, validationErrors);
+    final sections = _buildGroupedSections(context, fti, playerMap, sortedRules, validationErrors, ref: ref);
 
     // Find current position in available match nums
     final currentIndex = availableMatchNums.indexOf(selectedGameNum);
@@ -274,8 +276,9 @@ class RosterTab extends ConsumerWidget {
     BuildContext context,
     FantasyTeamInstance fti,
     List<FantasyPlayer> players,
-    List<int> availableMatchNums,
-  ) {
+    List<int> availableMatchNums, {
+    WidgetRef? ref,
+  }) {
     // Fallback to hardcoded structure if position rules aren't available
     // Map both by playerSeasonId AND by playerId for flexible matching
     final playerMap = <String, FantasyPlayer>{};
@@ -292,41 +295,12 @@ class RosterTab extends ConsumerWidget {
       );
     }
 
-    final rosterPlayers = fti.players!;
-
-    final batsmen = [
-      rosterPlayers.bat1?.id,
-      rosterPlayers.bat2?.id,
-    ].where((id) => id != null && playerMap.containsKey(id)).map((id) => playerMap[id]!).toList();
-
-    final wicketKeepers = [
-      rosterPlayers.wicket1?.id,
-    ].where((id) => id != null && playerMap.containsKey(id)).map((id) => playerMap[id]!).toList();
-
-    final bowlers = [
-      rosterPlayers.bowl1?.id,
-      rosterPlayers.bowl2?.id,
-      rosterPlayers.bowl3?.id,
-    ].where((id) => id != null && playerMap.containsKey(id)).map((id) => playerMap[id]!).toList();
-
-    final allRounders = [
-      rosterPlayers.all1?.id,
-    ].where((id) => id != null && playerMap.containsKey(id)).map((id) => playerMap[id]!).toList();
-
-    final flex = [
-      rosterPlayers.flex1?.id,
-    ].where((id) => id != null && playerMap.containsKey(id)).map((id) => playerMap[id]!).toList();
-
-    final bench = [
-      rosterPlayers.bench1?.id,
-      rosterPlayers.bench2?.id,
-      rosterPlayers.bench3?.id,
-      rosterPlayers.bench4?.id,
-      rosterPlayers.bench5?.id,
-      rosterPlayers.bench6?.id,
-      rosterPlayers.bench7?.id,
-      rosterPlayers.bench8?.id,
-    ].where((id) => id != null && playerMap.containsKey(id)).map((id) => playerMap[id]!).toList();
+    // Get slot info for each category
+    final battingSlots = _getSlotInfoForCategory(fti, 'batting', playerMap);
+    final bowlingSlots = _getSlotInfoForCategory(fti, 'bowling', playerMap);
+    final allRounderSlots = _getSlotInfoForCategory(fti, 'all-rounder', playerMap);
+    final flexSlots = _getSlotInfoForCategory(fti, 'flex', playerMap);
+    final benchSlots = _getSlotInfoForCategory(fti, 'bench', playerMap);
 
     // Find current position in available match nums
     final currentIndex = availableMatchNums.indexOf(selectedGameNum);
@@ -364,18 +338,11 @@ class RosterTab extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 20),
-          _buildSectionWithRules(context, 'BATTING', batsmen, 2, 2, 2),
-          const SizedBox(height: 24),
-          _buildSectionWithRules(context, 'WICKET-KEEPERS', wicketKeepers, 1, 1, 1),
-          const SizedBox(height: 24),
-          _buildSectionWithRules(context, 'BOWLING', bowlers, 3, 3, 3),
-          const SizedBox(height: 24),
-          _buildSectionWithRules(context, 'ALL-ROUNDERS', allRounders, 1, 1, 1),
-          const SizedBox(height: 24),
-          _buildSectionWithRules(context, 'FLEX', flex, 1, 1, 1),
-          const SizedBox(height: 24),
-          _buildSectionWithRules(context, 'BENCH', bench, 8, 8, 8),
-          const SizedBox(height: 24),
+          _buildSectionWithRulesV2(context, 'BATTING', battingSlots, 3, 3, fti: fti, ref: ref),
+          _buildSectionWithRulesV2(context, 'BOWLING', bowlingSlots, 3, 3, fti: fti, ref: ref),
+          _buildSectionWithRulesV2(context, 'ALL-ROUNDERS', allRounderSlots, 1, 1, fti: fti, ref: ref),
+          _buildSectionWithRulesV2(context, 'FLEX', flexSlots, 1, 1, fti: fti, ref: ref),
+          _buildSectionWithRulesV2(context, 'BENCH', benchSlots, 8, 8, fti: fti, ref: ref),
         ],
       ),
     );
@@ -386,8 +353,9 @@ class RosterTab extends ConsumerWidget {
     FantasyTeamInstance fti,
     Map<String, FantasyPlayer> playerMap,
     List<LeaguePositionRule> rules,
-    List<String> validationErrors,
-  ) {
+    List<String> validationErrors, {
+    WidgetRef? ref,
+  }) {
     // Group position rules by category
     final Map<String, List<LeaguePositionRule>> groupedRules = {};
 
@@ -404,6 +372,27 @@ class RosterTab extends ConsumerWidget {
       }
 
       groupedRules.putIfAbsent(category, () => []).add(rule);
+    }
+
+    // Validate captain and vice captain
+    if (fti.captain == null || fti.captain!.isEmpty) {
+      validationErrors.add('No captain selected');
+    } else {
+      // Check if captain is on bench
+      final captainSlot = _findSlotForPlayer(fti, fti.captain!);
+      if (captainSlot != null && captainSlot.startsWith('bench')) {
+        validationErrors.add('Captain is on bench');
+      }
+    }
+
+    if (fti.vice_captain == null || fti.vice_captain!.isEmpty) {
+      validationErrors.add('No vice captain selected');
+    } else {
+      // Check if vice captain is on bench
+      final viceCaptainSlot = _findSlotForPlayer(fti, fti.vice_captain!);
+      if (viceCaptainSlot != null && viceCaptainSlot.startsWith('bench')) {
+        validationErrors.add('Vice captain is on bench');
+      }
     }
 
     // Validate EACH individual rule before building sections
@@ -435,9 +424,9 @@ class RosterTab extends ConsumerWidget {
       }
     }
 
-    // Build sections in order: batting, wicket-keeper, bowling, all-rounder, flex, bench
+    // Build sections in order: batting, bowling, all-rounder, flex, bench
     final List<Widget> sections = [];
-    final orderedCategories = ['batting', 'wicket-keeper', 'bowling', 'all-rounder', 'flex', 'bench'];
+    final orderedCategories = ['batting', 'bowling', 'all-rounder', 'flex', 'bench'];
 
     for (var category in orderedCategories) {
       // Always render the main sections (batting, bowling, all-rounder, bench)
@@ -448,9 +437,7 @@ class RosterTab extends ConsumerWidget {
       final totalMax = categoryRules.isEmpty ? 0 : categoryRules.fold<int>(0, (sum, rule) => sum + rule.maxCount);
 
       // Get players from FTI slots for this category
-      final playerIds = _getPlayerIdsForPosition(fti, category);
-
-      final filledPlayers = playerIds.where((id) => id != null && playerMap.containsKey(id)).map((id) => playerMap[id]!).toList();
+      final slotInfo = _getSlotInfoForCategory(fti, category, playerMap);
 
       // Determine display title
       String sectionTitle;
@@ -480,15 +467,16 @@ class RosterTab extends ConsumerWidget {
       sections.add(
         Column(
           children: [
-            _buildSectionWithRules(
+            _buildSectionWithRulesV2(
               context,
               sectionTitle,
-              filledPlayers,
+              slotInfo,
               totalMin,
               totalMax,
-              playerIds.length, // Use actual slot count
+              fti: fti,
+              ref: ref,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 10),
           ],
         ),
       );
@@ -522,6 +510,48 @@ class RosterTab extends ConsumerWidget {
     }
 
     return false;
+  }
+
+  List<({String slot, FantasyPlayer? player})> _getSlotInfoForCategory(
+    FantasyTeamInstance fti,
+    String category,
+    Map<String, FantasyPlayer> playerMap,
+  ) {
+    if (fti.players == null) return [];
+
+    final players = fti.players!;
+    final slotInfo = <({String slot, FantasyPlayer? player})>[];
+
+    switch (category) {
+      case 'batting':
+        slotInfo.add((slot: 'bat1', player: players.bat1?.id != null ? playerMap[players.bat1!.id] : null));
+        slotInfo.add((slot: 'bat2', player: players.bat2?.id != null ? playerMap[players.bat2!.id] : null));
+        slotInfo.add((slot: 'wicket1', player: players.wicket1?.id != null ? playerMap[players.wicket1!.id] : null));
+        break;
+      case 'bowling':
+        slotInfo.add((slot: 'bowl1', player: players.bowl1?.id != null ? playerMap[players.bowl1!.id] : null));
+        slotInfo.add((slot: 'bowl2', player: players.bowl2?.id != null ? playerMap[players.bowl2!.id] : null));
+        slotInfo.add((slot: 'bowl3', player: players.bowl3?.id != null ? playerMap[players.bowl3!.id] : null));
+        break;
+      case 'all-rounder':
+        slotInfo.add((slot: 'all1', player: players.all1?.id != null ? playerMap[players.all1!.id] : null));
+        break;
+      case 'flex':
+        slotInfo.add((slot: 'flex1', player: players.flex1?.id != null ? playerMap[players.flex1!.id] : null));
+        break;
+      case 'bench':
+        slotInfo.add((slot: 'bench1', player: players.bench1?.id != null ? playerMap[players.bench1!.id] : null));
+        slotInfo.add((slot: 'bench2', player: players.bench2?.id != null ? playerMap[players.bench2!.id] : null));
+        slotInfo.add((slot: 'bench3', player: players.bench3?.id != null ? playerMap[players.bench3!.id] : null));
+        slotInfo.add((slot: 'bench4', player: players.bench4?.id != null ? playerMap[players.bench4!.id] : null));
+        slotInfo.add((slot: 'bench5', player: players.bench5?.id != null ? playerMap[players.bench5!.id] : null));
+        slotInfo.add((slot: 'bench6', player: players.bench6?.id != null ? playerMap[players.bench6!.id] : null));
+        slotInfo.add((slot: 'bench7', player: players.bench7?.id != null ? playerMap[players.bench7!.id] : null));
+        slotInfo.add((slot: 'bench8', player: players.bench8?.id != null ? playerMap[players.bench8!.id] : null));
+        break;
+    }
+
+    return slotInfo;
   }
 
   String _getCategoryFromRoleNames(List<String> roleNames) {
@@ -565,9 +595,9 @@ class RosterTab extends ConsumerWidget {
 
     switch (category) {
       case 'batting':
-        return [players.bat1?.id, players.bat2?.id];
+        return [players.bat1?.id, players.bat2?.id, players.wicket1?.id];
       case 'wicket-keeper':
-        return [players.wicket1?.id];
+        return [];
       case 'bowling':
         return [players.bowl1?.id, players.bowl2?.id, players.bowl3?.id];
       case 'all-rounder':
@@ -590,14 +620,20 @@ class RosterTab extends ConsumerWidget {
     }
   }
 
-  Widget _buildSectionWithRules(
+
+  Widget _buildSectionWithRulesV2(
     BuildContext context,
     String title,
-    List<FantasyPlayer> players,
+    List<({String slot, FantasyPlayer? player})> slotInfo,
     int minRequired,
-    int maxAllowed,
-    int totalSlots,
-  ) {
+    int maxAllowed, {
+    FantasyTeamInstance? fti,
+    WidgetRef? ref,
+  }) {
+    // For bench, only show filled slots
+    final isBenchSection = title == 'BENCH';
+    final slotsToShow = isBenchSection ? slotInfo.where((s) => s.player != null).toList() : slotInfo;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -614,11 +650,372 @@ class RosterTab extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 20),
-          // Only show filled player slots
-          ...players.map((player) => PlayerRosterCard(player: player)),
+          // Show slots (filled or empty)
+          ...slotsToShow.map((slotData) {
+            if (slotData.player != null) {
+              // Filled slot
+              return PlayerRosterCard(
+                player: slotData.player!,
+                slot: slotData.slot,
+                onTap: fti != null && ref != null ? () => _showManagePlayerSheet(context, ref, fti, slotData.player!, slotData.slot) : null,
+                captainId: fti?.captain,
+                viceCaptainId: fti?.vice_captain,
+              );
+            } else {
+              // Empty slot
+              return _buildEmptySlotCard(context, ref, fti, slotData.slot, title);
+            }
+          }),
         ],
       ),
     );
+  }
+
+  Widget _buildEmptySlotCard(
+    BuildContext context,
+    WidgetRef? ref,
+    FantasyTeamInstance? fti,
+    String slot,
+    String sectionTitle,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: AppColors.black200,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.black300, width: 1, strokeAlign: BorderSide.strokeAlignInside),
+      ),
+      child: Row(
+        children: [
+          // Empty avatar
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppColors.black400,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.black500, width: 2, strokeAlign: BorderSide.strokeAlignInside),
+            ),
+            child: const Icon(
+              Icons.person_add,
+              color: Colors.white38,
+              size: 20,
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          // Empty info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Empty Slot',
+                  style: const TextStyle(
+                    color: Colors.white54,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Tap a bench player to fill this position',
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  void _showManagePlayerSheet(
+    BuildContext context,
+    WidgetRef ref,
+    FantasyTeamInstance fti,
+    FantasyPlayer selectedPlayer,
+    String selectedSlot,
+  ) {
+    // Get all players from the roster
+    final allPlayers = _extractPlayersFromInstance(fti);
+    final playerMap = <String, FantasyPlayer>{};
+    for (var p in allPlayers) {
+      playerMap[p.playerSeasonId] = p;
+      if (p.playerId.isNotEmpty && p.playerId != p.playerSeasonId) {
+        playerMap[p.playerId] = p;
+      }
+    }
+
+    // Determine available players for swapping based on role compatibility
+    final availablePlayers = <({FantasyPlayer? player, String slot})>[];
+
+    // Determine eligible slots for the selected player based on their role
+    final eligibleSlots = _getEligibleSlotsForPlayer(selectedPlayer, selectedSlot);
+
+    // Add all players from eligible slots (except the current slot)
+    for (final slot in eligibleSlots) {
+      if (slot == selectedSlot) continue; // Skip the current slot
+
+      final playerId = _getPlayerIdForSlot(fti, slot);
+
+      // Handle empty slots
+      if (playerId == null || !playerMap.containsKey(playerId)) {
+        // Only show empty active slots (not empty bench slots individually)
+        if (!slot.startsWith('bench')) {
+          availablePlayers.add((player: null, slot: slot));
+        }
+        continue;
+      }
+
+      final player = playerMap[playerId]!;
+
+      // Check role compatibility for bench slots
+      if (slot.startsWith('bench')) {
+        if (!_isRoleCompatible(selectedPlayer, player)) {
+          continue; // Skip incompatible roles
+        }
+      }
+
+      // Only allow swap if the player hasn't played yet (performanceId is empty)
+      if (player.performanceId.isEmpty) {
+        availablePlayers.add((player: player, slot: slot));
+      }
+    }
+
+    // Add "Move to Bench" option if current slot is not bench
+    final hasEmptyBenchSlot = _getNextAvailableBenchSlot(fti) != null;
+    final showMoveToBench = !selectedSlot.startsWith('bench') && hasEmptyBenchSlot;
+
+    // Capture the parent context for use in the callbacks
+    final parentContext = context;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ManagePlayerBottomSheet(
+        selectedPlayer: selectedPlayer,
+        selectedSlot: selectedSlot,
+        availablePlayers: availablePlayers,
+        showMoveToBench: showMoveToBench,
+        currentCaptain: fti.captain,
+        currentViceCaptain: fti.vice_captain,
+        onCaptainChange: (captain, viceCaptain) async {
+          // Call the API to update captain/vice captain
+          final result = await ref.read(fantasyTeamInstancesProvider.notifier).updateCaptains(
+                ftiId: fti.id,
+                captain: captain,
+                viceCaptain: viceCaptain,
+              );
+          return result;
+        },
+        onSwap: (slot1, slot2) async {
+          // Handle "Move to Bench" special case
+          String targetSlot = slot2;
+          if (slot2 == 'bench') {
+            final nextBenchSlot = _getNextAvailableBenchSlot(fti);
+            if (nextBenchSlot == null) {
+              ScaffoldMessenger.of(parentContext).showSnackBar(
+                const SnackBar(
+                  content: Text('No available bench slots'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+              return;
+            }
+            targetSlot = nextBenchSlot;
+          }
+
+          // Show loading indicator using parent context
+          showDialog(
+            context: parentContext,
+            barrierDismissible: false,
+            builder: (context) => const Center(child: CircularProgressIndicator()),
+          );
+
+          // Call the swap API
+          final result = await ref.read(fantasyTeamInstancesProvider.notifier).swapSlots(
+                ftiId: fti.id,
+                slot1: slot1,
+                slot2: targetSlot,
+              );
+
+          // Close loading indicator using parent context
+          if (parentContext.mounted) Navigator.pop(parentContext);
+
+          // Show result message using parent context
+          if (parentContext.mounted) {
+            ScaffoldMessenger.of(parentContext).showSnackBar(
+              SnackBar(
+                content: Text(
+                  result['ok'] == true ? 'Players swapped successfully!' : result['message'] ?? 'Failed to swap players',
+                ),
+                backgroundColor: result['ok'] == true ? Colors.green : Colors.red,
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  String? _getPlayerIdForSlot(FantasyTeamInstance fti, String slot) {
+    if (fti.players == null) return null;
+    final players = fti.players!;
+
+    switch (slot) {
+      case 'bat1':
+        return players.bat1?.id;
+      case 'bat2':
+        return players.bat2?.id;
+      case 'wicket1':
+        return players.wicket1?.id;
+      case 'bowl1':
+        return players.bowl1?.id;
+      case 'bowl2':
+        return players.bowl2?.id;
+      case 'bowl3':
+        return players.bowl3?.id;
+      case 'all1':
+        return players.all1?.id;
+      case 'flex1':
+        return players.flex1?.id;
+      case 'bench1':
+        return players.bench1?.id;
+      case 'bench2':
+        return players.bench2?.id;
+      case 'bench3':
+        return players.bench3?.id;
+      case 'bench4':
+        return players.bench4?.id;
+      case 'bench5':
+        return players.bench5?.id;
+      case 'bench6':
+        return players.bench6?.id;
+      case 'bench7':
+        return players.bench7?.id;
+      case 'bench8':
+        return players.bench8?.id;
+      default:
+        return null;
+    }
+  }
+
+  List<String> _getEligibleSlotsForPlayer(FantasyPlayer player, String currentSlot) {
+    final role = player.role.toLowerCase();
+    final isBatsman = role.contains('bat') || role.contains('wicket') || role.contains('keeper');
+    final isBowler = role.contains('bowl');
+    final isAllRounder = role.contains('allrounder') || role.contains('all-rounder') || role.contains('all rounder');
+
+    final eligibleSlots = <String>[];
+    final isBenchSlot = currentSlot.startsWith('bench');
+
+    // If current slot is bench, only show active positions (not other bench slots)
+    if (isBenchSlot) {
+      // Add role-specific active slots only
+      if (isBatsman) {
+        eligibleSlots.addAll(['bat1', 'bat2', 'wicket1', 'flex1']);
+      }
+
+      if (isBowler) {
+        eligibleSlots.addAll(['bowl1', 'bowl2', 'bowl3', 'flex1']);
+      }
+
+      if (isAllRounder) {
+        eligibleSlots.addAll(['all1', 'flex1']);
+      }
+    } else {
+      // If current slot is an active position, show other active positions + bench (filtered by role in caller)
+
+      // Add bench slots (will be filtered by role compatibility in the caller)
+      eligibleSlots.addAll(['bench1', 'bench2', 'bench3', 'bench4', 'bench5', 'bench6', 'bench7', 'bench8']);
+
+      // Add role-specific active slots
+      if (isBatsman) {
+        eligibleSlots.addAll(['bat1', 'bat2', 'wicket1', 'flex1']);
+      }
+
+      if (isBowler) {
+        eligibleSlots.addAll(['bowl1', 'bowl2', 'bowl3', 'flex1']);
+      }
+
+      if (isAllRounder) {
+        eligibleSlots.addAll(['all1', 'flex1']);
+      }
+    }
+
+    return eligibleSlots;
+  }
+
+  bool _isRoleCompatible(FantasyPlayer player1, FantasyPlayer player2) {
+    final role1 = player1.role.toLowerCase();
+    final role2 = player2.role.toLowerCase();
+
+    final isBatsman1 = role1.contains('bat') || role1.contains('wicket') || role1.contains('keeper');
+    final isBowler1 = role1.contains('bowl');
+    final isAllRounder1 = role1.contains('allrounder') || role1.contains('all-rounder') || role1.contains('all rounder');
+
+    final isBatsman2 = role2.contains('bat') || role2.contains('wicket') || role2.contains('keeper');
+    final isBowler2 = role2.contains('bowl');
+    final isAllRounder2 = role2.contains('allrounder') || role2.contains('all-rounder') || role2.contains('all rounder');
+
+    // Check if roles match
+    if (isBatsman1 && isBatsman2) return true;
+    if (isBowler1 && isBowler2) return true;
+    if (isAllRounder1 && isAllRounder2) return true;
+
+    return false;
+  }
+
+  String? _getNextAvailableBenchSlot(FantasyTeamInstance fti) {
+    final benchSlots = ['bench1', 'bench2', 'bench3', 'bench4', 'bench5', 'bench6', 'bench7', 'bench8'];
+    for (final slot in benchSlots) {
+      final playerId = _getPlayerIdForSlot(fti, slot);
+      if (playerId == null) {
+        return slot;
+      }
+    }
+    return null; // All bench slots are full
+  }
+
+  String? _findSlotForPlayer(FantasyTeamInstance fti, String playerId) {
+    if (fti.players == null) return null;
+    final players = fti.players!;
+
+    // Check all slots
+    final allSlots = {
+      'bat1': players.bat1?.id,
+      'bat2': players.bat2?.id,
+      'wicket1': players.wicket1?.id,
+      'bowl1': players.bowl1?.id,
+      'bowl2': players.bowl2?.id,
+      'bowl3': players.bowl3?.id,
+      'all1': players.all1?.id,
+      'flex1': players.flex1?.id,
+      'bench1': players.bench1?.id,
+      'bench2': players.bench2?.id,
+      'bench3': players.bench3?.id,
+      'bench4': players.bench4?.id,
+      'bench5': players.bench5?.id,
+      'bench6': players.bench6?.id,
+      'bench7': players.bench7?.id,
+      'bench8': players.bench8?.id,
+    };
+
+    for (final entry in allSlots.entries) {
+      if (entry.value == playerId) {
+        return entry.key;
+      }
+    }
+
+    return null;
   }
 
   Widget _buildValidationErrors(List<String> errors) {
@@ -627,7 +1024,7 @@ class RosterTab extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.red.shade900.withOpacity(0.2),
+          color: Colors.red.shade900.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.red.shade800, width: 1),
         ),
