@@ -1,21 +1,20 @@
 import 'dart:ui';
 
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sixers/theme/colors.dart';
 
-({Color color, Object icon}) roleIconAndColor(String role) => switch (role) {
-  "Batsman" => (icon: PhosphorIcons.cricket(), color: AppColors.purple200),
-  "Bowler" => (icon: PhosphorIcons.boules(), color: AppColors.cyan200),
+({Color color, String iconPath}) roleIconAndColor(String role) => switch (role) {
+  "Batsman" => (iconPath: 'assets/images/player_icons/Batsmen.png', color: AppColors.purple200),
+  "Bowler" => (iconPath: 'assets/images/player_icons/Bowler.png', color: AppColors.cyan200),
   "Wicket-Keeper" => (
-    icon: PhosphorIcons.boxingGlove(),
+    iconPath: 'assets/images/player_icons/Batsmen.png', // Using Batsmen as placeholder for Wicket-Keeper
     color: AppColors.blue200,
   ),
   "All-Rounder" => (
-    icon: PhosphorIcons.star(),
+    iconPath: 'assets/images/player_icons/AllRounder.png',
     color: AppColors.pink600,
-  ), // amber-ish
+  ),
   String() => (
-    icon: PhosphorIcons.arrowsClockwise(),
+    iconPath: 'assets/images/player_icons/Batsmen.png', // Default fallback
     color: AppColors.black200,
   ),
 };

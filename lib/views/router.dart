@@ -20,6 +20,7 @@ import 'package:sixers/views/create_league/league_preview_screen.dart';
 import 'package:sixers/views/error_screen.dart';
 import 'package:sixers/views/fantasy_matchup/fantasy_matchup_screen.dart';
 import 'package:sixers/views/home/home_screen.dart';
+import 'package:sixers/views/league/league_screen.dart';
 import 'package:sixers/views/onboarding/basic_info_screen.dart';
 import 'package:sixers/views/onboarding/experience_screen.dart';
 import 'package:sixers/views/settings/settings_screen.dart';
@@ -79,8 +80,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         }
       }
 
-      if (location == (SignInScreen.route) ||
-          location == (SignUpScreen.route)) {
+      if (location == (SignInScreen.route) || location == (SignUpScreen.route)) {
         if (authState.value == null) return null;
         if (onboardingState.value == null) return BasicInfoScreen.route;
         switch (onboardingState.value!.onboardingStage) {
@@ -95,10 +95,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         }
       }
 
-      if(location == BasicInfoScreen.route) {
+      if (location == BasicInfoScreen.route) {
         if (authState.value == null) return SignInScreen.route;
         if (onboardingState.value == null) return BasicInfoScreen.route;
-        if(onboardingState.value!.onboardingStage == 2) {
+        if (onboardingState.value!.onboardingStage == 2) {
           return HomeScreen.route;
         }
         return null;
@@ -119,56 +119,48 @@ final routerProvider = Provider<GoRouter>((ref) {
         }
       }
 
-      if (authState.value == null &&
-          !(location == (SignInScreen.route) ||
-              location == (SignUpScreen.route))) {
+      if (authState.value == null && !(location == (SignInScreen.route) || location == (SignUpScreen.route))) {
         return gAuthOrigin;
       }
       return null;
     },
     routes: [
-      GoRoute(
-        path: SplashScreen.route,
-        builder: (context, state) => const SplashScreen(),
-      ),
+      GoRoute(path: SplashScreen.route, builder: (context, state) => const SplashScreen()),
       GoRoute(
         path: HomeScreen.route,
-        builder: (context, state) => const HomeScreen(),
+        builder: (context, state) {
+          final container = ProviderScope.containerOf(context);
+          final authState = container.read(authProviderProvider);
+          if (authState.value != null) {
+            logDebug("HomeScreen: User ID = ${authState.value!.userId}");
+          }
+          return const HomeScreen();
+        },
       ),
       GoRoute(
-        path: SignInScreen.route,
-        builder: (context, state) => const SignInScreen(),
+        path: "/",
+        builder: (context, state) {
+          final container = ProviderScope.containerOf(context);
+          final authState = container.read(authProviderProvider);
+          if (authState.value != null) {
+            logDebug("HomeScreen: User ID = ${authState.value!.userId}");
+          }
+          return const HomeScreen();
+        },
       ),
-      GoRoute(
-        path: SignUpScreen.route,
-        builder: (context, state) => const SignUpScreen(),
-      ),
-      GoRoute(
-        path: BasicInfoScreen.route,
-        builder: (context, state) => BasicInfoScreen(),
-      ),
-      GoRoute(
-        path: ExperienceScreen.route,
-        builder: (context, state) => ExperienceScreen(),
-      ),
-      GoRoute(
-        path: SettingsScreen.route,
-        builder: (context, state) => const SettingsScreen(),
-      ),
+      GoRoute(path: SignInScreen.route, builder: (context, state) => const SignInScreen()),
+      GoRoute(path: SignUpScreen.route, builder: (context, state) => const SignUpScreen()),
+      GoRoute(path: BasicInfoScreen.route, builder: (context, state) => BasicInfoScreen()),
+      GoRoute(path: ExperienceScreen.route, builder: (context, state) => ExperienceScreen()),
+      GoRoute(path: SettingsScreen.route, builder: (context, state) => const SettingsScreen()),
       GoRoute(
         path: '/fantasyMatchup',
         builder: (context, state) {
           final extra = state.extra as Map<String, dynamic>;
-          return FantasyMatchupScreen(
-            team1FtiId: extra["team1FtiId"],
-            team2FtiId: extra["team2FtiId"],
-          );
+          return FantasyMatchupScreen(team1FtiId: extra["team1FtiId"], team2FtiId: extra["team2FtiId"]);
         },
       ),
-      GoRoute(
-        path: CreateLeagueScreen.route,
-        builder: (context, state) => const CreateLeagueScreen(),
-      ),
+      GoRoute(path: CreateLeagueScreen.route, builder: (context, state) => const CreateLeagueScreen()),
       GoRoute(
         path: CustomizeScoringScreen.route,
         builder: (context, state) {
@@ -201,10 +193,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return LeagueSettingsScreen(leagueId: leagueId);
         },
       ),
-      GoRoute(
-        path: JoinLeagueScreen.route,
-        builder: (context, state) => const JoinLeagueScreen(),
-      ),
+      GoRoute(path: JoinLeagueScreen.route, builder: (context, state) => const JoinLeagueScreen()),
       GoRoute(
         path: LeaguePreviewScreen.route,
         builder: (context, state) {
@@ -217,10 +206,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final extra = state.extra as Map<String, dynamic>;
           final league = extra['league'] as League;
-          return CreateTeamScreen(
-            leagueToJoin: league,
-            joinCode: league.joinCode,
-          );
+          return CreateTeamScreen(leagueToJoin: league, joinCode: league.joinCode);
         },
       ),
     ],
@@ -234,7 +220,6 @@ class _RouterNotifier extends ChangeNotifier {
     ref.listen(onboardingStageProvider, (_, _) => notifyListeners());
   }
 }
-
 
 class LeagueLoader extends ConsumerWidget {
   final String leagueId;
@@ -256,6 +241,10 @@ class LeagueLoader extends ConsumerWidget {
             return CommissionerPreDraftScreen(leagueId: leagueId);
           case LeagueStatus.draft_in_progress:
             return CommissionerPreDraftScreen(leagueId: leagueId);
+          case LeagueStatus.active:
+            return ActiveLeagueScreen(league: currentLeague);
+          case LeagueStatus.completed:
+            return ActiveLeagueScreen(league: currentLeague);
           default:
             return CommissionerPreDraftScreen(leagueId: leagueId);
         }

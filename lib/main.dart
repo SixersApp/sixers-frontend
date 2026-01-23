@@ -28,8 +28,14 @@ Future<void> _configureAmplify() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-
-  await dotenv.load(fileName: '.env');
+  // Load .env file if it exists, otherwise continue without it
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    // .env file doesn't exist or is empty, continue without it
+    debugPrint('Warning: Could not load .env file: $e');
+  }
+  
   await _configureAmplify();
   // final _authService = new AuthService();
 
