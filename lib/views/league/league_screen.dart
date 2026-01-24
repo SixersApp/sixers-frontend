@@ -23,6 +23,7 @@ class _ActiveLeagueScreenState extends ConsumerState<ActiveLeagueScreen> with Ti
   late TabController _tabController;
   int _selectedTeamIndex = 0;
   late int _selectedGameNum;
+  int _selectedMatchupIndex = 0;
 
   @override
   void initState() {
@@ -60,6 +61,12 @@ class _ActiveLeagueScreenState extends ConsumerState<ActiveLeagueScreen> with Ti
       _selectedGameNum = newGameNum;
     });
     // No need to reload - all instances are already loaded
+  }
+
+  void _onMatchupChanged(int newMatchupIndex) {
+    setState(() {
+      _selectedMatchupIndex = newMatchupIndex;
+    });
   }
 
   @override
@@ -156,7 +163,11 @@ class _ActiveLeagueScreenState extends ConsumerState<ActiveLeagueScreen> with Ti
                   },
                   onGameChanged: _onGameChanged,
                 ),
-                MatchupsTab(league: widget.league),
+                MatchupsTab(
+                  league: widget.league,
+                  selectedMatchupIndex: _selectedMatchupIndex,
+                  onMatchupChanged: _onMatchupChanged,
+                ),
                 TransactionsTab(league: widget.league),
               ],
             ),

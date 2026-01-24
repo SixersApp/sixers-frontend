@@ -37,7 +37,7 @@ void main() async {
   }
   
   await _configureAmplify();
-  // final _authService = new AuthService();
+  //final _authService = new AuthService();
 
   // _authService.signOut();
   matchupPatternImage = await loadUiImage('assets/matchup_pattern.png');
