@@ -8,6 +8,7 @@ import 'package:sixers/backend/fantasy_player/fantasy_player_provider.dart';
 import 'package:sixers/backend/fantasy_team/fantasy_team_model.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/fantasy_matchup/matchup_model.dart';
+import 'package:sixers/backend/fantasy_team_instance/fantasy_team_instance_provider.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/utils/string_to_avatar.dart';
 
@@ -229,69 +230,69 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
   }
 
   Widget _buildTeamBlock(FantasyTeam team) {
-    return Column(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: stringToColor(team.teamColor),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              stringToAvatar(team.teamIcon),
-              width: 48,
-              height: 48,
-              fit: BoxFit.cover,
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: stringToColor(team.teamColor),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                stringToAvatar(team.teamIcon),
+                width: 48,
+                height: 48,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: 100,
-          child: Text(
+          const SizedBox(height: 8),
+          Text(
             team.teamName,
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
           ),
-        ),
-        if (team.userName != null && team.userName!.isNotEmpty)
-          Text('AKA ${team.userName}', 
-            style: TextStyle(color: Colors.grey.shade500, fontSize: 10)),
-      ],
+          if (team.userName != null && team.userName!.isNotEmpty)
+            Text('${team.userName}', 
+              style: TextStyle(color: Colors.grey.shade500, fontSize: 10)),
+        ],
+      ),
     );
   }
 
   Widget _buildGameNavigation(Matchup matchup, List<Matchup> allMatchups, int currentIndex) {
-    final canPrev = currentIndex > 0;
-    final canNext = currentIndex < allMatchups.length - 1;
+    final hasPrevious = currentIndex > 0;
+    final hasNext = currentIndex < allMatchups.length - 1;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-          onPressed: canPrev ? () => widget.onMatchupChanged(currentIndex - 1) : null,
-          icon: Icon(Icons.chevron_left, 
-            color: canPrev ? Colors.white : Colors.grey.shade600, size: 28),
-        ),
-        Column(
-          children: [
-            Text('Game ${matchup.matchNum}', 
-              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-            Text(widget.league.tournamentAbbr ?? 'IPL', 
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
-          ],
-        ),
-        IconButton(
-          onPressed: canNext ? () => widget.onMatchupChanged(currentIndex + 1) : null,
-          icon: Icon(Icons.chevron_right, 
-            color: canNext ? Colors.white : Colors.grey.shade600, size: 28),
-        ),
-      ],
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(color: AppColors.black200),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back_ios, size: 16),
+            onPressed: hasPrevious ? () => widget.onMatchupChanged(currentIndex - 1) : null,
+            color: hasPrevious ? Colors.white : Colors.grey.shade600,
+          ),
+          Text(
+            'Game ${matchup.matchNum}',
+            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+          IconButton(
+            icon: const Icon(Icons.arrow_forward_ios, size: 16),
+            onPressed: hasNext ? () => widget.onMatchupChanged(currentIndex + 1) : null,
+            color: hasNext ? Colors.white : Colors.grey.shade600,
+          ),
+        ],
+      ),
     );
   }
 
@@ -564,14 +565,14 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
                       borderRadius: BorderRadius.circular(2)),
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text('Score Breakdown',
-                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 20),
                 _buildPlayerHeader(_selectedPlayerForBreakdown!),
-                const SizedBox(height: 16),
+                const SizedBox(height: 4),
+                Text('${_selectedPlayerForBreakdown!.role} · ${_selectedPlayerForBreakdown!.homeTeamName}',
+                  style: TextStyle(color: Colors.grey.shade400, fontSize: 14)),
+                const SizedBox(height: 24),
                 _buildRelevantGame(_selectedPlayerForBreakdown!),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 _buildStatsTable(_selectedPlayerForBreakdown!),
               ],
             ),
@@ -584,71 +585,68 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
   Widget _buildPlayerHeader(FantasyPlayer player) {
     final total = _calculateTotalScore(player);
     
-    return Column(
+    return Row(
       children: [
-        // Player name and score
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 28,
-              backgroundColor: AppColors.black300,
-              backgroundImage: player.playerImage.isNotEmpty ? NetworkImage(player.playerImage) : null,
-              child: player.playerImage.isEmpty 
-                ? Text(_getInitials(player.fullName),
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600))
-                : null,
-            ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(player.fullName,
-                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 4),
-                Text('Batscore Game',
-                  style: TextStyle(color: Colors.grey.shade400, fontSize: 14)),
-              ],
-            ),
-            const Spacer(),
-            Text('$total',
-              style: const TextStyle(color: AppColors.green300, fontSize: 32, fontWeight: FontWeight.w800)),
-          ],
+        CircleAvatar(
+          radius: 32,
+          backgroundColor: AppColors.black300,
+          backgroundImage: player.playerImage.isNotEmpty ? NetworkImage(player.playerImage) : null,
+          child: player.playerImage.isEmpty 
+            ? Text(_getInitials(player.fullName),
+                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600))
+            : null,
         ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(player.fullName,
+                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700)),
+            ],
+          ),
+        ),
+        Text('$total',
+          style: const TextStyle(color: AppColors.green300, fontSize: 48, fontWeight: FontWeight.w900)),
       ],
     );
   }
 
   Widget _buildRelevantGame(FantasyPlayer player) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Relevant Game',
-          style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            _buildTeamChip(_getTeamAbbr(player.homeTeamName)),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text('vs', style: TextStyle(color: Colors.grey.shade400, fontSize: 14)),
-            ),
-            _buildTeamChip(_getTeamAbbr(player.awayTeamName)),
-          ],
-        ),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.black300,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          _buildTeamLogoChip(_getTeamAbbr(player.homeTeamName)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text('vs', style: TextStyle(color: Colors.grey.shade400, fontSize: 16, fontWeight: FontWeight.w600)),
+          ),
+          _buildTeamLogoChip(_getTeamAbbr(player.awayTeamName)),
+        ],
+      ),
     );
   }
 
-  Widget _buildTeamChip(String abbr) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.black300,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(abbr,
-        style: TextStyle(color: Colors.grey.shade300, fontSize: 14, fontWeight: FontWeight.w600)),
+  Widget _buildTeamLogoChip(String abbr) {
+    return Row(
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: AppColors.black400,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(abbr,
+          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+      ],
     );
   }
 
@@ -662,50 +660,120 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
       ),
       child: Column(
         children: [
-          _buildTableRow('', 'Start', 'Pre Perf', 'Points', isHeader: true),
-          const Divider(height: 1, color: AppColors.black400),
-          ...breakdown.map((row) => _buildTableRow(row.stat, '100', row.ptsPer, '${row.points}')),
-          const Divider(height: 1, color: AppColors.black400),
-          _buildTableRow('Total', '', '', '${_calculateTotalScore(player)}', isTotal: true),
+          _buildTableHeader(),
+          const Divider(height: 1, color: AppColors.black400, thickness: 1),
+          ...breakdown.map((row) => Column(
+            children: [
+              _buildTableRow(row.stat, "100", row.ptsPer, row.points),
+              const Divider(height: 1, color: AppColors.black400, thickness: 1),
+            ],
+          )),
+          _buildTableTotal(_calculateTotalScore(player)),
         ],
       ),
     );
   }
 
-  Widget _buildTableRow(String stat, String start, String prePer, String points, {bool isHeader = false, bool isTotal = false}) {
+  Widget _buildTableHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
         children: [
           Expanded(
-            flex: 3,
-            child: Text(stat,
+            flex: 4,
+            child: Text('Stat',
               style: TextStyle(
-                color: isHeader ? Colors.grey.shade400 : Colors.white,
-                fontSize: isHeader ? 12 : 14,
-                fontWeight: isHeader ? FontWeight.w600 : FontWeight.w500)),
+                color: Colors.grey.shade500,
+                fontSize: 14,
+                fontWeight: FontWeight.w600)),
           ),
           Expanded(
             flex: 2,
-            child: Text(start, textAlign: TextAlign.center,
+            child: Text('Pts. Per', textAlign: TextAlign.center,
               style: TextStyle(
-                color: isHeader ? Colors.grey.shade400 : Colors.grey.shade300,
-                fontSize: 12, fontWeight: FontWeight.w500)),
+                color: Colors.grey.shade500,
+                fontSize: 14,
+                fontWeight: FontWeight.w600)),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text('Points', textAlign: TextAlign.right,
+              style: TextStyle(
+                color: Colors.grey.shade500,
+                fontSize: 14,
+                fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTableRow(String stat, String start, String prePer, int points) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(stat,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500)),
+                if (start.isNotEmpty)
+                  Text(start,
+                    style: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400)),
+              ],
+            ),
           ),
           Expanded(
             flex: 2,
             child: Text(prePer, textAlign: TextAlign.center,
-              style: TextStyle(
-                color: isHeader ? Colors.grey.shade400 : Colors.grey.shade300,
-                fontSize: 12, fontWeight: FontWeight.w500)),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w500)),
           ),
           Expanded(
             flex: 2,
-            child: Text(points, textAlign: TextAlign.right,
+            child: Text('$points', textAlign: TextAlign.right,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTableTotal(int total) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Row(
+        children: [
+          const Expanded(
+            flex: 4,
+            child: Text('Total',
               style: TextStyle(
-                color: isTotal ? AppColors.green300 : Colors.white,
-                fontSize: isTotal ? 18 : 14,
-                fontWeight: isTotal ? FontWeight.w800 : FontWeight.w600)),
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w700)),
+          ),
+          const Expanded(flex: 2, child: SizedBox()),
+          Expanded(
+            flex: 2,
+            child: Text('$total', textAlign: TextAlign.right,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.w900)),
           ),
         ],
       ),
