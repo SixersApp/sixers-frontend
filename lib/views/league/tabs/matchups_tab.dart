@@ -71,7 +71,7 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
     // Find the teams from the league
     final team1 = widget.league.teams.firstWhereOrNull((t) => t.id == matchup.fantasyTeam1Id);
     final team2 = widget.league.teams.firstWhereOrNull((t) => t.id == matchup.fantasyTeam2Id);
-
+    print('Current index: $currentIndex');
     if (team1 == null || team2 == null) {
       return const Center(
         child: Text('Teams not found', style: TextStyle(color: Colors.white)),
@@ -266,35 +266,39 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
     );
   }
 
-  Widget _buildGameNavigation(Matchup matchup, List<Matchup> allMatchups, int currentIndex) {
-    final hasPrevious = currentIndex > 0;
-    final hasNext = currentIndex < allMatchups.length - 1;
+ Widget _buildGameNavigation(Matchup matchup, List<Matchup> allMatchups, int currentIndex) {
+  final hasPrevious = currentIndex > 0;
+  final hasNext = currentIndex < allMatchups.length - 1;
 
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(color: AppColors.black200),
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back_ios, size: 16),
-            onPressed: hasPrevious ? () => widget.onMatchupChanged(currentIndex - 1) : null,
-            color: hasPrevious ? Colors.white : Colors.grey.shade600,
-          ),
-          Text(
-            'Game ${matchup.matchNum}',
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          IconButton(
-            icon: const Icon(Icons.arrow_forward_ios, size: 16),
-            onPressed: hasNext ? () => widget.onMatchupChanged(currentIndex + 1) : null,
-            color: hasNext ? Colors.white : Colors.grey.shade600,
-          ),
-        ],
-      ),
-    );
-  }
+  return Container(
+    width: double.infinity,
+    decoration: BoxDecoration(color: AppColors.black200),
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.arrow_back_ios, size: 16),
+          onPressed: hasPrevious 
+            ? () => widget.onMatchupChanged(allMatchups[currentIndex - 1].matchNum) 
+            : null,
+          color: hasPrevious ? Colors.white : Colors.grey.shade600,
+        ),
+        Text(
+          'Game ${matchup.matchNum}',
+          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        IconButton(
+          icon: const Icon(Icons.arrow_forward_ios, size: 16),
+          onPressed: hasNext 
+            ? () => widget.onMatchupChanged(allMatchups[currentIndex + 1].matchNum) 
+            : null,
+          color: hasNext ? Colors.white : Colors.grey.shade600,
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildBattingSection(List<FantasyPlayer> allPlayers, List<FantasyPlayer> team1Players, List<FantasyPlayer> team2Players) {
     final battingPlayers = allPlayers.where((p) {
@@ -567,9 +571,6 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
                 ),
                 const SizedBox(height: 20),
                 _buildPlayerHeader(_selectedPlayerForBreakdown!),
-                const SizedBox(height: 4),
-                Text('${_selectedPlayerForBreakdown!.role} · ${_selectedPlayerForBreakdown!.homeTeamName}',
-                  style: TextStyle(color: Colors.grey.shade400, fontSize: 14)),
                 const SizedBox(height: 24),
                 _buildRelevantGame(_selectedPlayerForBreakdown!),
                 const SizedBox(height: 20),
@@ -582,7 +583,7 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
     );
   }
 
-  Widget _buildPlayerHeader(FantasyPlayer player) {
+Widget _buildPlayerHeader(FantasyPlayer player) {
     final total = _calculateTotalScore(player);
     
     return Row(
@@ -603,6 +604,9 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
             children: [
               Text(player.fullName,
                 style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
+              Text('${player.role} · ${player.homeTeamName}',
+                style: TextStyle(color: Colors.grey.shade400, fontSize: 14)),
             ],
           ),
         ),
@@ -612,25 +616,30 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
     );
   }
 
-  Widget _buildRelevantGame(FantasyPlayer player) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.black300,
-        borderRadius: BorderRadius.circular(12),
+Widget _buildRelevantGame(FantasyPlayer player) {
+  return Row(
+    children: [
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.black300,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildTeamLogoChip(_getTeamAbbr(player.homeTeamName)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text('vs', style: TextStyle(color: Colors.grey.shade400, fontSize: 16, fontWeight: FontWeight.w600)),
+            ),
+            _buildTeamLogoChip(_getTeamAbbr(player.awayTeamName)),
+          ],
+        ),
       ),
-      child: Row(
-        children: [
-          _buildTeamLogoChip(_getTeamAbbr(player.homeTeamName)),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text('vs', style: TextStyle(color: Colors.grey.shade400, fontSize: 16, fontWeight: FontWeight.w600)),
-          ),
-          _buildTeamLogoChip(_getTeamAbbr(player.awayTeamName)),
-        ],
-      ),
-    );
-  }
+    ],
+  );
+}
 
   Widget _buildTeamLogoChip(String abbr) {
     return Row(
@@ -652,6 +661,7 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
 
   Widget _buildStatsTable(FantasyPlayer player) {
     final breakdown = _computeScoreBreakdown(player);
+    final subtotal = breakdown.fold(0, (sum, item) => sum + item.points);
     
     return Container(
       decoration: BoxDecoration(
@@ -664,10 +674,14 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
           const Divider(height: 1, color: AppColors.black400, thickness: 1),
           ...breakdown.map((row) => Column(
             children: [
-              _buildTableRow(row.stat, "100", row.ptsPer, row.points),
+              _buildTableRow(row.stat, row.statValue, row.ptsPer, row.points),
               const Divider(height: 1, color: AppColors.black400, thickness: 1),
             ],
           )),
+          _buildTableSubtotal(subtotal),
+          const Divider(height: 1, color: AppColors.black400, thickness: 1),
+          _buildTableMultiplier(subtotal),
+          const Divider(height: 1, color: AppColors.black400, thickness: 1),
           _buildTableTotal(_calculateTotalScore(player)),
         ],
       ),
@@ -676,30 +690,76 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
 
   Widget _buildTableHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
+          const Expanded(
+            flex: 3,
+            child: SizedBox(),
+          ),
           Expanded(
-            flex: 4,
-            child: Text('Stat',
+            flex: 2,
+            child: Text('Stat', textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.grey.shade500,
-                fontSize: 14,
-                fontWeight: FontWeight.w600)),
+                fontSize: 12,
+                fontWeight: FontWeight.w500)),
           ),
           Expanded(
             flex: 2,
             child: Text('Pts. Per', textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.grey.shade500,
-                fontSize: 14,
-                fontWeight: FontWeight.w600)),
+                fontSize: 12,
+                fontWeight: FontWeight.w500)),
           ),
           Expanded(
             flex: 2,
             child: Text('Points', textAlign: TextAlign.right,
               style: TextStyle(
                 color: Colors.grey.shade500,
+                fontSize: 12,
+                fontWeight: FontWeight.w500)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTableRow(String statName, String statValue, String ptsPer, int points) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Text(statName,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w400)),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(statValue, textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey.shade400,
+                fontSize: 14,
+                fontWeight: FontWeight.w400)),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(ptsPer, textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w400)),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text('$points', textAlign: TextAlign.right,
+              style: const TextStyle(
+                color: Colors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w600)),
           ),
@@ -708,71 +768,97 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
     );
   }
 
-  Widget _buildTableRow(String stat, String start, String prePer, int points) {
+  Widget _buildTableSubtotal(int subtotal) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          Expanded(
-            flex: 4,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(stat,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500)),
-                if (start.isNotEmpty)
-                  Text(start,
-                    style: TextStyle(
-                      color: Colors.grey.shade500,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400)),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(prePer, textAlign: TextAlign.center,
-              style: const TextStyle(
+          const Expanded(
+            flex: 3,
+            child: Text('Subtotal',
+              style: TextStyle(
                 color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w500)),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text('$points', textAlign: TextAlign.right,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.w600)),
+          ),
+          const Expanded(flex: 2, child: SizedBox()),
+          const Expanded(flex: 2, child: SizedBox()),
+          Expanded(
+            flex: 2,
+            child: Text('$subtotal', textAlign: TextAlign.right,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w700)),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTableTotal(int total) {
+Widget _buildTableMultiplier(int subtotal) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    child: Row(
+      children: [
+        const Expanded(
+          flex: 3,
+          child: Text('Leadership Multiplier',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.w500)),
+        ),
+        Expanded(
+          flex: 2,
+          child: Text('C', textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.grey.shade500,
+              fontSize: 13,
+              fontWeight: FontWeight.w400)),
+        ),
+        const Expanded(
+          flex: 2,
+          child: Text('2x', textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w500)),
+        ),
+        Expanded(
+          flex: 2,
+          child: Text('$subtotal', textAlign: TextAlign.right,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.w600)),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildTableTotal(int total) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         children: [
           const Expanded(
-            flex: 4,
+            flex: 3,
             child: Text('Total',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w700)),
           ),
+          const Expanded(flex: 2, child: SizedBox()),
           const Expanded(flex: 2, child: SizedBox()),
           Expanded(
             flex: 2,
             child: Text('$total', textAlign: TextAlign.right,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.w900)),
           ),
         ],
@@ -780,31 +866,31 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
     );
   }
 
-  List<({String stat, String ptsPer, int points})> _computeScoreBreakdown(FantasyPlayer player) {
-    final breakdown = <({String stat, String ptsPer, int points})>[];
-    
-    breakdown.add((stat: 'Runs', ptsPer: '1', points: player.runsScored));
-    breakdown.add((stat: "4's scored", ptsPer: '1', points: player.fours));
-    breakdown.add((stat: "6's scored", ptsPer: '2', points: player.sixes * 2));
-    
-    final sr = player.ballsFaced > 0 ? (player.runsScored / player.ballsFaced) * 100 : 0.0;
-    final srBonus = sr > 140 ? 6 : 0;
-    breakdown.add((stat: 'Strike Rate', ptsPer: 'B', points: srBonus));
-    
-    if (player.runsScored >= 100) {
-      breakdown.add((stat: 'Century Bonus', ptsPer: '8', points: 8));
-    }
-    
-    if (player.catches > 0) {
-      breakdown.add((stat: 'Catch Taken', ptsPer: '8', points: player.catches * 8));
-    }
-    
-    return breakdown;
+ List<({String stat, String statValue, String ptsPer, int points})> _computeScoreBreakdown(FantasyPlayer player) {
+  final breakdown = <({String stat, String statValue, String ptsPer, int points})>[];
+  
+  breakdown.add((stat: 'Runs', statValue: '${player.runsScored}', ptsPer: '1', points: player.runsScored));
+  breakdown.add((stat: "4's scored", statValue: '${player.fours}', ptsPer: '1', points: player.fours));
+  breakdown.add((stat: "6's scored", statValue: '${player.sixes}', ptsPer: '2', points: player.sixes * 2));
+  
+  final sr = player.ballsFaced > 0 ? (player.runsScored / player.ballsFaced) * 100 : 0.0;
+  final srBonus = sr > 140 ? 6 : 0;
+  breakdown.add((stat: 'Strike Rate', statValue: '>140', ptsPer: '6', points: srBonus));
+  
+  if (player.runsScored >= 100) {
+    breakdown.add((stat: 'Century Bonus', statValue: '1', ptsPer: '8', points: 8));
   }
+  
+  if (player.catches > 0) {
+    breakdown.add((stat: 'Catch Taken', statValue: '${player.catches}', ptsPer: '8', points: player.catches * 8));
+  }
+  
+  return breakdown;
+}
 
   int _calculateTotalScore(FantasyPlayer player) {
     final breakdown = _computeScoreBreakdown(player);
-    return breakdown.fold(0, (sum, item) => sum + item.points);
+    return breakdown.fold(0, (sum, item) => (sum + item.points));
   }
 
   String _getInitials(String name) {

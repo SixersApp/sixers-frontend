@@ -10,7 +10,7 @@ class FantasyMatchupScreen extends ConsumerWidget {
   const FantasyMatchupScreen({
     super.key,
     required this.team1FtiId,
-    required this.team2FtiId,
+    required this.team2FtiId, required selectedMatchupIndex, required initialTab, required leagueId,
   });
 
   @override
