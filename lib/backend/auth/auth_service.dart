@@ -55,7 +55,7 @@ class AuthService {
 
   void printIdToken(String idToken) {
     final text = idToken;
-    const chunkSize = 500;
+    const chunkSize = 800;
     for (var i = 0; i < text.length; i += chunkSize) {
       logInfo(
         text.substring(
