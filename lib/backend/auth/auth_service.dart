@@ -39,8 +39,7 @@ class AuthService {
       final appSession = await _buildSessionFromCognito();
       ApiClient.setAuthToken(appSession.idToken);
 
-      // print(appSession.userId);
-      logInfo(appSession.idToken);
+      printIdToken(appSession.idToken);
 
       if (firstTime){
         initUserInBackend(appSession);
@@ -56,7 +55,7 @@ class AuthService {
 
   void printIdToken(String idToken) {
     final text = idToken;
-    const chunkSize = 800;
+    const chunkSize = 500;
     for (var i = 0; i < text.length; i += chunkSize) {
       logInfo(
         text.substring(
