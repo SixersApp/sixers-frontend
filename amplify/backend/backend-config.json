@@ -1,0 +1,147 @@
+{
+  "api": {
+    "scoringAPI": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "sixersScoringTournament"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "sixersScoringSeason"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "auth": {
+    "sixersscoring893e2197": {
+      "customAuth": false,
+      "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": [],
+          "passwordPolicyMinLength": 8
+        },
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [
+          "GOOGLE"
+        ],
+        "usernameAttributes": [
+          "EMAIL"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito"
+    }
+  },
+  "function": {
+    "sixersScoringSeason": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "sixersScoringTournament": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "sixersscoring893e2197"
+        },
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "sixersscoringSixersAPIShared"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "sixersscoringSixersAPIShared": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_sixersScoringSeason_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sixersScoringSeason"
+        }
+      ]
+    },
+    "AMPLIFY_function_sixersScoringSeason_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sixersScoringSeason"
+        }
+      ]
+    },
+    "AMPLIFY_function_sixersScoringTournament_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sixersScoringTournament"
+        }
+      ]
+    },
+    "AMPLIFY_function_sixersScoringTournament_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sixersScoringTournament"
+        }
+      ]
+    },
+    "AMPLIFY_function_sixersScoringTournament_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sixersScoringTournament"
+        }
+      ]
+    },
+    "AMPLIFY_function_sixersscoringSixersAPIShared_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sixersscoringSixersAPIShared"
+        }
+      ]
+    },
+    "AMPLIFY_function_sixersscoringSixersAPIShared_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sixersscoringSixersAPIShared"
+        }
+      ]
+    }
+  }
+}

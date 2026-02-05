@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "auth": {
+      "sixersscoring893e2197": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  },
+  "lambdaLayers": [
+    {
+      "type": "ProjectLayer",
+      "resourceName": "sixersscoringSixersAPIShared",
+      "env": "dev",
+      "version": "Always choose latest version",
+      "isLatestVersionSelected": true
+    }
+  ],
+  "secretNames": [
+    "RDS_HOST",
+    "RDS_PORT",
+    "RDS_USER",
+    "RDS_DATABASE",
+    "RDS_PASSWORD"
+  ]
+}

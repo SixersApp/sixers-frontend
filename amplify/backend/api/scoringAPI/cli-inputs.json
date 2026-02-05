@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "paths": {
+    "/tournaments/{tournamentId}": {
+      "name": "/tournaments/{tournamentId}",
+      "lambdaFunction": "sixersScoringTournament",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      }
+    },
+    "/seasons/{seasonId}": {
+      "name": "/seasons/{seasonId}",
+      "lambdaFunction": "sixersScoringSeason",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "read"
+        ]
+      }
+    }
+  }
+}

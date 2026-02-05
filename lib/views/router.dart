@@ -21,6 +21,7 @@ import 'package:sixers/views/error_screen.dart';
 import 'package:sixers/views/fantasy_matchup/fantasy_matchup_screen.dart';
 import 'package:sixers/views/home/home_screen.dart';
 import 'package:sixers/views/league/league_screen.dart';
+import 'package:sixers/views/league/tabs/matchups_tab.dart';
 import 'package:sixers/views/onboarding/basic_info_screen.dart';
 import 'package:sixers/views/onboarding/experience_screen.dart';
 import 'package:sixers/views/settings/settings_screen.dart';
@@ -153,13 +154,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: BasicInfoScreen.route, builder: (context, state) => BasicInfoScreen()),
       GoRoute(path: ExperienceScreen.route, builder: (context, state) => ExperienceScreen()),
       GoRoute(path: SettingsScreen.route, builder: (context, state) => const SettingsScreen()),
-      GoRoute(
-        path: '/fantasyMatchup',
-        builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>;
-          return FantasyMatchupScreen(team1FtiId: extra["team1FtiId"], team2FtiId: extra["team2FtiId"]);
-        },
-      ),
+      // GoRoute(
+      //   path: '/fantasyMatchup',
+      //   builder: (context, state) {
+      //     final extra = state.extra as Map<String, dynamic>;
+      //     return FantasyMatchupScreen(team1FtiId: extra["team1FtiId"], team2FtiId: extra["team2FtiId"]);
+      //   },
+      // ),
       GoRoute(path: CreateLeagueScreen.route, builder: (context, state) => const CreateLeagueScreen()),
       GoRoute(
         path: CustomizeScoringScreen.route,
@@ -186,6 +187,17 @@ final routerProvider = Provider<GoRouter>((ref) {
           return LeagueLoader(leagueId: leagueId);
         },
       ),
+      GoRoute(
+      path: "/leagues/:leagueId/matchups/:matchupNum",
+      builder: (context, state) {
+        final leagueId = state.pathParameters["leagueId"]!;
+        final matchupNum = int.parse(state.pathParameters["matchupNum"]!);
+        return LeagueMatchupsLoader(
+          leagueId: leagueId,
+          matchupNum: matchupNum,
+        );
+      },
+    ),
       GoRoute(
         path: "/league/:id/settings",
         builder: (context, state) {
@@ -248,6 +260,41 @@ class LeagueLoader extends ConsumerWidget {
           default:
             return CommissionerPreDraftScreen(leagueId: leagueId);
         }
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, _) => ErrorScreen(error: err.toString()),
+    );
+  }
+}
+
+class LeagueMatchupsLoader extends ConsumerWidget {
+  final String leagueId;
+  final int matchupNum;
+  
+  const LeagueMatchupsLoader({
+    Key? key,
+    required this.leagueId,
+    required this.matchupNum,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final leaguesAsync = ref.watch(leaguesProvider);
+
+    return leaguesAsync.when(
+      data: (leagues) {
+        final matching = leagues.where((e) => e.id == leagueId);
+        if (matching.isEmpty) {
+          return const ErrorScreen(error: "League Not Found");
+        }
+        final currentLeague = matching.first;
+        return MatchupsTab(
+          league: currentLeague,
+          selectedMatchupIndex: matchupNum,
+          onMatchupChanged: (newMatchupNum) {
+            context.go('/leagues/$leagueId/matchups/$newMatchupNum');
+          },
+        );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, _) => ErrorScreen(error: err.toString()),

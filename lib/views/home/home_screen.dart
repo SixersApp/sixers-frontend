@@ -234,6 +234,7 @@ class HomeScreen extends ConsumerWidget {
                                             team2.teamColor,
                                           ),
                                           leagueName: league.name,
+                                          matchNum: m.matchNum,
                                           gameNumber: "Game ${m.matchNum}",
                                           isLive: false,
                                           matchupId: m.id,
