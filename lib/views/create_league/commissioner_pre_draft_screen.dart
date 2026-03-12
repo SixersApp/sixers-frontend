@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,12 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
+import 'package:sixers/backend/draft/appsync_draft_service.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/backend/leagues/league_service.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/utils/string_to_avatar.dart';
 import 'package:sixers/views/create_league/league_settings_screen.dart';
+import 'package:sixers/views/draft/draft_order_screen.dart';
 import 'package:sixers/views/home/home_screen.dart';
 
 class CommissionerPreDraftScreen extends ConsumerStatefulWidget {
@@ -34,6 +38,7 @@ class _CommissionerPreDraftScreenState
   bool _isCommissioner = false;
 
   final LeagueService _leagueService = LeagueService();
+  StreamSubscription? _draftStartSub;
 
   // wheel ranges & limits
   static const int _minuteRange = 10; // 0..9
@@ -47,10 +52,26 @@ class _CommissionerPreDraftScreenState
   void initState() {
     super.initState();
     _loadLeague();
+    _subscribeToDraftStart();
+  }
+
+  @override
+  void dispose() {
+    _draftStartSub?.cancel();
+    super.dispose();
+  }
+
+  void _subscribeToDraftStart() {
+    _draftStartSub = AppSyncDraftService()
+        .onDraftStart(widget.leagueId)
+        .listen((_) {
+      ref.invalidate(leaguesProvider);
+    });
   }
 
   Future<void> _loadLeague() async {
     try {
+      await ref.read(leaguesProvider.notifier).refresh();
       final leagues = await ref.read(leaguesProvider.future);
       final league = leagues.firstWhere((l) => l.id == widget.leagueId);
       final session = await ref.read(authProviderProvider.future);
@@ -428,9 +449,14 @@ class _CommissionerPreDraftScreenState
                   // Teams List
                   const SizedBox(height: 20),
                   Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
+                    child: RefreshIndicator(
+                      onRefresh: _loadLeague,
+                      color: AppColors.black800,
+                      backgroundColor: AppColors.black200,
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           InkWell(
@@ -480,7 +506,7 @@ class _CommissionerPreDraftScreenState
                           const SizedBox(height: 5),
                           for (var team in _league!.teams)
                             Container(
-                              margin: const EdgeInsets.only(bottom: 9),
+                              margin: const EdgeInsets.only(bottom: 10),
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 color: AppColors.black200,
@@ -539,10 +565,20 @@ class _CommissionerPreDraftScreenState
                                       ],
                                     ),
                                   ),
+                                  if (team.userId == _league!.creatorId)
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: PhosphorIcon(
+                                        PhosphorIcons.crown(PhosphorIconsStyle.fill),
+                                        size: 20,
+                                        color: AppColors.black700,
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
                         ],
+                        ),
                       ),
                     ),
                   ),
@@ -582,15 +618,17 @@ class _CommissionerPreDraftScreenState
                       ),
                     ),
                   ),
-
-                  // Begin Draft Button
+                  if(_isCommissioner)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
                     child: SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // TODO: Navigate to draft screen
+                          context.push(
+                            DraftOrderScreen.route,
+                            extra: {'league': _league},
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.black800,

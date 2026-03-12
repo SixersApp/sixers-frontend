@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,10 @@ import 'package:sixers/theme/app_theme.dart';
 import 'package:sixers/views/router.dart';
 
 late final ui.Image matchupPatternImage;
+late final ui.Image batPatternImage;
+late final ui.Image bowlPatternImage;
+late final ui.Image allrounderPatternImage;
+late final ui.Image wicketkeeperPatternImage;
 
 Future<ui.Image> loadUiImage(String assetPath) async {
   final ByteData data = await rootBundle.load(assetPath);
@@ -21,26 +26,23 @@ Future<ui.Image> loadUiImage(String assetPath) async {
 
 Future<void> _configureAmplify() async {
   final auth = AmplifyAuthCognito();
-  await Amplify.addPlugin(auth);
+  final api = AmplifyAPI();
+  await Amplify.addPlugins([auth, api]);
   await Amplify.configure(amplifyconfig);
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load .env file if it exists, otherwise continue without it
-  try {
-    await dotenv.load(fileName: '.env');
-  } catch (e) {
-    // .env file doesn't exist or is empty, continue without it
-    debugPrint('Warning: Could not load .env file: $e');
-  }
-  
-  await _configureAmplify();
-  // final _authService = new AuthService();
+  await dotenv.load(fileName: '.env');
 
-  // _authService.signOut();
+  await _configureAmplify();
+
   matchupPatternImage = await loadUiImage('assets/matchup_pattern.png');
+  batPatternImage = await loadUiImage('assets/bat_pattern.png');
+  bowlPatternImage = await loadUiImage('assets/bowl_pattern.png');
+  allrounderPatternImage = await loadUiImage('assets/allrounder_pattern.png');
+  wicketkeeperPatternImage = await loadUiImage('assets/wicketkeeper_pattern.png');
   runApp(const ProviderScope(child: SixersApp()));
 }
 

@@ -166,6 +166,30 @@ class LeagueService {
     }
   }
 
+  Future<League> updateDraftOrder({
+    required String leagueId,
+    required List<Map<String, Object>> teamIds,
+  }) async {
+    logInfo('Updating draft order for league $leagueId with teamIds: $teamIds');
+
+    try {
+      final res = await _dio.put(
+        "/leagues/$leagueId/draft-order",
+        data: {"draft_order": teamIds},
+      );
+      logInfo('Update draft order response: ${res.statusCode} - ${res.data}');
+
+      if (res.statusCode != 200) {
+        throw Exception('Failed to update draft order: ${res.statusCode}');
+      }
+
+      return League.fromJson(res.data as Map<String, dynamic>);
+    } catch (e) {
+      logError('Update draft order error: $e');
+      rethrow;
+    }
+  }
+
   Future<List<LeagueScoringRule>> updateLeagueScoringRules({
     required String leagueId,
     required List<LeagueScoringRule> scoringRules,

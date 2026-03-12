@@ -194,8 +194,8 @@ class HomeScreen extends ConsumerWidget {
                                         ),
                                       );
 
-                                      late FantasyTeam team1;
-                                      late FantasyTeam team2;
+                                      FantasyTeam? team1;
+                                      FantasyTeam? team2;
 
                                       for (var team in league.teams) {
                                         if (team.id == m.fantasyTeam1Id) {
@@ -204,6 +204,10 @@ class HomeScreen extends ConsumerWidget {
                                         if (team.id == m.fantasyTeam2Id) {
                                           team2 = team;
                                         }
+                                      }
+
+                                      if (team1 == null || team2 == null) {
+                                        return const SizedBox.shrink();
                                       }
 
                                       return Padding(
