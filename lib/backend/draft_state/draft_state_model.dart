@@ -1,21 +1,36 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sixers/backend/draft_pick/draft_pick_model.dart';
 
 part 'draft_state_model.freezed.dart';
 part 'draft_state_model.g.dart';
 
-enum DraftDirection { forward, reverse }
-
 @freezed
 sealed class DraftState with _$DraftState {
   const factory DraftState({
-    @JsonKey(name: 'league_id') required String leagueId,
-    @JsonKey(name: 'current_pick_number') required int pickNumber,
-    @JsonKey(name: 'current_team_id') required String currentTeamId,
-    @JsonKey(name: 'round_number') required int roundNumber,
-    @JsonKey(name: 'pick_deadline') required DateTime pickDeadline,
-    required DraftDirection direction,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    required String leagueId,
+    required String currentTeamId,
+    required int currentRound,
+    required int currentPick,
+    required String pickExpiresAt,
+    required String status,
+    @Default([]) List<DraftPick> picks,
   }) = _DraftState;
 
-  factory DraftState.fromJson(Map<String, dynamic> json) => _$DraftStateFromJson(json);
+  factory DraftState.fromJson(Map<String, dynamic> json) =>
+      _$DraftStateFromJson(json);
+
+  /// Parse from GraphQL camelCase response.
+  factory DraftState.fromGraphQL(Map<String, dynamic> json) => DraftState(
+        leagueId: json['leagueId'] as String,
+        currentTeamId: json['currentTeamId'] as String,
+        currentRound: json['currentRound'] as int,
+        currentPick: json['currentPick'] as int,
+        pickExpiresAt: json['pickExpiresAt'] as String,
+        status: json['status'] as String,
+        picks: (json['picks'] as List<dynamic>?)
+                ?.map(
+                    (p) => DraftPick.fromGraphQL(p as Map<String, dynamic>))
+                .toList() ??
+            [],
+      );
 }

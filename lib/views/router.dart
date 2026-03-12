@@ -17,6 +17,8 @@ import 'package:sixers/views/create_league/commissioner_pre_draft_screen.dart';
 import 'package:sixers/views/create_league/league_settings_screen.dart';
 import 'package:sixers/views/create_league/join_league_screen.dart';
 import 'package:sixers/views/create_league/league_preview_screen.dart';
+import 'package:sixers/views/draft/draft_order_screen.dart';
+import 'package:sixers/views/draft/draft_screen.dart';
 import 'package:sixers/views/error_screen.dart';
 import 'package:sixers/views/fantasy_matchup/fantasy_matchup_screen.dart';
 import 'package:sixers/views/home/home_screen.dart';
@@ -223,6 +225,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
+      GoRoute(
+        path: DraftOrderScreen.route,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return DraftOrderScreen(league: extra['league'] as League);
+        },
+      ),
     ],
   );
 });
@@ -244,7 +253,7 @@ class LeagueLoader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final leaguesAsync = ref.watch(leaguesProvider);
 
-    return leaguesAsync.when(
+    return leaguesAsync.when<Widget>(
       data: (leagues) {
         final matching = leagues.where((e) => e.id == leagueId);
         if (matching.isEmpty) {
@@ -255,7 +264,7 @@ class LeagueLoader extends ConsumerWidget {
           case LeagueStatus.draft_pending:
             return CommissionerPreDraftScreen(leagueId: leagueId);
           case LeagueStatus.draft_in_progress:
-            return CommissionerPreDraftScreen(leagueId: leagueId);
+            return DraftScreen(leagueId: leagueId);
           default:
             return CommissionerPreDraftScreen(leagueId: leagueId);
         }

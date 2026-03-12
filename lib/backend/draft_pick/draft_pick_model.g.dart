@@ -7,20 +7,20 @@ part of 'draft_pick_model.dart';
 // **************************************************************************
 
 _DraftPick _$DraftPickFromJson(Map<String, dynamic> json) => _DraftPick(
-  leagueId: json['league_id'] as String,
-  pickNumber: (json['pick_number'] as num).toInt(),
-  teamId: json['fantasy_team_id'] as String,
-  playerId: json['player_id'] as String,
-  pickTime: json['pick_time'] == null
-      ? null
-      : DateTime.parse(json['pick_time'] as String),
+  leagueId: json['leagueId'] as String,
+  pickNumber: (json['pickNumber'] as num).toInt(),
+  teamId: json['teamId'] as String,
+  playerId: json['playerId'] as String,
+  roundNumber: (json['roundNumber'] as num).toInt(),
+  timestamp: json['timestamp'] as String?,
 );
 
 Map<String, dynamic> _$DraftPickToJson(_DraftPick instance) =>
     <String, dynamic>{
-      'league_id': instance.leagueId,
-      'pick_number': instance.pickNumber,
-      'fantasy_team_id': instance.teamId,
-      'player_id': instance.playerId,
-      'pick_time': instance.pickTime?.toIso8601String(),
+      'leagueId': instance.leagueId,
+      'pickNumber': instance.pickNumber,
+      'teamId': instance.teamId,
+      'playerId': instance.playerId,
+      'roundNumber': instance.roundNumber,
+      'timestamp': instance.timestamp,
     };

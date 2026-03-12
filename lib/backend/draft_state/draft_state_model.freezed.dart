@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DraftState {
 
-@JsonKey(name: 'league_id') String get leagueId;@JsonKey(name: 'current_pick_number') int get pickNumber;@JsonKey(name: 'current_team_id') String get currentTeamId;@JsonKey(name: 'round_number') int get roundNumber;@JsonKey(name: 'pick_deadline') DateTime get pickDeadline; DraftDirection get direction;@JsonKey(name: 'updated_at') DateTime? get updatedAt;
+ String get leagueId; String get currentTeamId; int get currentRound; int get currentPick; String get pickExpiresAt; String get status; List<DraftPick> get picks;
 /// Create a copy of DraftState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $DraftStateCopyWith<DraftState> get copyWith => _$DraftStateCopyWithImpl<DraftSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DraftState&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.pickNumber, pickNumber) || other.pickNumber == pickNumber)&&(identical(other.currentTeamId, currentTeamId) || other.currentTeamId == currentTeamId)&&(identical(other.roundNumber, roundNumber) || other.roundNumber == roundNumber)&&(identical(other.pickDeadline, pickDeadline) || other.pickDeadline == pickDeadline)&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DraftState&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.currentTeamId, currentTeamId) || other.currentTeamId == currentTeamId)&&(identical(other.currentRound, currentRound) || other.currentRound == currentRound)&&(identical(other.currentPick, currentPick) || other.currentPick == currentPick)&&(identical(other.pickExpiresAt, pickExpiresAt) || other.pickExpiresAt == pickExpiresAt)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.picks, picks));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,leagueId,pickNumber,currentTeamId,roundNumber,pickDeadline,direction,updatedAt);
+int get hashCode => Object.hash(runtimeType,leagueId,currentTeamId,currentRound,currentPick,pickExpiresAt,status,const DeepCollectionEquality().hash(picks));
 
 @override
 String toString() {
-  return 'DraftState(leagueId: $leagueId, pickNumber: $pickNumber, currentTeamId: $currentTeamId, roundNumber: $roundNumber, pickDeadline: $pickDeadline, direction: $direction, updatedAt: $updatedAt)';
+  return 'DraftState(leagueId: $leagueId, currentTeamId: $currentTeamId, currentRound: $currentRound, currentPick: $currentPick, pickExpiresAt: $pickExpiresAt, status: $status, picks: $picks)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $DraftStateCopyWith<$Res>  {
   factory $DraftStateCopyWith(DraftState value, $Res Function(DraftState) _then) = _$DraftStateCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'league_id') String leagueId,@JsonKey(name: 'current_pick_number') int pickNumber,@JsonKey(name: 'current_team_id') String currentTeamId,@JsonKey(name: 'round_number') int roundNumber,@JsonKey(name: 'pick_deadline') DateTime pickDeadline, DraftDirection direction,@JsonKey(name: 'updated_at') DateTime? updatedAt
+ String leagueId, String currentTeamId, int currentRound, int currentPick, String pickExpiresAt, String status, List<DraftPick> picks
 });
 
 
@@ -65,16 +65,16 @@ class _$DraftStateCopyWithImpl<$Res>
 
 /// Create a copy of DraftState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? leagueId = null,Object? pickNumber = null,Object? currentTeamId = null,Object? roundNumber = null,Object? pickDeadline = null,Object? direction = null,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? leagueId = null,Object? currentTeamId = null,Object? currentRound = null,Object? currentPick = null,Object? pickExpiresAt = null,Object? status = null,Object? picks = null,}) {
   return _then(_self.copyWith(
 leagueId: null == leagueId ? _self.leagueId : leagueId // ignore: cast_nullable_to_non_nullable
-as String,pickNumber: null == pickNumber ? _self.pickNumber : pickNumber // ignore: cast_nullable_to_non_nullable
-as int,currentTeamId: null == currentTeamId ? _self.currentTeamId : currentTeamId // ignore: cast_nullable_to_non_nullable
-as String,roundNumber: null == roundNumber ? _self.roundNumber : roundNumber // ignore: cast_nullable_to_non_nullable
-as int,pickDeadline: null == pickDeadline ? _self.pickDeadline : pickDeadline // ignore: cast_nullable_to_non_nullable
-as DateTime,direction: null == direction ? _self.direction : direction // ignore: cast_nullable_to_non_nullable
-as DraftDirection,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as String,currentTeamId: null == currentTeamId ? _self.currentTeamId : currentTeamId // ignore: cast_nullable_to_non_nullable
+as String,currentRound: null == currentRound ? _self.currentRound : currentRound // ignore: cast_nullable_to_non_nullable
+as int,currentPick: null == currentPick ? _self.currentPick : currentPick // ignore: cast_nullable_to_non_nullable
+as int,pickExpiresAt: null == pickExpiresAt ? _self.pickExpiresAt : pickExpiresAt // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,picks: null == picks ? _self.picks : picks // ignore: cast_nullable_to_non_nullable
+as List<DraftPick>,
   ));
 }
 
@@ -156,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'league_id')  String leagueId, @JsonKey(name: 'current_pick_number')  int pickNumber, @JsonKey(name: 'current_team_id')  String currentTeamId, @JsonKey(name: 'round_number')  int roundNumber, @JsonKey(name: 'pick_deadline')  DateTime pickDeadline,  DraftDirection direction, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String leagueId,  String currentTeamId,  int currentRound,  int currentPick,  String pickExpiresAt,  String status,  List<DraftPick> picks)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DraftState() when $default != null:
-return $default(_that.leagueId,_that.pickNumber,_that.currentTeamId,_that.roundNumber,_that.pickDeadline,_that.direction,_that.updatedAt);case _:
+return $default(_that.leagueId,_that.currentTeamId,_that.currentRound,_that.currentPick,_that.pickExpiresAt,_that.status,_that.picks);case _:
   return orElse();
 
 }
@@ -177,10 +177,10 @@ return $default(_that.leagueId,_that.pickNumber,_that.currentTeamId,_that.roundN
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'league_id')  String leagueId, @JsonKey(name: 'current_pick_number')  int pickNumber, @JsonKey(name: 'current_team_id')  String currentTeamId, @JsonKey(name: 'round_number')  int roundNumber, @JsonKey(name: 'pick_deadline')  DateTime pickDeadline,  DraftDirection direction, @JsonKey(name: 'updated_at')  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String leagueId,  String currentTeamId,  int currentRound,  int currentPick,  String pickExpiresAt,  String status,  List<DraftPick> picks)  $default,) {final _that = this;
 switch (_that) {
 case _DraftState():
-return $default(_that.leagueId,_that.pickNumber,_that.currentTeamId,_that.roundNumber,_that.pickDeadline,_that.direction,_that.updatedAt);}
+return $default(_that.leagueId,_that.currentTeamId,_that.currentRound,_that.currentPick,_that.pickExpiresAt,_that.status,_that.picks);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -194,10 +194,10 @@ return $default(_that.leagueId,_that.pickNumber,_that.currentTeamId,_that.roundN
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'league_id')  String leagueId, @JsonKey(name: 'current_pick_number')  int pickNumber, @JsonKey(name: 'current_team_id')  String currentTeamId, @JsonKey(name: 'round_number')  int roundNumber, @JsonKey(name: 'pick_deadline')  DateTime pickDeadline,  DraftDirection direction, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String leagueId,  String currentTeamId,  int currentRound,  int currentPick,  String pickExpiresAt,  String status,  List<DraftPick> picks)?  $default,) {final _that = this;
 switch (_that) {
 case _DraftState() when $default != null:
-return $default(_that.leagueId,_that.pickNumber,_that.currentTeamId,_that.roundNumber,_that.pickDeadline,_that.direction,_that.updatedAt);case _:
+return $default(_that.leagueId,_that.currentTeamId,_that.currentRound,_that.currentPick,_that.pickExpiresAt,_that.status,_that.picks);case _:
   return null;
 
 }
@@ -209,16 +209,22 @@ return $default(_that.leagueId,_that.pickNumber,_that.currentTeamId,_that.roundN
 @JsonSerializable()
 
 class _DraftState implements DraftState {
-  const _DraftState({@JsonKey(name: 'league_id') required this.leagueId, @JsonKey(name: 'current_pick_number') required this.pickNumber, @JsonKey(name: 'current_team_id') required this.currentTeamId, @JsonKey(name: 'round_number') required this.roundNumber, @JsonKey(name: 'pick_deadline') required this.pickDeadline, required this.direction, @JsonKey(name: 'updated_at') this.updatedAt});
+  const _DraftState({required this.leagueId, required this.currentTeamId, required this.currentRound, required this.currentPick, required this.pickExpiresAt, required this.status, final  List<DraftPick> picks = const []}): _picks = picks;
   factory _DraftState.fromJson(Map<String, dynamic> json) => _$DraftStateFromJson(json);
 
-@override@JsonKey(name: 'league_id') final  String leagueId;
-@override@JsonKey(name: 'current_pick_number') final  int pickNumber;
-@override@JsonKey(name: 'current_team_id') final  String currentTeamId;
-@override@JsonKey(name: 'round_number') final  int roundNumber;
-@override@JsonKey(name: 'pick_deadline') final  DateTime pickDeadline;
-@override final  DraftDirection direction;
-@override@JsonKey(name: 'updated_at') final  DateTime? updatedAt;
+@override final  String leagueId;
+@override final  String currentTeamId;
+@override final  int currentRound;
+@override final  int currentPick;
+@override final  String pickExpiresAt;
+@override final  String status;
+ final  List<DraftPick> _picks;
+@override@JsonKey() List<DraftPick> get picks {
+  if (_picks is EqualUnmodifiableListView) return _picks;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_picks);
+}
+
 
 /// Create a copy of DraftState
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DraftState&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.pickNumber, pickNumber) || other.pickNumber == pickNumber)&&(identical(other.currentTeamId, currentTeamId) || other.currentTeamId == currentTeamId)&&(identical(other.roundNumber, roundNumber) || other.roundNumber == roundNumber)&&(identical(other.pickDeadline, pickDeadline) || other.pickDeadline == pickDeadline)&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DraftState&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.currentTeamId, currentTeamId) || other.currentTeamId == currentTeamId)&&(identical(other.currentRound, currentRound) || other.currentRound == currentRound)&&(identical(other.currentPick, currentPick) || other.currentPick == currentPick)&&(identical(other.pickExpiresAt, pickExpiresAt) || other.pickExpiresAt == pickExpiresAt)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._picks, _picks));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,leagueId,pickNumber,currentTeamId,roundNumber,pickDeadline,direction,updatedAt);
+int get hashCode => Object.hash(runtimeType,leagueId,currentTeamId,currentRound,currentPick,pickExpiresAt,status,const DeepCollectionEquality().hash(_picks));
 
 @override
 String toString() {
-  return 'DraftState(leagueId: $leagueId, pickNumber: $pickNumber, currentTeamId: $currentTeamId, roundNumber: $roundNumber, pickDeadline: $pickDeadline, direction: $direction, updatedAt: $updatedAt)';
+  return 'DraftState(leagueId: $leagueId, currentTeamId: $currentTeamId, currentRound: $currentRound, currentPick: $currentPick, pickExpiresAt: $pickExpiresAt, status: $status, picks: $picks)';
 }
 
 
@@ -253,7 +259,7 @@ abstract mixin class _$DraftStateCopyWith<$Res> implements $DraftStateCopyWith<$
   factory _$DraftStateCopyWith(_DraftState value, $Res Function(_DraftState) _then) = __$DraftStateCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'league_id') String leagueId,@JsonKey(name: 'current_pick_number') int pickNumber,@JsonKey(name: 'current_team_id') String currentTeamId,@JsonKey(name: 'round_number') int roundNumber,@JsonKey(name: 'pick_deadline') DateTime pickDeadline, DraftDirection direction,@JsonKey(name: 'updated_at') DateTime? updatedAt
+ String leagueId, String currentTeamId, int currentRound, int currentPick, String pickExpiresAt, String status, List<DraftPick> picks
 });
 
 
@@ -270,16 +276,16 @@ class __$DraftStateCopyWithImpl<$Res>
 
 /// Create a copy of DraftState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? leagueId = null,Object? pickNumber = null,Object? currentTeamId = null,Object? roundNumber = null,Object? pickDeadline = null,Object? direction = null,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? leagueId = null,Object? currentTeamId = null,Object? currentRound = null,Object? currentPick = null,Object? pickExpiresAt = null,Object? status = null,Object? picks = null,}) {
   return _then(_DraftState(
 leagueId: null == leagueId ? _self.leagueId : leagueId // ignore: cast_nullable_to_non_nullable
-as String,pickNumber: null == pickNumber ? _self.pickNumber : pickNumber // ignore: cast_nullable_to_non_nullable
-as int,currentTeamId: null == currentTeamId ? _self.currentTeamId : currentTeamId // ignore: cast_nullable_to_non_nullable
-as String,roundNumber: null == roundNumber ? _self.roundNumber : roundNumber // ignore: cast_nullable_to_non_nullable
-as int,pickDeadline: null == pickDeadline ? _self.pickDeadline : pickDeadline // ignore: cast_nullable_to_non_nullable
-as DateTime,direction: null == direction ? _self.direction : direction // ignore: cast_nullable_to_non_nullable
-as DraftDirection,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as String,currentTeamId: null == currentTeamId ? _self.currentTeamId : currentTeamId // ignore: cast_nullable_to_non_nullable
+as String,currentRound: null == currentRound ? _self.currentRound : currentRound // ignore: cast_nullable_to_non_nullable
+as int,currentPick: null == currentPick ? _self.currentPick : currentPick // ignore: cast_nullable_to_non_nullable
+as int,pickExpiresAt: null == pickExpiresAt ? _self.pickExpiresAt : pickExpiresAt // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,picks: null == picks ? _self._picks : picks // ignore: cast_nullable_to_non_nullable
+as List<DraftPick>,
   ));
 }
 

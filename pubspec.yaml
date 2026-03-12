@@ -49,6 +49,7 @@ dependencies:
     logger: ^2.6.1
     amplify_flutter: ^2.6.5
     amplify_auth_cognito: ^2.6.5
+    amplify_api: ^2.6.5
     dio: ^5.9.0
     async: ^2.13.0
     flutter_native_splash: ^2.4.7
@@ -85,6 +86,10 @@ flutter:
         - assets/app_icon.png
         - assets/sixers_logo.png
         - assets/matchup_pattern.png
+        - assets/bat_pattern.png
+        - assets/bowl_pattern.png
+        - assets/allrounder_pattern.png
+        - assets/wicketkeeper_pattern.png
         - assets/splash_logo.png
         - assets/images/
         - assets/images/mascots/

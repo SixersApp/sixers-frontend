@@ -7,29 +7,26 @@ part of 'draft_state_model.dart';
 // **************************************************************************
 
 _DraftState _$DraftStateFromJson(Map<String, dynamic> json) => _DraftState(
-  leagueId: json['league_id'] as String,
-  pickNumber: (json['current_pick_number'] as num).toInt(),
-  currentTeamId: json['current_team_id'] as String,
-  roundNumber: (json['round_number'] as num).toInt(),
-  pickDeadline: DateTime.parse(json['pick_deadline'] as String),
-  direction: $enumDecode(_$DraftDirectionEnumMap, json['direction']),
-  updatedAt: json['updated_at'] == null
-      ? null
-      : DateTime.parse(json['updated_at'] as String),
+  leagueId: json['leagueId'] as String,
+  currentTeamId: json['currentTeamId'] as String,
+  currentRound: (json['currentRound'] as num).toInt(),
+  currentPick: (json['currentPick'] as num).toInt(),
+  pickExpiresAt: json['pickExpiresAt'] as String,
+  status: json['status'] as String,
+  picks:
+      (json['picks'] as List<dynamic>?)
+          ?.map((e) => DraftPick.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$DraftStateToJson(_DraftState instance) =>
     <String, dynamic>{
-      'league_id': instance.leagueId,
-      'current_pick_number': instance.pickNumber,
-      'current_team_id': instance.currentTeamId,
-      'round_number': instance.roundNumber,
-      'pick_deadline': instance.pickDeadline.toIso8601String(),
-      'direction': _$DraftDirectionEnumMap[instance.direction]!,
-      'updated_at': instance.updatedAt?.toIso8601String(),
+      'leagueId': instance.leagueId,
+      'currentTeamId': instance.currentTeamId,
+      'currentRound': instance.currentRound,
+      'currentPick': instance.currentPick,
+      'pickExpiresAt': instance.pickExpiresAt,
+      'status': instance.status,
+      'picks': instance.picks,
     };
-
-const _$DraftDirectionEnumMap = {
-  DraftDirection.forward: 'forward',
-  DraftDirection.reverse: 'reverse',
-};

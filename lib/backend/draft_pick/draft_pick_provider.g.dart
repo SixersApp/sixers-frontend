@@ -64,7 +64,7 @@ final class DraftPicksProvider
   }
 }
 
-String _$draftPicksHash() => r'9156683ca9f4acacb0f0fc77fc47a011530d193b';
+String _$draftPicksHash() => r'e31c9e9cf0a6dee7a85266dd9e1d0bbc95263a01';
 
 final class DraftPicksFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<DraftPick>>, String> {
@@ -116,7 +116,7 @@ final class DraftPickActionsProvider
   }
 }
 
-String _$draftPickActionsHash() => r'fe014cc0da4480d9f7291b0dbdd8184f5489b1d4';
+String _$draftPickActionsHash() => r'acc8141892d14d3abda8ca97063bd3f335d6ab82';
 
 abstract class _$DraftPickActions extends $Notifier<void> {
   void build();

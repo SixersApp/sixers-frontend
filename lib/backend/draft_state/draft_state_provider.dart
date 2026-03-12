@@ -1,6 +1,6 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sixers/backend/draft/appsync_draft_service.dart';
 import 'package:sixers/backend/draft_pick/draft_pick_provider.dart';
 import 'package:sixers/backend/leagues/league_provider.dart';
 import 'draft_state_model.dart';
@@ -8,23 +8,23 @@ import 'draft_state_service.dart';
 
 part 'draft_state_provider.g.dart';
 
-
 final draftStateServiceProvider = Provider<DraftStateService>((ref) {
   return DraftStateService();
 });
 
 @Riverpod(keepAlive: true)
-Stream<DraftState?> draftStateStream(WidgetRef ref, String leagueId) async* {
+Stream<DraftState?> draftStateStream(Ref ref, String leagueId) async* {
   final svc = DraftStateService();
+  final appsync = AppSyncDraftService();
 
-  final initial = await svc.fetch(leagueId); 
+  final initial = await svc.fetch(leagueId);
   yield initial;
 
-
-  await for (final s in svc.stream(leagueId)) {
-  
+  await for (final _ in appsync.onDraftPick(leagueId)) {
     ref.invalidate(draftPicksProvider(leagueId));
     ref.invalidate(leaguesProvider);
-    yield s; 
+    // Re-fetch the full draft state after each pick event
+    final updated = await svc.fetch(leagueId);
+    yield updated;
   }
 }
