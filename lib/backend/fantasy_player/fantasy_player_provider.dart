@@ -24,7 +24,6 @@ class FantasyPlayerController extends _$FantasyPlayerController {
   }
 
   Future<void> refresh() async {
-
     final newState = await AsyncValue.guard(() {
       return _service.fetchFantasyPlayers(ftiId);
     });

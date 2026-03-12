@@ -112,7 +112,7 @@ final class LeagueTeamsProvider
   }
 }
 
-String _$leagueTeamsHash() => r'7c3877763f7851a83b36ae97e747dc71d2ac9401';
+String _$leagueTeamsHash() => r'6c4c73ff55619f137e0166cd0cc59cce0136280c';
 
 final class LeagueTeamsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<FantasyTeam>>, String> {
@@ -187,7 +187,7 @@ final class UserTeamInLeagueProvider
   }
 }
 
-String _$userTeamInLeagueHash() => r'8107b525f9cceacc9f5c77d685ae198d058eb05c';
+String _$userTeamInLeagueHash() => r'146bf27d711c6ef82a2f08a16521aa636979b627';
 
 final class UserTeamInLeagueFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<FantasyTeam?>, String> {

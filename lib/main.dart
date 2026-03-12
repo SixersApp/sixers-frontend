@@ -35,6 +35,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: '.env');
+
   await _configureAmplify();
 
   matchupPatternImage = await loadUiImage('assets/matchup_pattern.png');

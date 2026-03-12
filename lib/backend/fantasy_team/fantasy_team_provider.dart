@@ -57,11 +57,11 @@ class FantasyTeams extends _$FantasyTeams {
 // -------------------- Helper Providers (unchanged) --------------------
 //
 @riverpod
-Future<List<FantasyTeam>> leagueTeams(WidgetRef ref, String leagueId) {
+Future<List<FantasyTeam>> leagueTeams(Ref ref, String leagueId) {
   return ref.watch(fantasyTeamsProvider.notifier).getTeamsInLeague(leagueId);
 }
 
 @riverpod
-Future<FantasyTeam?> userTeamInLeague(WidgetRef ref, String leagueId) {
+Future<FantasyTeam?> userTeamInLeague(Ref ref, String leagueId) {
   return ref.watch(fantasyTeamsProvider.notifier).getTeamForLeague(leagueId);
 }

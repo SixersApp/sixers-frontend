@@ -39,8 +39,7 @@ class AuthService {
       final appSession = await _buildSessionFromCognito();
       ApiClient.setAuthToken(appSession.idToken);
 
-      // print(appSession.userId);
-      logInfo(appSession.idToken);
+      printIdToken(appSession.idToken);
 
       if (firstTime){
         initUserInBackend(appSession);

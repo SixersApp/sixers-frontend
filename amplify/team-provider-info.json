@@ -11,6 +11,26 @@
       "StackId": "arn:aws:cloudformation:us-west-2:804320730546:stack/amplify-sixersscoring-dev-17eb3/18b8e1d0-bc5f-11f0-828e-02f368145315",
       "AmplifyAppId": "d2mke2k84o44ok",
       "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-sixersscoring-dev-17eb3-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
+    },
+    "categories": {
+      "function": {
+        "sixersScoringTournament": {
+          "secretsPathAmplifyAppId": "d2mke2k84o44ok",
+          "deploymentBucketName": "amplify-sixersscoring-dev-17eb3-deployment",
+          "s3Key": "amplify-builds/sixersScoringTournament-654a51696b6669424479-build.zip"
+        },
+        "sixersScoringSeason": {
+          "deploymentBucketName": "amplify-sixersscoring-dev-17eb3-deployment",
+          "s3Key": "amplify-builds/sixersScoringSeason-4a383142415a6665345a-build.zip"
+        },
+        "sixersscoringSixersAPIShared": {
+          "deploymentBucketName": "amplify-sixersscoring-dev-17eb3-deployment",
+          "s3Key": "amplify-builds/sixersscoringSixersAPIShared-LambdaLayerVersiona461565b-build.zip"
+        }
+      },
+      "auth": {
+        "sixersscoring893e2197": {}
+      }
     }
   }
 }

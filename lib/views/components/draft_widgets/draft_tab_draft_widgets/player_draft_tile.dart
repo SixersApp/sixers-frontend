@@ -89,10 +89,10 @@ class PlayerDraftTile extends StatelessWidget {
                     Container(
                       width: 20,
                       height: 20,
-                      padding: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(color: r.color, borderRadius: BorderRadius.circular(5)),
                       alignment: Alignment.center,
-                      child: Icon(r.icon as IconData?, size: 12, color: AppColors.black800),
+                      child: Image.asset(r.iconPath, width: 16, height: 16, fit: BoxFit.contain),
                     ),
                   ],
                 ),

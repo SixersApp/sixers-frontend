@@ -3,73 +3,125 @@ import '../fantasy_team/fantasy_team_provider.dart';
 import 'fantasy_team_instance_model.dart';
 import 'fantasy_team_instance_service.dart';
 
-final fantasyTeamInstanceProvider =
-    AsyncNotifierProvider<FantasyTeamInstanceNotifier, FantasyTeamInstance?>(
-      FantasyTeamInstanceNotifier.new,
-    );
+final fantasyTeamInstancesProvider = AsyncNotifierProvider<FantasyTeamInstancesNotifier, List<FantasyTeamInstance>>(
+  FantasyTeamInstancesNotifier.new,
+);
 
-class FantasyTeamInstanceNotifier extends AsyncNotifier<FantasyTeamInstance?> {
+class FantasyTeamInstancesNotifier extends AsyncNotifier<List<FantasyTeamInstance>> {
   late final FantasyTeamInstanceService _service;
+  String? _currentTeamId;
 
   @override
-  Future<FantasyTeamInstance?> build() async {
-    // default state is null
+  Future<List<FantasyTeamInstance>> build() async {
+    // default state is empty list
     _service = FantasyTeamInstanceService();
-    return null;
+    return [];
   }
 
   // ============================================================
-  // 🔹 FUNCTION 1: Direct lookup by fantasyTeamId + matchNum
+  // 🔹 FUNCTION 1: Load all instances for a fantasy team
   // ============================================================
-  Future<FantasyTeamInstance?> getInstance({
-    required String fantasyTeamId,
-    required int matchNum,
-  }) async {
-    final instance = await _service.getInstance(
-      fantasyTeamId: fantasyTeamId,
-      matchNum: matchNum,
-    );
-    state = AsyncData(instance);
-    return instance;
+  Future<List<FantasyTeamInstance>> loadAllInstances({required String fantasy_team_id}) async {
+    state = const AsyncLoading();
+    _currentTeamId = fantasy_team_id;
+    final instances = await _service.getAllInstances(fantasy_team_id: fantasy_team_id);
+    state = AsyncData(instances);
+    return instances;
   }
 
   // ============================================================
-  // 🔹 FUNCTION 2: Lookup instance using leagueId + matchNum
-  //    → Automatically finds the user's fantasy team
+  // 🔹 FUNCTION 2: Load all instances for a league (finds user's team first)
   // ============================================================
-  Future<FantasyTeamInstance?> getInstanceForLeague({
-    required String leagueId,
-    required int matchNum,
-  }) async {
-    final userTeam = await ref
-        .read(fantasyTeamsProvider.notifier)
-        .getTeamForLeague(leagueId);
+  Future<List<FantasyTeamInstance>> loadAllInstancesForLeague({required String leagueId}) async {
+    state = const AsyncLoading();
+
+    final userTeam = await ref.read(fantasyTeamsProvider.notifier).getTeamForLeague(leagueId);
 
     if (userTeam == null) {
-      state = const AsyncData(null);
-      return null;
+      state = const AsyncData([]);
+      return [];
     }
 
-    final instance = await _service.getInstance(
-      fantasyTeamId: userTeam.id,
-      matchNum: matchNum,
-    );
-
-    state = AsyncData(instance);
-    return instance;
+    return await loadAllInstances(fantasy_team_id: userTeam.id);
   }
 
   // ============================================================
-  // 🔹 FUNCTION 3: Refresh last-loaded instance
+  // 🔹 FUNCTION 3: Get a specific instance by match number from loaded instances
+  // ============================================================
+  FantasyTeamInstance? getInstanceByMatchNum(int match_num) {
+    final instances = state.value;
+    if (instances == null) return null;
+
+    try {
+      return instances.firstWhere((instance) => instance.match_num == match_num);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // ============================================================
+  // 🔹 FUNCTION 4: Refresh all instances
   // ============================================================
   Future<void> refresh() async {
-    final previous = state.value;
+    if (_currentTeamId == null) return;
+    await loadAllInstances(fantasy_team_id: _currentTeamId!);
+  }
 
-    if (previous == null) return;
+  // ============================================================
+  // 🔹 FUNCTION 4b: Silently refresh instances without loading state
+  // ============================================================
+  Future<void> silentRefresh() async {
+    if (_currentTeamId == null) return;
+    try {
+      final instances = await _service.getAllInstances(fantasy_team_id: _currentTeamId!);
+      state = AsyncData(instances);
+    } catch (e, stack) {
+      // Keep the current state if refresh fails
+      state = AsyncError(e, stack);
+    }
+  }
 
-    await getInstance(
-      fantasyTeamId: previous.fantasyTeamId,
-      matchNum: previous.matchNum,
+  // ============================================================
+  // 🔹 FUNCTION 5: Swap slots in a fantasy team instance
+  // ============================================================
+  Future<Map<String, dynamic>> swapSlots({
+    required String ftiId,
+    required String slot1,
+    required String slot2,
+  }) async {
+    final result = await _service.swapSlots(
+      ftiId: ftiId,
+      slot1: slot1,
+      slot2: slot2,
     );
+
+    // Silently refresh instances after swap without showing loading state
+    if (result['ok'] == true) {
+      await silentRefresh();
+    }
+
+    return result;
+  }
+
+  // ============================================================
+  // 🔹 FUNCTION 6: Update captains in a fantasy team instance
+  // ============================================================
+  Future<Map<String, dynamic>> updateCaptains({
+    required String ftiId,
+    required String captain,
+    required String viceCaptain,
+  }) async {
+    final result = await _service.updateCaptains(
+      ftiId: ftiId,
+      captain: captain,
+      viceCaptain: viceCaptain,
+    );
+
+    // Silently refresh instances after captain update without showing loading state
+    if (result['ok'] == true) {
+      await silentRefresh();
+    }
+
+    return result;
   }
 }
