@@ -9,7 +9,6 @@ import 'package:sixers/backend/leagues/league_service.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/utils/logger.dart';
 import 'package:sixers/utils/string_to_avatar.dart';
-import 'package:sixers/views/create_league/commissioner_pre_draft_screen.dart';
 
 class CreateTeamScreen extends ConsumerStatefulWidget {
   static const String route = '/create-team';
@@ -17,6 +16,7 @@ class CreateTeamScreen extends ConsumerStatefulWidget {
   // For creating a new league
   final String? leagueName;
   final String? tournamentId;
+  final int? maxTeams;
   final List<LeagueScoringRule>? scoringRules;
 
   // For joining an existing league
@@ -27,6 +27,7 @@ class CreateTeamScreen extends ConsumerStatefulWidget {
     super.key,
     this.leagueName,
     this.tournamentId,
+    this.maxTeams,
     this.scoringRules,
     this.leagueToJoin,
     this.joinCode,
@@ -127,6 +128,7 @@ class _CreateTeamScreenState extends ConsumerState<CreateTeamScreen> {
           teamColor: _getColorName(_selectedColor),
           teamAbbreviation: teamAbbr,
           teamIcon: _selectedMascot,
+          maxTeams: widget.maxTeams!,
           scoringRules: widget.scoringRules,
         );
       }

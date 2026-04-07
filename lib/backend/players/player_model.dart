@@ -23,4 +23,4 @@ sealed class Player with _$Player {
   factory Player.fromJson(Map<String, dynamic> json) => _$PlayerFromJson(json);
 }
 
-enum PositionFilter { all, batsman, bowler, wicketKeeper, allRounder }
+enum PositionFilter { all, batsman, bowler, allRounder, wicketKeeper }

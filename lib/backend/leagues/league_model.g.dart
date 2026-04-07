@@ -31,6 +31,7 @@ _League _$LeagueFromJson(Map<String, dynamic> json) => _League(
   joinCode: json['join_code'] as String,
   seasonId: json['season_id'] as String,
   latestGame: (json['latest_game'] as num?)?.toInt() ?? 0,
+  weeks: (json['total_games'] as num?)?.toInt() ?? 0,
   teams: (json['teams'] as List<dynamic>)
       .map((e) => FantasyTeam.fromJson(e as Map<String, dynamic>))
       .toList(),
@@ -57,6 +58,7 @@ Map<String, dynamic> _$LeagueToJson(_League instance) => <String, dynamic>{
   'join_code': instance.joinCode,
   'season_id': instance.seasonId,
   'latest_game': instance.latestGame,
+  'total_games': instance.weeks,
   'teams': instance.teams,
   'tournament_abbr': instance.tournamentAbbr,
   'season_year': instance.seasonYear,

@@ -9,6 +9,7 @@ part of 'draft_pick_result_model.dart';
 _DraftPickResult _$DraftPickResultFromJson(Map<String, dynamic> json) =>
     _DraftPickResult(
       pick: DraftPick.fromJson(json['pick'] as Map<String, dynamic>),
+      leagueId: json['leagueId'] as String?,
       nextTeamId: json['nextTeamId'] as String?,
       nextPickExpiresAt: json['nextPickExpiresAt'] as String?,
     );
@@ -16,6 +17,7 @@ _DraftPickResult _$DraftPickResultFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$DraftPickResultToJson(_DraftPickResult instance) =>
     <String, dynamic>{
       'pick': instance.pick,
+      'leagueId': instance.leagueId,
       'nextTeamId': instance.nextTeamId,
       'nextPickExpiresAt': instance.nextPickExpiresAt,
     };

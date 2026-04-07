@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sixers/backend/match/match_provider.dart';
+import 'package:sixers/backend/live_match/live_match_provider.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/views/components/matches/match_card.dart';
 
@@ -28,63 +28,61 @@ class _MatchFeedSectionImplState extends ConsumerState<_MatchFeedSectionImpl> {
 
   @override
   Widget build(BuildContext context) {
-    final feedData = ref.watch(matchFeedProvider);
+    final liveData = ref.watch(liveMatchesProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        //_header(context),
-        feedData.when(
+        liveData.when(
           loading: () => const Center(
             child: CircularProgressIndicator(color: Colors.white),
           ),
           error: (e, _) =>
               Text("Error: $e", style: const TextStyle(color: Colors.red)),
-
-          data: (list) {
-            if (list.isEmpty) {
+          data: (matchMap) {
+            if (matchMap.isEmpty) {
               return const Text(
                 "Join a league to see relevant real life matches",
                 style: TextStyle(color: Colors.white70),
               );
             }
 
-            // Combine all matches with tournament metadata
-            final combined = <Map<String, dynamic>>[];
-            for (final fg in list) {
-              final matches = fg.matches;
-              for (final m in matches) {
-                combined.add({
-                  'match': m,
-                  'tournamentId': fg.tournamentId,
-                  'tournamentName': fg.tournamentName,
-                });
-              }
+            final matches = matchMap.values.toList();
+
+            // Sort: live first, then upcoming, then finished
+            int statusOrder(String status) {
+              final s = status.toUpperCase();
+              if (s == 'LIVE') return 0;
+              if (s == 'FINISHED' || s == 'ABAN') return 2;
+              return 1; // NS / upcoming
             }
 
-            // Sort: live matches first, then by start date (earliest first)
-            combined.sort((a, b) {
-              final aMatch = a['match'];
-              final bMatch = b['match'];
+            matches.sort((a, b) {
+              final cmp = statusOrder(a.status).compareTo(statusOrder(b.status));
+              if (cmp != 0) return cmp;
 
-              final aLive =
-                  (aMatch?.status ?? '').toString().toLowerCase() == 'live';
-              final bLive =
-                  (bMatch?.status ?? '').toString().toLowerCase() == 'live';
-              if (aLive != bLive) return aLive ? -1 : 1;
-
-              final aDt =
-                  DateTime.tryParse(aMatch?.matchDate ?? '') ?? DateTime(9999);
-              final bDt =
-                  DateTime.tryParse(bMatch?.matchDate ?? '') ?? DateTime(9999);
+              final aDt = DateTime.tryParse(a.matchDate) ?? DateTime(9999);
+              final bDt = DateTime.tryParse(b.matchDate) ?? DateTime(9999);
               return aDt.compareTo(bDt);
             });
 
+            // Build tournament filter chips
+            final tournamentIds = <String>{};
+            final tournamentAbbreviations = <String, String>{};
+            for (final m in matches) {
+              tournamentIds.add(m.tournamentId);
+              if (m.abbreviation != null) {
+                tournamentAbbreviations[m.tournamentId] = m.abbreviation!;
+              } else if (m.tournamentName != null) {
+                tournamentAbbreviations[m.tournamentId] = m.tournamentName!;
+              }
+            }
+
             // Apply tournament filter
-            final matchupsToRender = currentTournament == ""
-                ? combined
-                : combined
-                      .where((c) => c['tournamentId'] == currentTournament)
+            final filtered = currentTournament.isEmpty
+                ? matches
+                : matches
+                      .where((m) => m.tournamentId == currentTournament)
                       .toList();
 
             return Column(
@@ -92,70 +90,15 @@ class _MatchFeedSectionImplState extends ConsumerState<_MatchFeedSectionImpl> {
               children: [
                 Row(
                   children: [
-                    Material(
-                      color: currentTournament == ""
-                          ? AppColors.black800
-                          : AppColors.black300,
-                      borderRadius: BorderRadius.circular(5),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(5),
-                        splashColor: AppColors.black500.withAlpha(25),
-                        onTap: () {
-                          setState(() {
-                            currentTournament = "";
-                          });
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          child: Text(
-                            "All",
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  color: currentTournament == ""
-                                      ? AppColors.black100
-                                      : AppColors.black600,
-                                ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    _buildFilterChip(context, "", "All"),
                     const SizedBox(width: 10),
-                    ...list.map(
-                      (fg) => Container(
-                        margin: EdgeInsets.only(right: 10),
-                        child: Material(
-                          color: currentTournament == fg.tournamentId
-                              ? AppColors.black800
-                              : AppColors.black300,
-                          borderRadius: BorderRadius.circular(5),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(5),
-                            splashColor: AppColors.black500.withAlpha(25),
-                            onTap: () {
-                              setState(() {
-                                currentTournament = fg.tournamentId;
-                              });
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
-                              ),
-                              child: Text(
-                                fg.abbreviation,
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(
-                                      color:
-                                          currentTournament == fg.tournamentId
-                                          ? AppColors.black100
-                                          : AppColors.black600,
-                                    ),
-                              ),
-                            ),
-                          ),
+                    ...tournamentIds.map(
+                      (tid) => Container(
+                        margin: const EdgeInsets.only(right: 10),
+                        child: _buildFilterChip(
+                          context,
+                          tid,
+                          tournamentAbbreviations[tid] ?? tid.substring(0, 3).toUpperCase(),
                         ),
                       ),
                     ),
@@ -163,38 +106,33 @@ class _MatchFeedSectionImplState extends ConsumerState<_MatchFeedSectionImpl> {
                 ),
                 const SizedBox(height: 10),
 
-                // Render matches or show empty message
-                if (matchupsToRender.isEmpty)
+                if (filtered.isEmpty)
                   const Text(
                     "No matches found for this tournament",
                     style: TextStyle(color: Colors.white70),
                   )
                 else
                   Column(
-                    children: matchupsToRender.map((c) {
-                      final m = c['match'];
-                      final tournamentLabel =
-                          c['tournamentName'] ?? m?.tournamentName ?? "";
+                    children: filtered.map((m) {
                       return MatchCard(
-                        homeTeamName: m?.homeTeamName ?? "Home Team",
-                        awayTeamName: m?.awayTeamName ?? "Away Team",
-                        homeTeamLogo: m?.homeTeamImage,
-                        awayTeamLogo: m?.awayTeamImage,
-                        matchDateFormatted: m?.matchDate,
+                        homeTeamName: m.homeTeamAbbreviation ?? m.homeTeamName ?? "Home",
+                        awayTeamName: m.awayTeamAbbreviation ?? m.awayTeamName ?? "Away",
+                        homeTeamLogo: m.homeTeamImage,
+                        awayTeamLogo: m.awayTeamImage,
+                        matchDateFormatted: m.matchDate,
                         homeScore: _formatScore(
-                          m?.homeTeamScore,
-                          m?.homeTeamWickets,
-                          m?.homeTeamBalls,
+                          m.homeTeamScore,
+                          m.homeTeamWickets,
+                          m.homeTeamBalls,
                         ),
                         awayScore: _formatScore(
-                          m?.awayTeamScore,
-                          m?.awayTeamWickets,
-                          m?.awayTeamBalls,
+                          m.awayTeamScore,
+                          m.awayTeamWickets,
+                          m.awayTeamBalls,
                         ),
-                        tournamentLabel: tournamentLabel,
-                        isLive:
-                            (m?.status ?? "").toString().toLowerCase() ==
-                            "live",
+                        tournamentLabel: m.abbreviation ?? m.tournamentName ?? "",
+                        status: m.status,
+                        result: m.result,
                       );
                     }).toList(),
                   ),
@@ -206,39 +144,40 @@ class _MatchFeedSectionImplState extends ConsumerState<_MatchFeedSectionImpl> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // DATE FORMATTER — fully null & parse safe
-  // ---------------------------------------------------------------------------
-  // String _formatDate(String? raw) {
-  //   if (raw == null || raw.isEmpty) return "--";
+  Widget _buildFilterChip(BuildContext context, String id, String label) {
+    final isSelected = currentTournament == id;
+    return Material(
+      color: isSelected ? AppColors.black800 : AppColors.black300,
+      borderRadius: BorderRadius.circular(5),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(5),
+        splashColor: AppColors.black500.withAlpha(25),
+        onTap: () {
+          setState(() {
+            currentTournament = id;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: isSelected ? AppColors.black100 : AppColors.black600,
+                ),
+          ),
+        ),
+      ),
+    );
+  }
 
-  //   try {
-  //     final dt = DateTime.tryParse(raw);
-  //     if (dt == null) return "--";
-  //     return DateFormat("MMM d • h:mm a").format(dt);
-  //   } catch (_) {
-  //     return "--";
-  //   }
-  // }
-
-  // ---------------------------------------------------------------------------
-  // SCORE FORMATTER — safe on all null combinations
-  // ---------------------------------------------------------------------------
   String _formatScore(dynamic runs, dynamic wickets, dynamic balls) {
+    if (runs == null && wickets == null && balls == null) return "";
     final r = runs?.toString() ?? "0";
     final w = wickets?.toString() ?? "0";
 
-    String overs = "--";
-    if (balls != null && balls is int && balls >= 0) {
-      final o = balls ~/ 6;
-      final b = balls % 6;
-      overs = "$o.$b";
-    }
-
-    return "$r/$w ($overs)";
+    if (balls == null || balls is! int || balls < 0) return "$r/$w";
+    final o = balls ~/ 6;
+    final b = balls % 6;
+    return "$r/$w ($o.$b)";
   }
-
-  // ---------------------------------------------------------------------------
-  // TOURNAMENT TAG — fallback when tournamentId is null
-  // ---------------------------------------------------------------------------
 }

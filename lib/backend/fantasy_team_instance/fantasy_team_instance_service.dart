@@ -11,22 +11,16 @@ class FantasyTeamInstanceService {
     );
 
     if (res.data == null) return null;
-    logDebug(res.data);
     return FantasyTeamInstance.fromJson(res.data);
   }
 
   Future<List<FantasyTeamInstance>> getAllInstances({required String fantasy_team_id}) async {
-    logInfo('Fetching all instances for team $fantasy_team_id');
-
     try {
       final res = await ApiClient.dio.get("/fantasy-team-instance/$fantasy_team_id/all");
 
       if (res.statusCode != 200 || res.data is! List) {
-        logInfo('No instances found, returning empty list');
         return [];
       }
-
-      logInfo('Loaded ${(res.data as List).length} team instances');
 
       return (res.data as List).map((e) => FantasyTeamInstance.fromJson(e as Map<String, dynamic>)).toList();
     } catch (e) {
@@ -37,12 +31,12 @@ class FantasyTeamInstanceService {
 
   Future<Map<String, dynamic>> swapSlots({required String ftiId, required String slot1, required String slot2}) async {
     try {
-      logInfo('Swapping slots $slot1 and $slot2 for instance $ftiId');
+      // logInfo('Swapping slots');
 
       final res = await ApiClient.dio.post("/fantasy-team-instance/$ftiId/swap-slots", data: {"slot1": slot1, "slot2": slot2});
 
       if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
-        logInfo('Swap successful');
+        // logInfo('Swap successful');
         return res.data as Map<String, dynamic>;
       } else {
         logError('Swap failed with status ${res.statusCode}');
@@ -56,12 +50,12 @@ class FantasyTeamInstanceService {
 
   Future<Map<String, dynamic>> updateCaptains({required String ftiId, required String captain, required String viceCaptain}) async {
     try {
-      logInfo('Updating captains for instance $ftiId: captain=$captain, viceCaptain=$viceCaptain');
+      // logInfo('Updating captains');
 
       final res = await ApiClient.dio.patch("/fantasy-team-instance/$ftiId/captains", data: {"captain": captain, "vice_captain": viceCaptain});
 
       if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
-        logInfo('Captains updated successfully');
+        // logInfo('Captains updated successfully');
         return {"ok": true, ...res.data as Map<String, dynamic>};
       } else {
         logError('Update captains failed with status ${res.statusCode}');

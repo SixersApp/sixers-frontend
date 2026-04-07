@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sixers/amplifyconfiguration.dart';
+import 'package:sixers/backend/live_match/live_match_provider.dart';
 import 'package:sixers/theme/app_theme.dart';
 import 'package:sixers/views/router.dart';
 
@@ -46,12 +47,36 @@ void main() async {
   runApp(const ProviderScope(child: SixersApp()));
 }
 
-class SixersApp extends ConsumerWidget {
+class SixersApp extends ConsumerStatefulWidget {
   const SixersApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SixersApp> createState() => _SixersAppState();
+}
 
+class _SixersAppState extends ConsumerState<SixersApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.read(liveMatchesProvider.notifier).onAppResumed();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(

@@ -21,10 +21,10 @@ class PositionFilterButton extends StatelessWidget {
         return 'assets/images/player_icons/Batsmen.png';
       case PositionFilter.bowler:
         return 'assets/images/player_icons/Bowler.png';
-      case PositionFilter.wicketKeeper:
-        return 'assets/images/player_icons/Batsmen.png'; // Using Batsmen as placeholder
       case PositionFilter.allRounder:
-        return 'assets/images/player_icons/AllRounder.png';
+        return 'assets/images/player_icons/Batsmen.png';
+      case PositionFilter.wicketKeeper:
+        return 'assets/images/player_icons/Batsmen.png';
     }
   }
 
@@ -81,8 +81,8 @@ class PositionFilterButton extends StatelessWidget {
           _menuItem(ctx, PositionFilter.all, 'All'),
           _menuItem(ctx, PositionFilter.batsman, 'Batsman'),
           _menuItem(ctx, PositionFilter.bowler, 'Bowler'),
-          _menuItem(ctx, PositionFilter.wicketKeeper, 'Wicket Keeper'),
           _menuItem(ctx, PositionFilter.allRounder, 'All Rounder'),
+          _menuItem(ctx, PositionFilter.wicketKeeper, 'Wicket Keeper'),
         ],
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -121,9 +121,9 @@ String labelForFilter(PositionFilter f) {
       return 'Batsman';
     case PositionFilter.bowler:
       return 'Bowler';
-    case PositionFilter.wicketKeeper:
-      return 'Wicket Keeper';
     case PositionFilter.allRounder:
       return 'All Rounder';
+    case PositionFilter.wicketKeeper:
+      return 'Wicket Keeper';
   }
 }

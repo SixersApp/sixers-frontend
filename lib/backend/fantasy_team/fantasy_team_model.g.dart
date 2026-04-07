@@ -15,6 +15,7 @@ _FantasyTeam _$FantasyTeamFromJson(Map<String, dynamic> json) => _FantasyTeam(
   draftOrder: (json['draft_order'] as num?)?.toInt(),
   teamColor: json['team_color'] as String?,
   teamIcon: json['team_icon'] as String?,
+  teamAbbreviation: json['abbreviation'] as String?,
   createdAt: json['created_at'] as String?,
 );
 
@@ -28,5 +29,6 @@ Map<String, dynamic> _$FantasyTeamToJson(_FantasyTeam instance) =>
       'draft_order': instance.draftOrder,
       'team_color': instance.teamColor,
       'team_icon': instance.teamIcon,
+      'abbreviation': instance.teamAbbreviation,
       'created_at': instance.createdAt,
     };

@@ -25,7 +25,6 @@ class DraftOrderScreen extends ConsumerStatefulWidget {
 class _DraftOrderScreenState extends ConsumerState<DraftOrderScreen> {
   late List<FantasyTeam> _orderedTeams;
   late League _league;
-  bool _isRefreshing = false;
   bool _isSaving = false;
 
   @override
@@ -37,7 +36,6 @@ class _DraftOrderScreenState extends ConsumerState<DraftOrderScreen> {
   }
 
   Future<void> _refreshLeagues() async {
-    setState(() => _isRefreshing = true);
     try {
       await ref.read(leaguesProvider.notifier).refresh();
       final leagues = await ref.read(leaguesProvider.future);
@@ -49,12 +47,11 @@ class _DraftOrderScreenState extends ConsumerState<DraftOrderScreen> {
         setState(() {
           _league = updatedLeague;
           _orderedTeams = List.from(_league.teams);
-          _isRefreshing = false;
         });
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _isRefreshing = false);
+        // error ignored
       }
     }
   }

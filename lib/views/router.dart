@@ -41,7 +41,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
       final uri = state.uri;
 
-      logDebug("Redirecting!");
+      logDebug("Redirect: location=$location, auth=${authState.value != null ? 'signed-in' : authState.isLoading ? 'loading' : 'null'}, onboarding=${onboardingState.isLoading ? 'loading' : onboardingState.value?.onboardingStage}");
 
       if (authState.isLoading || onboardingState.isLoading) return null;
       if (uri.toString().contains('auth')) {
@@ -134,7 +134,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           final container = ProviderScope.containerOf(context);
           final authState = container.read(authProviderProvider);
           if (authState.value != null) {
-            logDebug("HomeScreen: User ID = ${authState.value!.userId}");
+            // logDebug("HomeScreen: User ID = ${authState.value!.userId}");
           }
           return const HomeScreen();
         },
@@ -145,7 +145,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           final container = ProviderScope.containerOf(context);
           final authState = container.read(authProviderProvider);
           if (authState.value != null) {
-            logDebug("HomeScreen: User ID = ${authState.value!.userId}");
+            // logDebug("HomeScreen: User ID = ${authState.value!.userId}");
           }
           return const HomeScreen();
         },
@@ -177,6 +177,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return CreateTeamScreen(
             leagueName: extra['leagueName'] as String,
             tournamentId: extra['tournamentId'] as String,
+            maxTeams: extra['maxTeams'] as int,
             scoringRules: extra['scoringRules'],
           );
         },
@@ -185,7 +186,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: "/leagues/:id",
         builder: (context, state) {
           final leagueId = state.pathParameters["id"]!;
-          return LeagueLoader(leagueId: leagueId);
+          final tab = int.tryParse(state.uri.queryParameters['tab'] ?? '') ?? 0;
+          final game = int.tryParse(state.uri.queryParameters['game'] ?? '');
+          return LeagueLoader(leagueId: leagueId, initialTab: tab, initialGame: game);
         },
       ),
       GoRoute(
@@ -232,7 +235,9 @@ class _RouterNotifier extends ChangeNotifier {
 
 class LeagueLoader extends ConsumerWidget {
   final String leagueId;
-  const LeagueLoader({Key? key, required this.leagueId}) : super(key: key);
+  final int initialTab;
+  final int? initialGame;
+  const LeagueLoader({Key? key, required this.leagueId, this.initialTab = 0, this.initialGame}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -250,6 +255,8 @@ class LeagueLoader extends ConsumerWidget {
             return CommissionerPreDraftScreen(leagueId: leagueId);
           case LeagueStatus.draft_in_progress:
             return DraftScreen(leagueId: leagueId);
+          case LeagueStatus.active:
+            return ActiveLeagueScreen(league: currentLeague, initialTab: initialTab, initialGame: initialGame);
           default:
             return CommissionerPreDraftScreen(leagueId: leagueId);
         }

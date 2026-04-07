@@ -4,6 +4,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/theme/colors.dart';
+import 'package:sixers/utils/logger.dart';
 
 class VerifyCodeSheet extends ConsumerStatefulWidget {
   final String email;
@@ -30,23 +31,33 @@ class _VerifyCodeSheetState extends ConsumerState<VerifyCodeSheet> {
       error = null;
     });
 
+    // Capture references before any async gaps
+    final authNotifier = ref.read(authProviderProvider.notifier);
+    final email = widget.email;
+    final password = widget.password;
+
     try {
       // 1️⃣ Confirm verification code
       final result = await Amplify.Auth.confirmSignUp(
-        username: widget.email,
+        username: email,
         confirmationCode: codeController.text.trim(),
       );
 
+      logDebug("confirmSignUp result: isSignUpComplete=${result.isSignUpComplete}, nextStep=${result.nextStep.signUpStep}");
+
       if (!result.isSignUpComplete) {
-        setState(() => error = "Verification not completed.");
+        if (mounted) setState(() => error = "Verification not completed.");
         return;
       }
 
-      // 2️⃣ Sign user in automatically after confirm
-      await ref
-          .read(authProviderProvider.notifier)
-          .signIn(widget.email, widget.password, true);
-    } catch (e) {
+      // 2️⃣ Sign in (Cognito may or may not have auto-signed in)
+      logDebug("Signing in after verification...");
+      await authNotifier.signInAfterVerification(email, password);
+      logDebug("Sign in completed successfully");
+
+      // Router redirect will navigate away from /sign-up, dismissing the bottom sheet
+    } catch (e, st) {
+      logError("verifyCode error: $e", st);
       if (mounted) {
         _showError(e.toString());
       }

@@ -8,26 +8,37 @@ class TeamSelector extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTeamSelected;
 
-  const TeamSelector({super.key, required this.teams, required this.selectedIndex, required this.onTeamSelected});
+  const TeamSelector({
+    super.key,
+    required this.teams,
+    required this.selectedIndex,
+    required this.onTeamSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 26,
+      height: 30,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         itemCount: teams.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
         itemBuilder: (context, index) {
           final team = teams[index];
           final isSelected = index == selectedIndex;
 
           return GestureDetector(
             onTap: () => onTeamSelected(index),
-            child: Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(color: AppColors.black400, borderRadius: BorderRadius.circular(5)),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.black300 : AppColors.black200,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: AppColors.black400, width: 1),
+              ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -35,21 +46,32 @@ class TeamSelector extends StatelessWidget {
                     width: 16,
                     height: 16,
                     decoration: BoxDecoration(
-                      color: isSelected ? stringToColor(team.teamColor) : AppColors.black300,
+                      color: stringToColor(team.teamColor),
                       borderRadius: BorderRadius.circular(5),
-                      border: isSelected ? Border.all(color: stringToColor(team.teamColor), width: 2) : null,
                     ),
-                    child: ClipRRect(borderRadius: BorderRadius.circular(12), child: _buildTeamIcon(team, isSelected)),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: _buildTeamIcon(team, isSelected),
+                    ),
                   ),
                   const SizedBox(width: 5),
-                  // Show abbreviated team name for all teams
-                  Text(
-                    index == selectedIndex ? team.teamName : _getTeamAbbreviation(team.teamName),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.black800,
-                      fontSize: 11,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeInOut,
+                    alignment: Alignment.centerLeft,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      child: Text(
+                        isSelected
+                            ? team.teamName
+                            : _getTeamAbbreviation(team.teamName),
+                        key: ValueKey('${team.id}_$isSelected'),
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: AppColors.black800,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -67,11 +89,17 @@ class TeamSelector extends StatelessWidget {
     // Split by spaces and take first letter of each word, max 3 letters
     final words = teamName.trim().split(' ');
     if (words.length >= 2) {
-      return words.map((w) => w.isNotEmpty ? w[0] : '').take(3).join().toUpperCase();
+      return words
+          .map((w) => w.isNotEmpty ? w[0] : '')
+          .take(3)
+          .join()
+          .toUpperCase();
     }
 
     // If single word, take first 3 letters
-    return teamName.substring(0, teamName.length >= 3 ? 3 : teamName.length).toUpperCase();
+    return teamName
+        .substring(0, teamName.length >= 3 ? 3 : teamName.length)
+        .toUpperCase();
   }
 
   Widget _buildTeamIcon(FantasyTeam team, bool isSelected) {
@@ -94,11 +122,20 @@ class TeamSelector extends StatelessWidget {
   }
 
   Widget _buildInitials(FantasyTeam team, bool isSelected) {
-    final initials = team.teamName.split(' ').map((w) => w.isNotEmpty ? w[0] : '').take(2).join().toUpperCase();
+    final initials = team.teamName
+        .split(' ')
+        .map((w) => w.isNotEmpty ? w[0] : '')
+        .take(2)
+        .join()
+        .toUpperCase();
     return Center(
       child: Text(
         initials,
-        style: TextStyle(color: isSelected ? Colors.white : Colors.grey.shade500, fontSize: 16, fontWeight: FontWeight.w700),
+        style: TextStyle(
+          color: isSelected ? Colors.white : Colors.grey.shade500,
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

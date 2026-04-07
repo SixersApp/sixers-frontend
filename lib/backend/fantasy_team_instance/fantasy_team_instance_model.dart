@@ -23,17 +23,12 @@ sealed class RosterPlayers with _$RosterPlayers {
   const factory RosterPlayers({
     RosterPlayerData? bat1,
     RosterPlayerData? bat2,
-    RosterPlayerData? bat3,
-    RosterPlayerData? bat4,
     RosterPlayerData? bowl1,
     RosterPlayerData? bowl2,
     RosterPlayerData? bowl3,
-    RosterPlayerData? bowl4,
     RosterPlayerData? all1,
-    RosterPlayerData? all2,
-    RosterPlayerData? all3,
     RosterPlayerData? wicket1,
-    RosterPlayerData? wicket2,
+    RosterPlayerData? flex1,
     RosterPlayerData? bench1,
     RosterPlayerData? bench2,
     RosterPlayerData? bench3,
@@ -42,10 +37,6 @@ sealed class RosterPlayers with _$RosterPlayers {
     RosterPlayerData? bench6,
     RosterPlayerData? bench7,
     RosterPlayerData? bench8,
-    RosterPlayerData? flex1,
-    RosterPlayerData? flex2,
-    RosterPlayerData? flex3,
-    RosterPlayerData? flex4,
   }) = _RosterPlayers;
 
   factory RosterPlayers.fromJson(Map<String, dynamic> json) => _$RosterPlayersFromJson(json);

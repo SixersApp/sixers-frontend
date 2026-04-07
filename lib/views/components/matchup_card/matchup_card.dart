@@ -28,6 +28,8 @@ class MatchupCard extends StatelessWidget {
     required this.leagueId,
     required this.team1FtiId,
     required this.team2FtiId,
+    required this.matchNum,
+    this.isUpcoming = false,
     this.isLive = true,
     this.width,
     this.onTap,
@@ -51,6 +53,8 @@ class MatchupCard extends StatelessWidget {
   final String leagueId;
   final String team1FtiId;
   final String team2FtiId;
+  final int matchNum;
+  final bool isUpcoming;
   final bool isLive;
   final double? width;
   final VoidCallback? onTap;
@@ -59,13 +63,7 @@ class MatchupCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        GoRouter.of(context).push(
-          '/fantasyMatchup',
-          extra: {
-            "team1FtiId": team1FtiId,
-            "team2FtiId": team2FtiId,
-          },
-        );
+        GoRouter.of(context).push('/leagues/$leagueId?tab=1&game=$matchNum');
       },
       child: Container(
         width: 350,
@@ -126,8 +124,8 @@ class MatchupCard extends StatelessWidget {
                         ),
                       ),
 
-                      // Live indicator
-                      if (isLive)
+                      // Status indicator
+                      if (isLive && !isUpcoming)
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -178,37 +176,47 @@ class MatchupCard extends StatelessWidget {
                         child: Center(child: team1Logo),
                       ),
 
-                      // Scores
-                      Row(
-                        children: [
-                          Text(
-                            team1Score,
-                            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                              color: AppColors.black800,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 28,
-                            ),
+                      // Scores or UPCOMING
+                      if (isUpcoming)
+                        Text(
+                          'UPCOMING',
+                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                            color: AppColors.black500,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 30,
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            ':',
-                            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                              color: AppColors.black500,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 28,
+                        )
+                      else
+                        Row(
+                          children: [
+                            Text(
+                              team1Score,
+                              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                color: AppColors.black800,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 28,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            team2Score,
-                            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                              color: AppColors.black800,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 28,
+                            const SizedBox(width: 10),
+                            Text(
+                              ':',
+                              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                color: AppColors.black500,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 28,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                            const SizedBox(width: 10),
+                            Text(
+                              team2Score,
+                              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                color: AppColors.black800,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 28,
+                              ),
+                            ),
+                          ],
+                        ),
 
                       // Team 2 logo
                       Container(

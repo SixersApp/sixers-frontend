@@ -290,7 +290,7 @@ as String,
 /// @nodoc
 mixin _$RosterPlayers {
 
- RosterPlayerData? get bat1; RosterPlayerData? get bat2; RosterPlayerData? get bat3; RosterPlayerData? get bat4; RosterPlayerData? get bowl1; RosterPlayerData? get bowl2; RosterPlayerData? get bowl3; RosterPlayerData? get bowl4; RosterPlayerData? get all1; RosterPlayerData? get all2; RosterPlayerData? get all3; RosterPlayerData? get wicket1; RosterPlayerData? get wicket2; RosterPlayerData? get bench1; RosterPlayerData? get bench2; RosterPlayerData? get bench3; RosterPlayerData? get bench4; RosterPlayerData? get bench5; RosterPlayerData? get bench6; RosterPlayerData? get bench7; RosterPlayerData? get bench8; RosterPlayerData? get flex1; RosterPlayerData? get flex2; RosterPlayerData? get flex3; RosterPlayerData? get flex4;
+ RosterPlayerData? get bat1; RosterPlayerData? get bat2; RosterPlayerData? get bowl1; RosterPlayerData? get bowl2; RosterPlayerData? get bowl3; RosterPlayerData? get all1; RosterPlayerData? get wicket1; RosterPlayerData? get flex1; RosterPlayerData? get bench1; RosterPlayerData? get bench2; RosterPlayerData? get bench3; RosterPlayerData? get bench4; RosterPlayerData? get bench5; RosterPlayerData? get bench6; RosterPlayerData? get bench7; RosterPlayerData? get bench8;
 /// Create a copy of RosterPlayers
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -303,16 +303,16 @@ $RosterPlayersCopyWith<RosterPlayers> get copyWith => _$RosterPlayersCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RosterPlayers&&(identical(other.bat1, bat1) || other.bat1 == bat1)&&(identical(other.bat2, bat2) || other.bat2 == bat2)&&(identical(other.bat3, bat3) || other.bat3 == bat3)&&(identical(other.bat4, bat4) || other.bat4 == bat4)&&(identical(other.bowl1, bowl1) || other.bowl1 == bowl1)&&(identical(other.bowl2, bowl2) || other.bowl2 == bowl2)&&(identical(other.bowl3, bowl3) || other.bowl3 == bowl3)&&(identical(other.bowl4, bowl4) || other.bowl4 == bowl4)&&(identical(other.all1, all1) || other.all1 == all1)&&(identical(other.all2, all2) || other.all2 == all2)&&(identical(other.all3, all3) || other.all3 == all3)&&(identical(other.wicket1, wicket1) || other.wicket1 == wicket1)&&(identical(other.wicket2, wicket2) || other.wicket2 == wicket2)&&(identical(other.bench1, bench1) || other.bench1 == bench1)&&(identical(other.bench2, bench2) || other.bench2 == bench2)&&(identical(other.bench3, bench3) || other.bench3 == bench3)&&(identical(other.bench4, bench4) || other.bench4 == bench4)&&(identical(other.bench5, bench5) || other.bench5 == bench5)&&(identical(other.bench6, bench6) || other.bench6 == bench6)&&(identical(other.bench7, bench7) || other.bench7 == bench7)&&(identical(other.bench8, bench8) || other.bench8 == bench8)&&(identical(other.flex1, flex1) || other.flex1 == flex1)&&(identical(other.flex2, flex2) || other.flex2 == flex2)&&(identical(other.flex3, flex3) || other.flex3 == flex3)&&(identical(other.flex4, flex4) || other.flex4 == flex4));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RosterPlayers&&(identical(other.bat1, bat1) || other.bat1 == bat1)&&(identical(other.bat2, bat2) || other.bat2 == bat2)&&(identical(other.bowl1, bowl1) || other.bowl1 == bowl1)&&(identical(other.bowl2, bowl2) || other.bowl2 == bowl2)&&(identical(other.bowl3, bowl3) || other.bowl3 == bowl3)&&(identical(other.all1, all1) || other.all1 == all1)&&(identical(other.wicket1, wicket1) || other.wicket1 == wicket1)&&(identical(other.flex1, flex1) || other.flex1 == flex1)&&(identical(other.bench1, bench1) || other.bench1 == bench1)&&(identical(other.bench2, bench2) || other.bench2 == bench2)&&(identical(other.bench3, bench3) || other.bench3 == bench3)&&(identical(other.bench4, bench4) || other.bench4 == bench4)&&(identical(other.bench5, bench5) || other.bench5 == bench5)&&(identical(other.bench6, bench6) || other.bench6 == bench6)&&(identical(other.bench7, bench7) || other.bench7 == bench7)&&(identical(other.bench8, bench8) || other.bench8 == bench8));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,bat1,bat2,bat3,bat4,bowl1,bowl2,bowl3,bowl4,all1,all2,all3,wicket1,wicket2,bench1,bench2,bench3,bench4,bench5,bench6,bench7,bench8,flex1,flex2,flex3,flex4]);
+int get hashCode => Object.hash(runtimeType,bat1,bat2,bowl1,bowl2,bowl3,all1,wicket1,flex1,bench1,bench2,bench3,bench4,bench5,bench6,bench7,bench8);
 
 @override
 String toString() {
-  return 'RosterPlayers(bat1: $bat1, bat2: $bat2, bat3: $bat3, bat4: $bat4, bowl1: $bowl1, bowl2: $bowl2, bowl3: $bowl3, bowl4: $bowl4, all1: $all1, all2: $all2, all3: $all3, wicket1: $wicket1, wicket2: $wicket2, bench1: $bench1, bench2: $bench2, bench3: $bench3, bench4: $bench4, bench5: $bench5, bench6: $bench6, bench7: $bench7, bench8: $bench8, flex1: $flex1, flex2: $flex2, flex3: $flex3, flex4: $flex4)';
+  return 'RosterPlayers(bat1: $bat1, bat2: $bat2, bowl1: $bowl1, bowl2: $bowl2, bowl3: $bowl3, all1: $all1, wicket1: $wicket1, flex1: $flex1, bench1: $bench1, bench2: $bench2, bench3: $bench3, bench4: $bench4, bench5: $bench5, bench6: $bench6, bench7: $bench7, bench8: $bench8)';
 }
 
 
@@ -323,11 +323,11 @@ abstract mixin class $RosterPlayersCopyWith<$Res>  {
   factory $RosterPlayersCopyWith(RosterPlayers value, $Res Function(RosterPlayers) _then) = _$RosterPlayersCopyWithImpl;
 @useResult
 $Res call({
- RosterPlayerData? bat1, RosterPlayerData? bat2, RosterPlayerData? bat3, RosterPlayerData? bat4, RosterPlayerData? bowl1, RosterPlayerData? bowl2, RosterPlayerData? bowl3, RosterPlayerData? bowl4, RosterPlayerData? all1, RosterPlayerData? all2, RosterPlayerData? all3, RosterPlayerData? wicket1, RosterPlayerData? wicket2, RosterPlayerData? bench1, RosterPlayerData? bench2, RosterPlayerData? bench3, RosterPlayerData? bench4, RosterPlayerData? bench5, RosterPlayerData? bench6, RosterPlayerData? bench7, RosterPlayerData? bench8, RosterPlayerData? flex1, RosterPlayerData? flex2, RosterPlayerData? flex3, RosterPlayerData? flex4
+ RosterPlayerData? bat1, RosterPlayerData? bat2, RosterPlayerData? bowl1, RosterPlayerData? bowl2, RosterPlayerData? bowl3, RosterPlayerData? all1, RosterPlayerData? wicket1, RosterPlayerData? flex1, RosterPlayerData? bench1, RosterPlayerData? bench2, RosterPlayerData? bench3, RosterPlayerData? bench4, RosterPlayerData? bench5, RosterPlayerData? bench6, RosterPlayerData? bench7, RosterPlayerData? bench8
 });
 
 
-$RosterPlayerDataCopyWith<$Res>? get bat1;$RosterPlayerDataCopyWith<$Res>? get bat2;$RosterPlayerDataCopyWith<$Res>? get bat3;$RosterPlayerDataCopyWith<$Res>? get bat4;$RosterPlayerDataCopyWith<$Res>? get bowl1;$RosterPlayerDataCopyWith<$Res>? get bowl2;$RosterPlayerDataCopyWith<$Res>? get bowl3;$RosterPlayerDataCopyWith<$Res>? get bowl4;$RosterPlayerDataCopyWith<$Res>? get all1;$RosterPlayerDataCopyWith<$Res>? get all2;$RosterPlayerDataCopyWith<$Res>? get all3;$RosterPlayerDataCopyWith<$Res>? get wicket1;$RosterPlayerDataCopyWith<$Res>? get wicket2;$RosterPlayerDataCopyWith<$Res>? get bench1;$RosterPlayerDataCopyWith<$Res>? get bench2;$RosterPlayerDataCopyWith<$Res>? get bench3;$RosterPlayerDataCopyWith<$Res>? get bench4;$RosterPlayerDataCopyWith<$Res>? get bench5;$RosterPlayerDataCopyWith<$Res>? get bench6;$RosterPlayerDataCopyWith<$Res>? get bench7;$RosterPlayerDataCopyWith<$Res>? get bench8;$RosterPlayerDataCopyWith<$Res>? get flex1;$RosterPlayerDataCopyWith<$Res>? get flex2;$RosterPlayerDataCopyWith<$Res>? get flex3;$RosterPlayerDataCopyWith<$Res>? get flex4;
+$RosterPlayerDataCopyWith<$Res>? get bat1;$RosterPlayerDataCopyWith<$Res>? get bat2;$RosterPlayerDataCopyWith<$Res>? get bowl1;$RosterPlayerDataCopyWith<$Res>? get bowl2;$RosterPlayerDataCopyWith<$Res>? get bowl3;$RosterPlayerDataCopyWith<$Res>? get all1;$RosterPlayerDataCopyWith<$Res>? get wicket1;$RosterPlayerDataCopyWith<$Res>? get flex1;$RosterPlayerDataCopyWith<$Res>? get bench1;$RosterPlayerDataCopyWith<$Res>? get bench2;$RosterPlayerDataCopyWith<$Res>? get bench3;$RosterPlayerDataCopyWith<$Res>? get bench4;$RosterPlayerDataCopyWith<$Res>? get bench5;$RosterPlayerDataCopyWith<$Res>? get bench6;$RosterPlayerDataCopyWith<$Res>? get bench7;$RosterPlayerDataCopyWith<$Res>? get bench8;
 
 }
 /// @nodoc
@@ -340,21 +340,16 @@ class _$RosterPlayersCopyWithImpl<$Res>
 
 /// Create a copy of RosterPlayers
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? bat1 = freezed,Object? bat2 = freezed,Object? bat3 = freezed,Object? bat4 = freezed,Object? bowl1 = freezed,Object? bowl2 = freezed,Object? bowl3 = freezed,Object? bowl4 = freezed,Object? all1 = freezed,Object? all2 = freezed,Object? all3 = freezed,Object? wicket1 = freezed,Object? wicket2 = freezed,Object? bench1 = freezed,Object? bench2 = freezed,Object? bench3 = freezed,Object? bench4 = freezed,Object? bench5 = freezed,Object? bench6 = freezed,Object? bench7 = freezed,Object? bench8 = freezed,Object? flex1 = freezed,Object? flex2 = freezed,Object? flex3 = freezed,Object? flex4 = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? bat1 = freezed,Object? bat2 = freezed,Object? bowl1 = freezed,Object? bowl2 = freezed,Object? bowl3 = freezed,Object? all1 = freezed,Object? wicket1 = freezed,Object? flex1 = freezed,Object? bench1 = freezed,Object? bench2 = freezed,Object? bench3 = freezed,Object? bench4 = freezed,Object? bench5 = freezed,Object? bench6 = freezed,Object? bench7 = freezed,Object? bench8 = freezed,}) {
   return _then(_self.copyWith(
 bat1: freezed == bat1 ? _self.bat1 : bat1 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bat2: freezed == bat2 ? _self.bat2 : bat2 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,bat3: freezed == bat3 ? _self.bat3 : bat3 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,bat4: freezed == bat4 ? _self.bat4 : bat4 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bowl1: freezed == bowl1 ? _self.bowl1 : bowl1 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bowl2: freezed == bowl2 ? _self.bowl2 : bowl2 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bowl3: freezed == bowl3 ? _self.bowl3 : bowl3 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,bowl4: freezed == bowl4 ? _self.bowl4 : bowl4 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,all1: freezed == all1 ? _self.all1 : all1 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,all2: freezed == all2 ? _self.all2 : all2 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,all3: freezed == all3 ? _self.all3 : all3 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,wicket1: freezed == wicket1 ? _self.wicket1 : wicket1 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,wicket2: freezed == wicket2 ? _self.wicket2 : wicket2 // ignore: cast_nullable_to_non_nullable
+as RosterPlayerData?,flex1: freezed == flex1 ? _self.flex1 : flex1 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bench1: freezed == bench1 ? _self.bench1 : bench1 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bench2: freezed == bench2 ? _self.bench2 : bench2 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bench3: freezed == bench3 ? _self.bench3 : bench3 // ignore: cast_nullable_to_non_nullable
@@ -363,10 +358,6 @@ as RosterPlayerData?,bench5: freezed == bench5 ? _self.bench5 : bench5 // ignore
 as RosterPlayerData?,bench6: freezed == bench6 ? _self.bench6 : bench6 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bench7: freezed == bench7 ? _self.bench7 : bench7 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bench8: freezed == bench8 ? _self.bench8 : bench8 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,flex1: freezed == flex1 ? _self.flex1 : flex1 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,flex2: freezed == flex2 ? _self.flex2 : flex2 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,flex3: freezed == flex3 ? _self.flex3 : flex3 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,flex4: freezed == flex4 ? _self.flex4 : flex4 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,
   ));
 }
@@ -393,30 +384,6 @@ $RosterPlayerDataCopyWith<$Res>? get bat2 {
 
   return $RosterPlayerDataCopyWith<$Res>(_self.bat2!, (value) {
     return _then(_self.copyWith(bat2: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get bat3 {
-    if (_self.bat3 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.bat3!, (value) {
-    return _then(_self.copyWith(bat3: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get bat4 {
-    if (_self.bat4 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.bat4!, (value) {
-    return _then(_self.copyWith(bat4: value));
   });
 }/// Create a copy of RosterPlayers
 /// with the given fields replaced by the non-null parameter values.
@@ -458,18 +425,6 @@ $RosterPlayerDataCopyWith<$Res>? get bowl3 {
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get bowl4 {
-    if (_self.bowl4 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.bowl4!, (value) {
-    return _then(_self.copyWith(bowl4: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
 $RosterPlayerDataCopyWith<$Res>? get all1 {
     if (_self.all1 == null) {
     return null;
@@ -477,30 +432,6 @@ $RosterPlayerDataCopyWith<$Res>? get all1 {
 
   return $RosterPlayerDataCopyWith<$Res>(_self.all1!, (value) {
     return _then(_self.copyWith(all1: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get all2 {
-    if (_self.all2 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.all2!, (value) {
-    return _then(_self.copyWith(all2: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get all3 {
-    if (_self.all3 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.all3!, (value) {
-    return _then(_self.copyWith(all3: value));
   });
 }/// Create a copy of RosterPlayers
 /// with the given fields replaced by the non-null parameter values.
@@ -518,13 +449,13 @@ $RosterPlayerDataCopyWith<$Res>? get wicket1 {
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get wicket2 {
-    if (_self.wicket2 == null) {
+$RosterPlayerDataCopyWith<$Res>? get flex1 {
+    if (_self.flex1 == null) {
     return null;
   }
 
-  return $RosterPlayerDataCopyWith<$Res>(_self.wicket2!, (value) {
-    return _then(_self.copyWith(wicket2: value));
+  return $RosterPlayerDataCopyWith<$Res>(_self.flex1!, (value) {
+    return _then(_self.copyWith(flex1: value));
   });
 }/// Create a copy of RosterPlayers
 /// with the given fields replaced by the non-null parameter values.
@@ -621,54 +552,6 @@ $RosterPlayerDataCopyWith<$Res>? get bench8 {
 
   return $RosterPlayerDataCopyWith<$Res>(_self.bench8!, (value) {
     return _then(_self.copyWith(bench8: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get flex1 {
-    if (_self.flex1 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.flex1!, (value) {
-    return _then(_self.copyWith(flex1: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get flex2 {
-    if (_self.flex2 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.flex2!, (value) {
-    return _then(_self.copyWith(flex2: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get flex3 {
-    if (_self.flex3 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.flex3!, (value) {
-    return _then(_self.copyWith(flex3: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get flex4 {
-    if (_self.flex4 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.flex4!, (value) {
-    return _then(_self.copyWith(flex4: value));
   });
 }
 }
@@ -749,10 +632,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( RosterPlayerData? bat1,  RosterPlayerData? bat2,  RosterPlayerData? bat3,  RosterPlayerData? bat4,  RosterPlayerData? bowl1,  RosterPlayerData? bowl2,  RosterPlayerData? bowl3,  RosterPlayerData? bowl4,  RosterPlayerData? all1,  RosterPlayerData? all2,  RosterPlayerData? all3,  RosterPlayerData? wicket1,  RosterPlayerData? wicket2,  RosterPlayerData? bench1,  RosterPlayerData? bench2,  RosterPlayerData? bench3,  RosterPlayerData? bench4,  RosterPlayerData? bench5,  RosterPlayerData? bench6,  RosterPlayerData? bench7,  RosterPlayerData? bench8,  RosterPlayerData? flex1,  RosterPlayerData? flex2,  RosterPlayerData? flex3,  RosterPlayerData? flex4)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( RosterPlayerData? bat1,  RosterPlayerData? bat2,  RosterPlayerData? bowl1,  RosterPlayerData? bowl2,  RosterPlayerData? bowl3,  RosterPlayerData? all1,  RosterPlayerData? wicket1,  RosterPlayerData? flex1,  RosterPlayerData? bench1,  RosterPlayerData? bench2,  RosterPlayerData? bench3,  RosterPlayerData? bench4,  RosterPlayerData? bench5,  RosterPlayerData? bench6,  RosterPlayerData? bench7,  RosterPlayerData? bench8)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RosterPlayers() when $default != null:
-return $default(_that.bat1,_that.bat2,_that.bat3,_that.bat4,_that.bowl1,_that.bowl2,_that.bowl3,_that.bowl4,_that.all1,_that.all2,_that.all3,_that.wicket1,_that.wicket2,_that.bench1,_that.bench2,_that.bench3,_that.bench4,_that.bench5,_that.bench6,_that.bench7,_that.bench8,_that.flex1,_that.flex2,_that.flex3,_that.flex4);case _:
+return $default(_that.bat1,_that.bat2,_that.bowl1,_that.bowl2,_that.bowl3,_that.all1,_that.wicket1,_that.flex1,_that.bench1,_that.bench2,_that.bench3,_that.bench4,_that.bench5,_that.bench6,_that.bench7,_that.bench8);case _:
   return orElse();
 
 }
@@ -770,10 +653,10 @@ return $default(_that.bat1,_that.bat2,_that.bat3,_that.bat4,_that.bowl1,_that.bo
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( RosterPlayerData? bat1,  RosterPlayerData? bat2,  RosterPlayerData? bat3,  RosterPlayerData? bat4,  RosterPlayerData? bowl1,  RosterPlayerData? bowl2,  RosterPlayerData? bowl3,  RosterPlayerData? bowl4,  RosterPlayerData? all1,  RosterPlayerData? all2,  RosterPlayerData? all3,  RosterPlayerData? wicket1,  RosterPlayerData? wicket2,  RosterPlayerData? bench1,  RosterPlayerData? bench2,  RosterPlayerData? bench3,  RosterPlayerData? bench4,  RosterPlayerData? bench5,  RosterPlayerData? bench6,  RosterPlayerData? bench7,  RosterPlayerData? bench8,  RosterPlayerData? flex1,  RosterPlayerData? flex2,  RosterPlayerData? flex3,  RosterPlayerData? flex4)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( RosterPlayerData? bat1,  RosterPlayerData? bat2,  RosterPlayerData? bowl1,  RosterPlayerData? bowl2,  RosterPlayerData? bowl3,  RosterPlayerData? all1,  RosterPlayerData? wicket1,  RosterPlayerData? flex1,  RosterPlayerData? bench1,  RosterPlayerData? bench2,  RosterPlayerData? bench3,  RosterPlayerData? bench4,  RosterPlayerData? bench5,  RosterPlayerData? bench6,  RosterPlayerData? bench7,  RosterPlayerData? bench8)  $default,) {final _that = this;
 switch (_that) {
 case _RosterPlayers():
-return $default(_that.bat1,_that.bat2,_that.bat3,_that.bat4,_that.bowl1,_that.bowl2,_that.bowl3,_that.bowl4,_that.all1,_that.all2,_that.all3,_that.wicket1,_that.wicket2,_that.bench1,_that.bench2,_that.bench3,_that.bench4,_that.bench5,_that.bench6,_that.bench7,_that.bench8,_that.flex1,_that.flex2,_that.flex3,_that.flex4);}
+return $default(_that.bat1,_that.bat2,_that.bowl1,_that.bowl2,_that.bowl3,_that.all1,_that.wicket1,_that.flex1,_that.bench1,_that.bench2,_that.bench3,_that.bench4,_that.bench5,_that.bench6,_that.bench7,_that.bench8);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -787,10 +670,10 @@ return $default(_that.bat1,_that.bat2,_that.bat3,_that.bat4,_that.bowl1,_that.bo
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( RosterPlayerData? bat1,  RosterPlayerData? bat2,  RosterPlayerData? bat3,  RosterPlayerData? bat4,  RosterPlayerData? bowl1,  RosterPlayerData? bowl2,  RosterPlayerData? bowl3,  RosterPlayerData? bowl4,  RosterPlayerData? all1,  RosterPlayerData? all2,  RosterPlayerData? all3,  RosterPlayerData? wicket1,  RosterPlayerData? wicket2,  RosterPlayerData? bench1,  RosterPlayerData? bench2,  RosterPlayerData? bench3,  RosterPlayerData? bench4,  RosterPlayerData? bench5,  RosterPlayerData? bench6,  RosterPlayerData? bench7,  RosterPlayerData? bench8,  RosterPlayerData? flex1,  RosterPlayerData? flex2,  RosterPlayerData? flex3,  RosterPlayerData? flex4)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( RosterPlayerData? bat1,  RosterPlayerData? bat2,  RosterPlayerData? bowl1,  RosterPlayerData? bowl2,  RosterPlayerData? bowl3,  RosterPlayerData? all1,  RosterPlayerData? wicket1,  RosterPlayerData? flex1,  RosterPlayerData? bench1,  RosterPlayerData? bench2,  RosterPlayerData? bench3,  RosterPlayerData? bench4,  RosterPlayerData? bench5,  RosterPlayerData? bench6,  RosterPlayerData? bench7,  RosterPlayerData? bench8)?  $default,) {final _that = this;
 switch (_that) {
 case _RosterPlayers() when $default != null:
-return $default(_that.bat1,_that.bat2,_that.bat3,_that.bat4,_that.bowl1,_that.bowl2,_that.bowl3,_that.bowl4,_that.all1,_that.all2,_that.all3,_that.wicket1,_that.wicket2,_that.bench1,_that.bench2,_that.bench3,_that.bench4,_that.bench5,_that.bench6,_that.bench7,_that.bench8,_that.flex1,_that.flex2,_that.flex3,_that.flex4);case _:
+return $default(_that.bat1,_that.bat2,_that.bowl1,_that.bowl2,_that.bowl3,_that.all1,_that.wicket1,_that.flex1,_that.bench1,_that.bench2,_that.bench3,_that.bench4,_that.bench5,_that.bench6,_that.bench7,_that.bench8);case _:
   return null;
 
 }
@@ -802,22 +685,17 @@ return $default(_that.bat1,_that.bat2,_that.bat3,_that.bat4,_that.bowl1,_that.bo
 @JsonSerializable()
 
 class _RosterPlayers implements RosterPlayers {
-  const _RosterPlayers({this.bat1, this.bat2, this.bat3, this.bat4, this.bowl1, this.bowl2, this.bowl3, this.bowl4, this.all1, this.all2, this.all3, this.wicket1, this.wicket2, this.bench1, this.bench2, this.bench3, this.bench4, this.bench5, this.bench6, this.bench7, this.bench8, this.flex1, this.flex2, this.flex3, this.flex4});
+  const _RosterPlayers({this.bat1, this.bat2, this.bowl1, this.bowl2, this.bowl3, this.all1, this.wicket1, this.flex1, this.bench1, this.bench2, this.bench3, this.bench4, this.bench5, this.bench6, this.bench7, this.bench8});
   factory _RosterPlayers.fromJson(Map<String, dynamic> json) => _$RosterPlayersFromJson(json);
 
 @override final  RosterPlayerData? bat1;
 @override final  RosterPlayerData? bat2;
-@override final  RosterPlayerData? bat3;
-@override final  RosterPlayerData? bat4;
 @override final  RosterPlayerData? bowl1;
 @override final  RosterPlayerData? bowl2;
 @override final  RosterPlayerData? bowl3;
-@override final  RosterPlayerData? bowl4;
 @override final  RosterPlayerData? all1;
-@override final  RosterPlayerData? all2;
-@override final  RosterPlayerData? all3;
 @override final  RosterPlayerData? wicket1;
-@override final  RosterPlayerData? wicket2;
+@override final  RosterPlayerData? flex1;
 @override final  RosterPlayerData? bench1;
 @override final  RosterPlayerData? bench2;
 @override final  RosterPlayerData? bench3;
@@ -826,10 +704,6 @@ class _RosterPlayers implements RosterPlayers {
 @override final  RosterPlayerData? bench6;
 @override final  RosterPlayerData? bench7;
 @override final  RosterPlayerData? bench8;
-@override final  RosterPlayerData? flex1;
-@override final  RosterPlayerData? flex2;
-@override final  RosterPlayerData? flex3;
-@override final  RosterPlayerData? flex4;
 
 /// Create a copy of RosterPlayers
 /// with the given fields replaced by the non-null parameter values.
@@ -844,16 +718,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RosterPlayers&&(identical(other.bat1, bat1) || other.bat1 == bat1)&&(identical(other.bat2, bat2) || other.bat2 == bat2)&&(identical(other.bat3, bat3) || other.bat3 == bat3)&&(identical(other.bat4, bat4) || other.bat4 == bat4)&&(identical(other.bowl1, bowl1) || other.bowl1 == bowl1)&&(identical(other.bowl2, bowl2) || other.bowl2 == bowl2)&&(identical(other.bowl3, bowl3) || other.bowl3 == bowl3)&&(identical(other.bowl4, bowl4) || other.bowl4 == bowl4)&&(identical(other.all1, all1) || other.all1 == all1)&&(identical(other.all2, all2) || other.all2 == all2)&&(identical(other.all3, all3) || other.all3 == all3)&&(identical(other.wicket1, wicket1) || other.wicket1 == wicket1)&&(identical(other.wicket2, wicket2) || other.wicket2 == wicket2)&&(identical(other.bench1, bench1) || other.bench1 == bench1)&&(identical(other.bench2, bench2) || other.bench2 == bench2)&&(identical(other.bench3, bench3) || other.bench3 == bench3)&&(identical(other.bench4, bench4) || other.bench4 == bench4)&&(identical(other.bench5, bench5) || other.bench5 == bench5)&&(identical(other.bench6, bench6) || other.bench6 == bench6)&&(identical(other.bench7, bench7) || other.bench7 == bench7)&&(identical(other.bench8, bench8) || other.bench8 == bench8)&&(identical(other.flex1, flex1) || other.flex1 == flex1)&&(identical(other.flex2, flex2) || other.flex2 == flex2)&&(identical(other.flex3, flex3) || other.flex3 == flex3)&&(identical(other.flex4, flex4) || other.flex4 == flex4));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RosterPlayers&&(identical(other.bat1, bat1) || other.bat1 == bat1)&&(identical(other.bat2, bat2) || other.bat2 == bat2)&&(identical(other.bowl1, bowl1) || other.bowl1 == bowl1)&&(identical(other.bowl2, bowl2) || other.bowl2 == bowl2)&&(identical(other.bowl3, bowl3) || other.bowl3 == bowl3)&&(identical(other.all1, all1) || other.all1 == all1)&&(identical(other.wicket1, wicket1) || other.wicket1 == wicket1)&&(identical(other.flex1, flex1) || other.flex1 == flex1)&&(identical(other.bench1, bench1) || other.bench1 == bench1)&&(identical(other.bench2, bench2) || other.bench2 == bench2)&&(identical(other.bench3, bench3) || other.bench3 == bench3)&&(identical(other.bench4, bench4) || other.bench4 == bench4)&&(identical(other.bench5, bench5) || other.bench5 == bench5)&&(identical(other.bench6, bench6) || other.bench6 == bench6)&&(identical(other.bench7, bench7) || other.bench7 == bench7)&&(identical(other.bench8, bench8) || other.bench8 == bench8));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,bat1,bat2,bat3,bat4,bowl1,bowl2,bowl3,bowl4,all1,all2,all3,wicket1,wicket2,bench1,bench2,bench3,bench4,bench5,bench6,bench7,bench8,flex1,flex2,flex3,flex4]);
+int get hashCode => Object.hash(runtimeType,bat1,bat2,bowl1,bowl2,bowl3,all1,wicket1,flex1,bench1,bench2,bench3,bench4,bench5,bench6,bench7,bench8);
 
 @override
 String toString() {
-  return 'RosterPlayers(bat1: $bat1, bat2: $bat2, bat3: $bat3, bat4: $bat4, bowl1: $bowl1, bowl2: $bowl2, bowl3: $bowl3, bowl4: $bowl4, all1: $all1, all2: $all2, all3: $all3, wicket1: $wicket1, wicket2: $wicket2, bench1: $bench1, bench2: $bench2, bench3: $bench3, bench4: $bench4, bench5: $bench5, bench6: $bench6, bench7: $bench7, bench8: $bench8, flex1: $flex1, flex2: $flex2, flex3: $flex3, flex4: $flex4)';
+  return 'RosterPlayers(bat1: $bat1, bat2: $bat2, bowl1: $bowl1, bowl2: $bowl2, bowl3: $bowl3, all1: $all1, wicket1: $wicket1, flex1: $flex1, bench1: $bench1, bench2: $bench2, bench3: $bench3, bench4: $bench4, bench5: $bench5, bench6: $bench6, bench7: $bench7, bench8: $bench8)';
 }
 
 
@@ -864,11 +738,11 @@ abstract mixin class _$RosterPlayersCopyWith<$Res> implements $RosterPlayersCopy
   factory _$RosterPlayersCopyWith(_RosterPlayers value, $Res Function(_RosterPlayers) _then) = __$RosterPlayersCopyWithImpl;
 @override @useResult
 $Res call({
- RosterPlayerData? bat1, RosterPlayerData? bat2, RosterPlayerData? bat3, RosterPlayerData? bat4, RosterPlayerData? bowl1, RosterPlayerData? bowl2, RosterPlayerData? bowl3, RosterPlayerData? bowl4, RosterPlayerData? all1, RosterPlayerData? all2, RosterPlayerData? all3, RosterPlayerData? wicket1, RosterPlayerData? wicket2, RosterPlayerData? bench1, RosterPlayerData? bench2, RosterPlayerData? bench3, RosterPlayerData? bench4, RosterPlayerData? bench5, RosterPlayerData? bench6, RosterPlayerData? bench7, RosterPlayerData? bench8, RosterPlayerData? flex1, RosterPlayerData? flex2, RosterPlayerData? flex3, RosterPlayerData? flex4
+ RosterPlayerData? bat1, RosterPlayerData? bat2, RosterPlayerData? bowl1, RosterPlayerData? bowl2, RosterPlayerData? bowl3, RosterPlayerData? all1, RosterPlayerData? wicket1, RosterPlayerData? flex1, RosterPlayerData? bench1, RosterPlayerData? bench2, RosterPlayerData? bench3, RosterPlayerData? bench4, RosterPlayerData? bench5, RosterPlayerData? bench6, RosterPlayerData? bench7, RosterPlayerData? bench8
 });
 
 
-@override $RosterPlayerDataCopyWith<$Res>? get bat1;@override $RosterPlayerDataCopyWith<$Res>? get bat2;@override $RosterPlayerDataCopyWith<$Res>? get bat3;@override $RosterPlayerDataCopyWith<$Res>? get bat4;@override $RosterPlayerDataCopyWith<$Res>? get bowl1;@override $RosterPlayerDataCopyWith<$Res>? get bowl2;@override $RosterPlayerDataCopyWith<$Res>? get bowl3;@override $RosterPlayerDataCopyWith<$Res>? get bowl4;@override $RosterPlayerDataCopyWith<$Res>? get all1;@override $RosterPlayerDataCopyWith<$Res>? get all2;@override $RosterPlayerDataCopyWith<$Res>? get all3;@override $RosterPlayerDataCopyWith<$Res>? get wicket1;@override $RosterPlayerDataCopyWith<$Res>? get wicket2;@override $RosterPlayerDataCopyWith<$Res>? get bench1;@override $RosterPlayerDataCopyWith<$Res>? get bench2;@override $RosterPlayerDataCopyWith<$Res>? get bench3;@override $RosterPlayerDataCopyWith<$Res>? get bench4;@override $RosterPlayerDataCopyWith<$Res>? get bench5;@override $RosterPlayerDataCopyWith<$Res>? get bench6;@override $RosterPlayerDataCopyWith<$Res>? get bench7;@override $RosterPlayerDataCopyWith<$Res>? get bench8;@override $RosterPlayerDataCopyWith<$Res>? get flex1;@override $RosterPlayerDataCopyWith<$Res>? get flex2;@override $RosterPlayerDataCopyWith<$Res>? get flex3;@override $RosterPlayerDataCopyWith<$Res>? get flex4;
+@override $RosterPlayerDataCopyWith<$Res>? get bat1;@override $RosterPlayerDataCopyWith<$Res>? get bat2;@override $RosterPlayerDataCopyWith<$Res>? get bowl1;@override $RosterPlayerDataCopyWith<$Res>? get bowl2;@override $RosterPlayerDataCopyWith<$Res>? get bowl3;@override $RosterPlayerDataCopyWith<$Res>? get all1;@override $RosterPlayerDataCopyWith<$Res>? get wicket1;@override $RosterPlayerDataCopyWith<$Res>? get flex1;@override $RosterPlayerDataCopyWith<$Res>? get bench1;@override $RosterPlayerDataCopyWith<$Res>? get bench2;@override $RosterPlayerDataCopyWith<$Res>? get bench3;@override $RosterPlayerDataCopyWith<$Res>? get bench4;@override $RosterPlayerDataCopyWith<$Res>? get bench5;@override $RosterPlayerDataCopyWith<$Res>? get bench6;@override $RosterPlayerDataCopyWith<$Res>? get bench7;@override $RosterPlayerDataCopyWith<$Res>? get bench8;
 
 }
 /// @nodoc
@@ -881,21 +755,16 @@ class __$RosterPlayersCopyWithImpl<$Res>
 
 /// Create a copy of RosterPlayers
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? bat1 = freezed,Object? bat2 = freezed,Object? bat3 = freezed,Object? bat4 = freezed,Object? bowl1 = freezed,Object? bowl2 = freezed,Object? bowl3 = freezed,Object? bowl4 = freezed,Object? all1 = freezed,Object? all2 = freezed,Object? all3 = freezed,Object? wicket1 = freezed,Object? wicket2 = freezed,Object? bench1 = freezed,Object? bench2 = freezed,Object? bench3 = freezed,Object? bench4 = freezed,Object? bench5 = freezed,Object? bench6 = freezed,Object? bench7 = freezed,Object? bench8 = freezed,Object? flex1 = freezed,Object? flex2 = freezed,Object? flex3 = freezed,Object? flex4 = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? bat1 = freezed,Object? bat2 = freezed,Object? bowl1 = freezed,Object? bowl2 = freezed,Object? bowl3 = freezed,Object? all1 = freezed,Object? wicket1 = freezed,Object? flex1 = freezed,Object? bench1 = freezed,Object? bench2 = freezed,Object? bench3 = freezed,Object? bench4 = freezed,Object? bench5 = freezed,Object? bench6 = freezed,Object? bench7 = freezed,Object? bench8 = freezed,}) {
   return _then(_RosterPlayers(
 bat1: freezed == bat1 ? _self.bat1 : bat1 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bat2: freezed == bat2 ? _self.bat2 : bat2 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,bat3: freezed == bat3 ? _self.bat3 : bat3 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,bat4: freezed == bat4 ? _self.bat4 : bat4 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bowl1: freezed == bowl1 ? _self.bowl1 : bowl1 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bowl2: freezed == bowl2 ? _self.bowl2 : bowl2 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bowl3: freezed == bowl3 ? _self.bowl3 : bowl3 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,bowl4: freezed == bowl4 ? _self.bowl4 : bowl4 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,all1: freezed == all1 ? _self.all1 : all1 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,all2: freezed == all2 ? _self.all2 : all2 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,all3: freezed == all3 ? _self.all3 : all3 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,wicket1: freezed == wicket1 ? _self.wicket1 : wicket1 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,wicket2: freezed == wicket2 ? _self.wicket2 : wicket2 // ignore: cast_nullable_to_non_nullable
+as RosterPlayerData?,flex1: freezed == flex1 ? _self.flex1 : flex1 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bench1: freezed == bench1 ? _self.bench1 : bench1 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bench2: freezed == bench2 ? _self.bench2 : bench2 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bench3: freezed == bench3 ? _self.bench3 : bench3 // ignore: cast_nullable_to_non_nullable
@@ -904,10 +773,6 @@ as RosterPlayerData?,bench5: freezed == bench5 ? _self.bench5 : bench5 // ignore
 as RosterPlayerData?,bench6: freezed == bench6 ? _self.bench6 : bench6 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bench7: freezed == bench7 ? _self.bench7 : bench7 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,bench8: freezed == bench8 ? _self.bench8 : bench8 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,flex1: freezed == flex1 ? _self.flex1 : flex1 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,flex2: freezed == flex2 ? _self.flex2 : flex2 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,flex3: freezed == flex3 ? _self.flex3 : flex3 // ignore: cast_nullable_to_non_nullable
-as RosterPlayerData?,flex4: freezed == flex4 ? _self.flex4 : flex4 // ignore: cast_nullable_to_non_nullable
 as RosterPlayerData?,
   ));
 }
@@ -935,30 +800,6 @@ $RosterPlayerDataCopyWith<$Res>? get bat2 {
 
   return $RosterPlayerDataCopyWith<$Res>(_self.bat2!, (value) {
     return _then(_self.copyWith(bat2: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get bat3 {
-    if (_self.bat3 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.bat3!, (value) {
-    return _then(_self.copyWith(bat3: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get bat4 {
-    if (_self.bat4 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.bat4!, (value) {
-    return _then(_self.copyWith(bat4: value));
   });
 }/// Create a copy of RosterPlayers
 /// with the given fields replaced by the non-null parameter values.
@@ -1000,18 +841,6 @@ $RosterPlayerDataCopyWith<$Res>? get bowl3 {
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get bowl4 {
-    if (_self.bowl4 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.bowl4!, (value) {
-    return _then(_self.copyWith(bowl4: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
 $RosterPlayerDataCopyWith<$Res>? get all1 {
     if (_self.all1 == null) {
     return null;
@@ -1019,30 +848,6 @@ $RosterPlayerDataCopyWith<$Res>? get all1 {
 
   return $RosterPlayerDataCopyWith<$Res>(_self.all1!, (value) {
     return _then(_self.copyWith(all1: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get all2 {
-    if (_self.all2 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.all2!, (value) {
-    return _then(_self.copyWith(all2: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get all3 {
-    if (_self.all3 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.all3!, (value) {
-    return _then(_self.copyWith(all3: value));
   });
 }/// Create a copy of RosterPlayers
 /// with the given fields replaced by the non-null parameter values.
@@ -1060,13 +865,13 @@ $RosterPlayerDataCopyWith<$Res>? get wicket1 {
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get wicket2 {
-    if (_self.wicket2 == null) {
+$RosterPlayerDataCopyWith<$Res>? get flex1 {
+    if (_self.flex1 == null) {
     return null;
   }
 
-  return $RosterPlayerDataCopyWith<$Res>(_self.wicket2!, (value) {
-    return _then(_self.copyWith(wicket2: value));
+  return $RosterPlayerDataCopyWith<$Res>(_self.flex1!, (value) {
+    return _then(_self.copyWith(flex1: value));
   });
 }/// Create a copy of RosterPlayers
 /// with the given fields replaced by the non-null parameter values.
@@ -1163,54 +968,6 @@ $RosterPlayerDataCopyWith<$Res>? get bench8 {
 
   return $RosterPlayerDataCopyWith<$Res>(_self.bench8!, (value) {
     return _then(_self.copyWith(bench8: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get flex1 {
-    if (_self.flex1 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.flex1!, (value) {
-    return _then(_self.copyWith(flex1: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get flex2 {
-    if (_self.flex2 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.flex2!, (value) {
-    return _then(_self.copyWith(flex2: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get flex3 {
-    if (_self.flex3 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.flex3!, (value) {
-    return _then(_self.copyWith(flex3: value));
-  });
-}/// Create a copy of RosterPlayers
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$RosterPlayerDataCopyWith<$Res>? get flex4 {
-    if (_self.flex4 == null) {
-    return null;
-  }
-
-  return $RosterPlayerDataCopyWith<$Res>(_self.flex4!, (value) {
-    return _then(_self.copyWith(flex4: value));
   });
 }
 }

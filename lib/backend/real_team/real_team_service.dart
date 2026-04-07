@@ -11,7 +11,6 @@ class RealTeamService {
   }
 
   Future<List<RealTeam>> fetchTeamsForTournament(String tournamentId) async {
-    logDebug("fetching all tournmanet teams");
     final rows = await client.from('real_teams').select().eq('tournament_id', tournamentId);
     return (rows as List).map((r) => RealTeam.fromJson(r as Map<String, dynamic>)).toList();
   }

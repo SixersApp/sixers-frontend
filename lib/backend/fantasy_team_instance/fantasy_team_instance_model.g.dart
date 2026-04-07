@@ -36,12 +36,6 @@ _RosterPlayers _$RosterPlayersFromJson(Map<String, dynamic> json) =>
       bat2: json['bat2'] == null
           ? null
           : RosterPlayerData.fromJson(json['bat2'] as Map<String, dynamic>),
-      bat3: json['bat3'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['bat3'] as Map<String, dynamic>),
-      bat4: json['bat4'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['bat4'] as Map<String, dynamic>),
       bowl1: json['bowl1'] == null
           ? null
           : RosterPlayerData.fromJson(json['bowl1'] as Map<String, dynamic>),
@@ -51,24 +45,15 @@ _RosterPlayers _$RosterPlayersFromJson(Map<String, dynamic> json) =>
       bowl3: json['bowl3'] == null
           ? null
           : RosterPlayerData.fromJson(json['bowl3'] as Map<String, dynamic>),
-      bowl4: json['bowl4'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['bowl4'] as Map<String, dynamic>),
       all1: json['all1'] == null
           ? null
           : RosterPlayerData.fromJson(json['all1'] as Map<String, dynamic>),
-      all2: json['all2'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['all2'] as Map<String, dynamic>),
-      all3: json['all3'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['all3'] as Map<String, dynamic>),
       wicket1: json['wicket1'] == null
           ? null
           : RosterPlayerData.fromJson(json['wicket1'] as Map<String, dynamic>),
-      wicket2: json['wicket2'] == null
+      flex1: json['flex1'] == null
           ? null
-          : RosterPlayerData.fromJson(json['wicket2'] as Map<String, dynamic>),
+          : RosterPlayerData.fromJson(json['flex1'] as Map<String, dynamic>),
       bench1: json['bench1'] == null
           ? null
           : RosterPlayerData.fromJson(json['bench1'] as Map<String, dynamic>),
@@ -93,35 +78,18 @@ _RosterPlayers _$RosterPlayersFromJson(Map<String, dynamic> json) =>
       bench8: json['bench8'] == null
           ? null
           : RosterPlayerData.fromJson(json['bench8'] as Map<String, dynamic>),
-      flex1: json['flex1'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['flex1'] as Map<String, dynamic>),
-      flex2: json['flex2'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['flex2'] as Map<String, dynamic>),
-      flex3: json['flex3'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['flex3'] as Map<String, dynamic>),
-      flex4: json['flex4'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['flex4'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$RosterPlayersToJson(_RosterPlayers instance) =>
     <String, dynamic>{
       'bat1': instance.bat1,
       'bat2': instance.bat2,
-      'bat3': instance.bat3,
-      'bat4': instance.bat4,
       'bowl1': instance.bowl1,
       'bowl2': instance.bowl2,
       'bowl3': instance.bowl3,
-      'bowl4': instance.bowl4,
       'all1': instance.all1,
-      'all2': instance.all2,
-      'all3': instance.all3,
       'wicket1': instance.wicket1,
-      'wicket2': instance.wicket2,
+      'flex1': instance.flex1,
       'bench1': instance.bench1,
       'bench2': instance.bench2,
       'bench3': instance.bench3,
@@ -130,10 +98,6 @@ Map<String, dynamic> _$RosterPlayersToJson(_RosterPlayers instance) =>
       'bench6': instance.bench6,
       'bench7': instance.bench7,
       'bench8': instance.bench8,
-      'flex1': instance.flex1,
-      'flex2': instance.flex2,
-      'flex3': instance.flex3,
-      'flex4': instance.flex4,
     };
 
 _FantasyTeamInstance _$FantasyTeamInstanceFromJson(Map<String, dynamic> json) =>

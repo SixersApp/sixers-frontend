@@ -256,7 +256,6 @@ class _CommissionerPreDraftScreenState
                                 },
                                 childDelegate: ListWheelChildBuilderDelegate(
                                   builder: (context, index) {
-                                    final displayed = index % secondCount == null ? 0 : index % _secondRange;
                                     final displayed2 = index % _secondRange;
                                     final dist = (index - selectedSecondAbs).abs();
                                     final double fontSize = dist == 0 ? 36 : dist == 1 ? 24 : 16;

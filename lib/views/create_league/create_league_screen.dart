@@ -57,9 +57,7 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
 
   Future<void> _loadTournaments() async {
     try {
-      logInfo('Loading tournaments...');
       final tournaments = await _leagueService.getTournaments();
-      logInfo('Loaded ${tournaments.length} tournaments');
       if (mounted) {
         setState(() {
           _tournaments = tournaments;
@@ -113,6 +111,7 @@ class _CreateLeagueScreenState extends ConsumerState<CreateLeagueScreen> {
       extra: {
         'leagueName': _nameController.text.trim(),
         'tournamentId': _selectedTournament!.id,
+        'maxTeams': _selectedTournament!.maxTeams,
         'scoringRules': _scoringRules,
       },
     );

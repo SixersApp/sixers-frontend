@@ -64,7 +64,7 @@ final class DraftStateStreamProvider
   }
 }
 
-String _$draftStateStreamHash() => r'd867d3caaadefde7e4dcca3cef9d9614b555cc8a';
+String _$draftStateStreamHash() => r'50d4b036986d9416c5994961678ce9d594a4f0b0';
 
 final class DraftStateStreamFamily extends $Family
     with $FunctionalFamilyOverride<Stream<DraftState?>, String> {

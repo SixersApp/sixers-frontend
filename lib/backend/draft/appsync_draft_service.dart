@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:sixers/backend/draft/draft_end_result_model.dart';
 import 'package:sixers/backend/draft/draft_pick_result_model.dart';
 import 'package:sixers/backend/draft/draft_start_result_model.dart';
 import 'package:sixers/backend/draft_pick/draft_pick_model.dart';
@@ -99,6 +100,15 @@ class AppSyncDraftService {
         leagueId
         nextTeamId
         nextPickExpiresAt
+      }
+    }
+  ''';
+
+  static const String _onDraftEndDoc = '''
+    subscription OnDraftEnd(\$leagueId: String!) {
+      onDraftEnd(leagueId: \$leagueId) {
+        leagueId
+        status
       }
     }
   ''';
@@ -236,7 +246,7 @@ class AppSyncDraftService {
     final operation = Amplify.API.subscribe(
       request,
       onEstablished: () {
-        logInfo('onDraftPick subscription established for league: $leagueId');
+        // logInfo('onDraftPick subscription established');
       },
     );
 
@@ -251,6 +261,31 @@ class AppSyncDraftService {
     });
   }
 
+  Stream<DraftEndResult> onDraftEnd(String leagueId) {
+    final request = GraphQLRequest<String>(
+      document: _onDraftEndDoc,
+      variables: {'leagueId': leagueId},
+      apiName: _apiName,
+    );
+
+    final operation = Amplify.API.subscribe(
+      request,
+      onEstablished: () {
+        // logInfo('onDraftEnd subscription established');
+      },
+    );
+
+    return operation.map((event) {
+      if (event.hasErrors) {
+        logError('onDraftEnd subscription error: ${event.errors}');
+        throw Exception(event.errors.first.message);
+      }
+      final data = jsonDecode(event.data!) as Map<String, dynamic>;
+      return DraftEndResult.fromJson(
+          data['onDraftEnd'] as Map<String, dynamic>);
+    });
+  }
+
   Stream<DraftStartResult> onDraftStart(String leagueId) {
     final request = GraphQLRequest<String>(
       document: _onDraftStartDoc,
@@ -261,7 +296,7 @@ class AppSyncDraftService {
     final operation = Amplify.API.subscribe(
       request,
       onEstablished: () {
-        logInfo('onDraftStart subscription established for league: $leagueId');
+        // logInfo('onDraftStart subscription established');
       },
     );
 

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/backend/onboarding/onboarding_provider.dart';
+import 'package:sixers/backend/onboarding/profile_model.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/utils/logger.dart';
 import 'package:sixers/views/onboarding/basic_info_screen.dart';
@@ -104,6 +105,7 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
       final notifier = ref.read(onboardingStageProvider.notifier);
 
       final profile = await ref.read(onboardingStageProvider.future);
+      final auth = ref.read(authProviderProvider).value!;
 
       final expValue = {
         'new_to_cricket': 1,
@@ -111,10 +113,18 @@ class _ExperienceScreenState extends ConsumerState<ExperienceScreen> {
         'die_hard_fan': 3,
       }[_selectedExperience]!;
 
-      final profileData = profile!.copyWith(
-        experience: expValue,
-        onboardingStage: 2,
-      );
+      final profileData = profile != null
+          ? profile.copyWith(
+              experience: expValue,
+              onboardingStage: 2,
+            )
+          : ProfileModel(
+              userId: auth.userId,
+              createdAt: DateTime.now(),
+              dob: DateTime(2000, 1, 1),
+              experience: expValue,
+              onboardingStage: 2,
+            );
 
       await notifier.updateProfileInfo(profileData: profileData);
 

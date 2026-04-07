@@ -299,7 +299,7 @@ as double?,
 /// @nodoc
 mixin _$Tournament {
 
-@JsonKey(name: "id") String get id;@JsonKey(name: "name") String get name;@JsonKey(name: "abbreviation") String? get abbreviation;@JsonKey(name: "seasons") List<Season>? get seasons;
+@JsonKey(name: "id") String get id;@JsonKey(name: "name") String get name;@JsonKey(name: "abbreviation") String? get abbreviation;@JsonKey(name: "max_teams") int get maxTeams;@JsonKey(name: "weeks") int get weeks;@JsonKey(name: "seasons") List<Season>? get seasons;
 /// Create a copy of Tournament
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -312,16 +312,16 @@ $TournamentCopyWith<Tournament> get copyWith => _$TournamentCopyWithImpl<Tournam
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Tournament&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.abbreviation, abbreviation) || other.abbreviation == abbreviation)&&const DeepCollectionEquality().equals(other.seasons, seasons));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Tournament&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.abbreviation, abbreviation) || other.abbreviation == abbreviation)&&(identical(other.maxTeams, maxTeams) || other.maxTeams == maxTeams)&&(identical(other.weeks, weeks) || other.weeks == weeks)&&const DeepCollectionEquality().equals(other.seasons, seasons));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,abbreviation,const DeepCollectionEquality().hash(seasons));
+int get hashCode => Object.hash(runtimeType,id,name,abbreviation,maxTeams,weeks,const DeepCollectionEquality().hash(seasons));
 
 @override
 String toString() {
-  return 'Tournament(id: $id, name: $name, abbreviation: $abbreviation, seasons: $seasons)';
+  return 'Tournament(id: $id, name: $name, abbreviation: $abbreviation, maxTeams: $maxTeams, weeks: $weeks, seasons: $seasons)';
 }
 
 
@@ -332,7 +332,7 @@ abstract mixin class $TournamentCopyWith<$Res>  {
   factory $TournamentCopyWith(Tournament value, $Res Function(Tournament) _then) = _$TournamentCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: "id") String id,@JsonKey(name: "name") String name,@JsonKey(name: "abbreviation") String? abbreviation,@JsonKey(name: "seasons") List<Season>? seasons
+@JsonKey(name: "id") String id,@JsonKey(name: "name") String name,@JsonKey(name: "abbreviation") String? abbreviation,@JsonKey(name: "max_teams") int maxTeams,@JsonKey(name: "weeks") int weeks,@JsonKey(name: "seasons") List<Season>? seasons
 });
 
 
@@ -349,12 +349,14 @@ class _$TournamentCopyWithImpl<$Res>
 
 /// Create a copy of Tournament
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? abbreviation = freezed,Object? seasons = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? abbreviation = freezed,Object? maxTeams = null,Object? weeks = null,Object? seasons = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,abbreviation: freezed == abbreviation ? _self.abbreviation : abbreviation // ignore: cast_nullable_to_non_nullable
-as String?,seasons: freezed == seasons ? _self.seasons : seasons // ignore: cast_nullable_to_non_nullable
+as String?,maxTeams: null == maxTeams ? _self.maxTeams : maxTeams // ignore: cast_nullable_to_non_nullable
+as int,weeks: null == weeks ? _self.weeks : weeks // ignore: cast_nullable_to_non_nullable
+as int,seasons: freezed == seasons ? _self.seasons : seasons // ignore: cast_nullable_to_non_nullable
 as List<Season>?,
   ));
 }
@@ -437,10 +439,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: "id")  String id, @JsonKey(name: "name")  String name, @JsonKey(name: "abbreviation")  String? abbreviation, @JsonKey(name: "seasons")  List<Season>? seasons)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: "id")  String id, @JsonKey(name: "name")  String name, @JsonKey(name: "abbreviation")  String? abbreviation, @JsonKey(name: "max_teams")  int maxTeams, @JsonKey(name: "weeks")  int weeks, @JsonKey(name: "seasons")  List<Season>? seasons)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Tournament() when $default != null:
-return $default(_that.id,_that.name,_that.abbreviation,_that.seasons);case _:
+return $default(_that.id,_that.name,_that.abbreviation,_that.maxTeams,_that.weeks,_that.seasons);case _:
   return orElse();
 
 }
@@ -458,10 +460,10 @@ return $default(_that.id,_that.name,_that.abbreviation,_that.seasons);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: "id")  String id, @JsonKey(name: "name")  String name, @JsonKey(name: "abbreviation")  String? abbreviation, @JsonKey(name: "seasons")  List<Season>? seasons)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: "id")  String id, @JsonKey(name: "name")  String name, @JsonKey(name: "abbreviation")  String? abbreviation, @JsonKey(name: "max_teams")  int maxTeams, @JsonKey(name: "weeks")  int weeks, @JsonKey(name: "seasons")  List<Season>? seasons)  $default,) {final _that = this;
 switch (_that) {
 case _Tournament():
-return $default(_that.id,_that.name,_that.abbreviation,_that.seasons);}
+return $default(_that.id,_that.name,_that.abbreviation,_that.maxTeams,_that.weeks,_that.seasons);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -475,10 +477,10 @@ return $default(_that.id,_that.name,_that.abbreviation,_that.seasons);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: "id")  String id, @JsonKey(name: "name")  String name, @JsonKey(name: "abbreviation")  String? abbreviation, @JsonKey(name: "seasons")  List<Season>? seasons)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: "id")  String id, @JsonKey(name: "name")  String name, @JsonKey(name: "abbreviation")  String? abbreviation, @JsonKey(name: "max_teams")  int maxTeams, @JsonKey(name: "weeks")  int weeks, @JsonKey(name: "seasons")  List<Season>? seasons)?  $default,) {final _that = this;
 switch (_that) {
 case _Tournament() when $default != null:
-return $default(_that.id,_that.name,_that.abbreviation,_that.seasons);case _:
+return $default(_that.id,_that.name,_that.abbreviation,_that.maxTeams,_that.weeks,_that.seasons);case _:
   return null;
 
 }
@@ -490,12 +492,14 @@ return $default(_that.id,_that.name,_that.abbreviation,_that.seasons);case _:
 @JsonSerializable()
 
 class _Tournament implements Tournament {
-  const _Tournament({@JsonKey(name: "id") required this.id, @JsonKey(name: "name") required this.name, @JsonKey(name: "abbreviation") this.abbreviation, @JsonKey(name: "seasons") final  List<Season>? seasons}): _seasons = seasons;
+  const _Tournament({@JsonKey(name: "id") required this.id, @JsonKey(name: "name") required this.name, @JsonKey(name: "abbreviation") this.abbreviation, @JsonKey(name: "max_teams") required this.maxTeams, @JsonKey(name: "weeks") required this.weeks, @JsonKey(name: "seasons") final  List<Season>? seasons}): _seasons = seasons;
   factory _Tournament.fromJson(Map<String, dynamic> json) => _$TournamentFromJson(json);
 
 @override@JsonKey(name: "id") final  String id;
 @override@JsonKey(name: "name") final  String name;
 @override@JsonKey(name: "abbreviation") final  String? abbreviation;
+@override@JsonKey(name: "max_teams") final  int maxTeams;
+@override@JsonKey(name: "weeks") final  int weeks;
  final  List<Season>? _seasons;
 @override@JsonKey(name: "seasons") List<Season>? get seasons {
   final value = _seasons;
@@ -519,16 +523,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Tournament&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.abbreviation, abbreviation) || other.abbreviation == abbreviation)&&const DeepCollectionEquality().equals(other._seasons, _seasons));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Tournament&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.abbreviation, abbreviation) || other.abbreviation == abbreviation)&&(identical(other.maxTeams, maxTeams) || other.maxTeams == maxTeams)&&(identical(other.weeks, weeks) || other.weeks == weeks)&&const DeepCollectionEquality().equals(other._seasons, _seasons));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,abbreviation,const DeepCollectionEquality().hash(_seasons));
+int get hashCode => Object.hash(runtimeType,id,name,abbreviation,maxTeams,weeks,const DeepCollectionEquality().hash(_seasons));
 
 @override
 String toString() {
-  return 'Tournament(id: $id, name: $name, abbreviation: $abbreviation, seasons: $seasons)';
+  return 'Tournament(id: $id, name: $name, abbreviation: $abbreviation, maxTeams: $maxTeams, weeks: $weeks, seasons: $seasons)';
 }
 
 
@@ -539,7 +543,7 @@ abstract mixin class _$TournamentCopyWith<$Res> implements $TournamentCopyWith<$
   factory _$TournamentCopyWith(_Tournament value, $Res Function(_Tournament) _then) = __$TournamentCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: "id") String id,@JsonKey(name: "name") String name,@JsonKey(name: "abbreviation") String? abbreviation,@JsonKey(name: "seasons") List<Season>? seasons
+@JsonKey(name: "id") String id,@JsonKey(name: "name") String name,@JsonKey(name: "abbreviation") String? abbreviation,@JsonKey(name: "max_teams") int maxTeams,@JsonKey(name: "weeks") int weeks,@JsonKey(name: "seasons") List<Season>? seasons
 });
 
 
@@ -556,12 +560,14 @@ class __$TournamentCopyWithImpl<$Res>
 
 /// Create a copy of Tournament
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? abbreviation = freezed,Object? seasons = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? abbreviation = freezed,Object? maxTeams = null,Object? weeks = null,Object? seasons = freezed,}) {
   return _then(_Tournament(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,abbreviation: freezed == abbreviation ? _self.abbreviation : abbreviation // ignore: cast_nullable_to_non_nullable
-as String?,seasons: freezed == seasons ? _self._seasons : seasons // ignore: cast_nullable_to_non_nullable
+as String?,maxTeams: null == maxTeams ? _self.maxTeams : maxTeams // ignore: cast_nullable_to_non_nullable
+as int,weeks: null == weeks ? _self.weeks : weeks // ignore: cast_nullable_to_non_nullable
+as int,seasons: freezed == seasons ? _self._seasons : seasons // ignore: cast_nullable_to_non_nullable
 as List<Season>?,
   ));
 }

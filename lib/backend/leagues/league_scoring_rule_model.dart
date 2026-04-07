@@ -101,6 +101,8 @@ sealed class Tournament with _$Tournament {
     @JsonKey(name: "id") required String id,
     @JsonKey(name: "name") required String name,
     @JsonKey(name: "abbreviation") String? abbreviation,
+    @JsonKey(name: "max_teams") required int maxTeams,
+    @JsonKey(name: "weeks") required int weeks,
     @JsonKey(name: "seasons") List<Season>? seasons,
   }) = _Tournament;
 

@@ -123,10 +123,10 @@ class DraftTabDraft extends ConsumerWidget {
         return 'Batsman';
       case PositionFilter.bowler:
         return 'Bowler';
-      case PositionFilter.wicketKeeper:
-        return 'Wicket-Keeper';
       case PositionFilter.allRounder:
         return 'All-Rounder';
+      case PositionFilter.wicketKeeper:
+        return 'Wicket-Keeper';
       case PositionFilter.all:
         return null;
     }

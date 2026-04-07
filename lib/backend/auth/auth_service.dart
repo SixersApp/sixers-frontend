@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:sixers/backend/auth/dio_client.dart';
@@ -41,8 +42,8 @@ class AuthService {
 
       printIdToken(appSession.idToken);
 
-      if (firstTime){
-        initUserInBackend(appSession);
+      if (firstTime) {
+        await initUserInBackend(appSession);
       }
       return appSession;
     } on AuthException catch (e) {
@@ -141,8 +142,18 @@ class AuthService {
   }
 
   Future<void> initUserInBackend(AppSession session) async {
-    await ApiClient.dio.put("/users/auth/signup", data: {
-      "email": session.email
-    });
+    final authHeader = ApiClient.dio.options.headers['Authorization'];
+    logDebug("initUserInBackend: Authorization header = $authHeader");
+    logDebug("initUserInBackend: session.idToken starts with = ${session.idToken.substring(0, 20)}...");
+    try {
+      await ApiClient.dio.put("/account/signup", data: {
+        "email": session.email
+      });
+      logDebug("initUserInBackend: success");
+    } on DioException catch (e) {
+      logError("initUserInBackend failed: status=${e.response?.statusCode} body=${e.response?.data}");
+      logError("initUserInBackend actual request headers: ${e.requestOptions.headers}");
+      rethrow;
+    }
   }
 }

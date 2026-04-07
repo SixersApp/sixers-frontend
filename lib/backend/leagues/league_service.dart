@@ -24,7 +24,7 @@ class LeagueService {
     required String teamColor,
     required String teamAbbreviation,
     String? teamIcon,
-    int maxTeams = 10,
+    required int maxTeams,
     List<LeagueScoringRule>? scoringRules,
   }) async {
     final body = {
@@ -40,11 +40,8 @@ class LeagueService {
       'scoring_rules': scoringRules?.map((r) => r.toJson()).toList(),
     };
 
-    logInfo('Creating league with body: $body');
-
     try {
       final res = await _dio.post("/leagues", data: body);
-      logInfo('Create league response: ${res.statusCode} - ${res.data}');
 
       if (res.statusCode != 201) {
         throw Exception('Failed to create league: ${res.statusCode}');
@@ -62,8 +59,6 @@ class LeagueService {
 
     if (res.statusCode != 200 || res.data is! List) return [];
 
-    logInfo('Raw scoring rules response: ${res.data}');
-
     return (res.data as List)
         .map((e) => LeagueScoringRule.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -73,8 +68,6 @@ class LeagueService {
     final res = await _dio.get("/tournaments");
 
     if (res.statusCode != 200 || res.data is! List) return [];
-
-    logInfo('Raw tournaments response: ${res.data}');
 
     return (res.data as List)
         .map((e) => Tournament.fromJson(e as Map<String, dynamic>))
@@ -93,17 +86,11 @@ class LeagueService {
       body['pick_warning_seconds'] = pickWarningSeconds;
     if (snakeDraft != null) body['snake_draft'] = snakeDraft;
 
-    logInfo('Updating draft settings for league $leagueId with body: $body');
-
     try {
       final res = await _dio.put(
         "/leagues/$leagueId/draft-settings",
         data: body,
       );
-      logInfo(
-        'Update draft settings response: ${res.statusCode} - ${res.data}',
-      );
-
       if (res.statusCode != 200) {
         throw Exception('Failed to update draft settings: ${res.statusCode}');
       }
@@ -116,11 +103,8 @@ class LeagueService {
   }
 
   Future<League?> findLeagueByCode(String joinCode) async {
-    logInfo('Finding league with code: $joinCode');
-
     try {
       final res = await _dio.get("/leagues/join/$joinCode");
-      logInfo('Find league response: ${res.statusCode} - ${res.data}');
 
       if (res.statusCode != 200) {
         return null;
@@ -147,11 +131,8 @@ class LeagueService {
       if (teamIcon != null) 'team_icon': teamIcon,
     };
 
-    logInfo('Joining league with code $joinCode, body: $body');
-
     try {
       final res = await _dio.post("/leagues/join/$joinCode", data: body);
-      logInfo('Join league response: ${res.statusCode} - ${res.data}');
 
       if (res.statusCode != 200 && res.statusCode != 201) {
         throw Exception(
@@ -170,14 +151,11 @@ class LeagueService {
     required String leagueId,
     required List<Map<String, Object>> teamIds,
   }) async {
-    logInfo('Updating draft order for league $leagueId with teamIds: $teamIds');
-
     try {
       final res = await _dio.put(
         "/leagues/$leagueId/draft-order",
         data: {"draft_order": teamIds},
       );
-      logInfo('Update draft order response: ${res.statusCode} - ${res.data}');
 
       if (res.statusCode != 200) {
         throw Exception('Failed to update draft order: ${res.statusCode}');
@@ -196,17 +174,11 @@ class LeagueService {
   }) async {
     final rules = scoringRules.map((r) => r.toJson()).toList();
 
-    logInfo(
-      'Updating scoring rules for league $leagueId, count: ${rules.length}',
-    );
-    logInfo('Rules body: $rules');
-
     try {
       final res = await _dio.put(
         "/leagues/$leagueId/scoring-rules",
         data: {"scoring_rules": rules},
       );
-      logInfo('Update scoring rules response: ${res.statusCode} - ${res.data}');
 
       if (res.statusCode != 200) {
         throw Exception('Failed to update scoring rules: ${res.statusCode}');
@@ -224,17 +196,12 @@ class LeagueService {
   Future<List<LeaguePositionRule>> getLeaguePositionRules({
     required String leagueId,
   }) async {
-    logInfo('Fetching position rules for league $leagueId');
-
     try {
       final res = await _dio.get("/leagues/$leagueId/position-rules");
       
       if (res.statusCode != 200 || res.data is! List) {
-        logInfo('No position rules found, returning empty list');
         return [];
       }
-
-      logInfo('Raw position rules response: ${res.data}');
 
       return (res.data as List)
           .map((e) => LeaguePositionRule.fromJson(e as Map<String, dynamic>))

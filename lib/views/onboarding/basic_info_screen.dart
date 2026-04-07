@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sixers/backend/auth/auth_provider.dart';
 import 'package:sixers/backend/onboarding/onboarding_provider.dart';
+import 'package:sixers/backend/onboarding/profile_model.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/utils/logger.dart';
 import 'package:sixers/views/onboarding/experience_screen.dart';
@@ -130,16 +131,27 @@ class _BasicInfoScreenState extends ConsumerState<BasicInfoScreen> {
     try {
       final notifier = ref.read(onboardingStageProvider.notifier);
       final profileData = await ref.watch(onboardingStageProvider.future);
-      final newProfile = profileData!.copyWith(
-        fullName: _nameController.text,
-        country: _selectedCountry!,
-        dob: DateTime(
-          _selectedYear,
-          _months.indexOf(_selectedMonth) + 1,
-          _selectedDay,
-        ),
-        onboardingStage: max(profileData.onboardingStage, 1),
+      final auth = ref.read(authProviderProvider).value!;
+      final dob = DateTime(
+        _selectedYear,
+        _months.indexOf(_selectedMonth) + 1,
+        _selectedDay,
       );
+      final newProfile = profileData != null
+          ? profileData.copyWith(
+              fullName: _nameController.text,
+              country: _selectedCountry!,
+              dob: dob,
+              onboardingStage: max(profileData.onboardingStage, 1),
+            )
+          : ProfileModel(
+              userId: auth.userId,
+              createdAt: DateTime.now(),
+              fullName: _nameController.text,
+              country: _selectedCountry!,
+              dob: dob,
+              onboardingStage: 1,
+            );
       await notifier.updateProfileInfo(profileData: newProfile);
       if (context.mounted) {
         context.go(ExperienceScreen.route);

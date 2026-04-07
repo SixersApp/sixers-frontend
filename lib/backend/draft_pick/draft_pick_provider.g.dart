@@ -116,7 +116,7 @@ final class DraftPickActionsProvider
   }
 }
 
-String _$draftPickActionsHash() => r'acc8141892d14d3abda8ca97063bd3f335d6ab82';
+String _$draftPickActionsHash() => r'016846d242d441918e4f0927fe9d782ee22368af';
 
 abstract class _$DraftPickActions extends $Notifier<void> {
   void build();

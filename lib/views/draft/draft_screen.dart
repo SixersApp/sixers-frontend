@@ -18,7 +18,6 @@ import 'package:sixers/theme/colors.dart';
 import 'package:sixers/utils/logger.dart';
 import 'package:sixers/utils/string_to_avatar.dart';
 import 'package:sixers/views/components/helpers.dart';
-import 'package:sixers/views/components/matchup_card/matchup_card.dart';
 import 'package:sixers/views/home/home_screen.dart';
 
 // ── Screen ───────────────────────────────────────────────────────────────────
@@ -118,7 +117,12 @@ class _DraftScreenState extends ConsumerState<DraftScreen>
             return const Center(child: Text('Waiting for draft to start...'));
           }
 
-          final secsLeft = _computeSecondsLeft(state.pickExpiresAt);
+          final isFinalizing = state.status == 'finalizing';
+          final isCompleted = state.status == 'completed';
+          final isDraftOver = isFinalizing || isCompleted;
+
+          final secsLeft =
+              isDraftOver ? 0 : _computeSecondsLeft(state.pickExpiresAt);
 
           final leaguesAsync = ref.watch(leaguesProvider);
           final userTeamId = leaguesAsync.whenOrNull(
@@ -128,7 +132,8 @@ class _DraftScreenState extends ConsumerState<DraftScreen>
               return match.isNotEmpty ? match.first.userTeamId : null;
             },
           );
-          final isMyTurn = userTeamId != null &&
+          final isMyTurn = !isDraftOver &&
+              userTeamId != null &&
               userTeamId.isNotEmpty &&
               state.currentTeamId == userTeamId;
 
@@ -155,11 +160,28 @@ class _DraftScreenState extends ConsumerState<DraftScreen>
                       context.go(HomeScreen.route);
                     }
                   },
-                  timerText: _formatTimer(secsLeft),
+                  timerText:
+                      isDraftOver ? '--:--' : _formatTimer(secsLeft),
                   round: state.currentRound,
                   pick: pickInRound(state.currentPick),
                   isMyTurn: isMyTurn,
+                  isDraftOver: isDraftOver,
                 ),
+
+                // ── Draft complete / finalizing banner ────────
+                if (isDraftOver)
+                  _DraftEndBanner(
+                    isFinalizing: isFinalizing,
+                    onViewLeague: isCompleted
+                        ? () {
+                            if (context.canPop()) {
+                              context.pop();
+                            } else {
+                              context.go(HomeScreen.route);
+                            }
+                          }
+                        : null,
+                  ),
 
                 // ── Pick timeline ──────────────────────────────
                 if (state.picks.isNotEmpty)
@@ -285,6 +307,7 @@ class _DraftHeader extends StatelessWidget {
   final int round;
   final int pick;
   final bool isMyTurn;
+  final bool isDraftOver;
 
   const _DraftHeader({
     required this.onBack,
@@ -292,6 +315,7 @@ class _DraftHeader extends StatelessWidget {
     required this.round,
     required this.pick,
     required this.isMyTurn,
+    this.isDraftOver = false,
   });
 
   @override
@@ -336,7 +360,7 @@ class _DraftHeader extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                'Round $round, Pick $pick',
+                isDraftOver ? 'Draft Over' : 'Round $round, Pick $pick',
                 style: t.labelMedium?.copyWith(color: AppColors.black600),
               ),
             ],
@@ -345,6 +369,78 @@ class _DraftHeader extends StatelessWidget {
       ),
     );
   }
+}
+
+// ── Draft End Banner ─────────────────────────────────────────────────────────
+
+class _DraftEndBanner extends StatelessWidget {
+  final bool isFinalizing;
+  final VoidCallback? onViewLeague;
+
+  const _DraftEndBanner({
+    required this.isFinalizing,
+    this.onViewLeague,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      color: isFinalizing ? AppColors.black200 : AppColors.green300,
+      child: Row(
+        children: [
+          if (isFinalizing)
+            const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          else
+            Icon(PhosphorIcons.checkCircle(PhosphorIconsStyle.fill),
+                color: Colors.black, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              isFinalizing ? 'Finalizing draft...' : 'Draft Complete!',
+              style: t.bodyMedium?.copyWith(
+                color: isFinalizing ? AppColors.black700 : Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          if (onViewLeague != null)
+            GestureDetector(
+              onTap: onViewLeague,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'View League',
+                  style: t.labelMedium?.copyWith(color: AppColors.green300),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Snake-draft-aware pick-in-round number.
+/// Odd rounds: pick 1 is first team, pick N is last team.
+/// Even rounds: pick 1 is last team, pick N is first team.
+int _pickInRound(DraftPick pick, int numTeams) {
+  final posInRound = ((pick.pickNumber - 1) % numTeams) + 1;
+  if (pick.roundNumber.isEven) {
+    return numTeams - posInRound + 1;
+  }
+  return posInRound;
 }
 
 // ── Pick Timeline Card ───────────────────────────────────────────────────────
@@ -430,7 +526,7 @@ class _PickTimelineCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 5,),
                           Text(
-                            '${pick.roundNumber}.${(((pick.pickNumber - 1) % numTeams) + 1).toString().padLeft(2, '0')}',
+                            '${pick.roundNumber}.${_pickInRound(pick, numTeams).toString().padLeft(2, '0')}',
                             style: t.titleSmall?.copyWith(color: AppColors.black800)
                           ),
                         ],
@@ -693,10 +789,10 @@ class _DraftTabState extends ConsumerState<_DraftTab> {
     );
     if (userTeamId == null || userTeamId.isEmpty) return;
 
-    logDebug('Pick attempt: userTeamId=$userTeamId, '
-        'currentTeamId=${widget.draftState.currentTeamId}, '
-        'round=${widget.draftState.currentRound}, '
-        'pick=${widget.draftState.currentPick}');
+    // logDebug('Pick attempt: userTeamId=$userTeamId, '
+    //     'currentTeamId=${widget.draftState.currentTeamId}, '
+    //     'round=${widget.draftState.currentRound}, '
+    //     'pick=${widget.draftState.currentPick}');
 
     await ref.read(draftPickActionsProvider.notifier).makePick(
           leagueId: widget.leagueId,
@@ -842,10 +938,10 @@ class _DraftTabState extends ConsumerState<_DraftTab> {
     switch (f) {
       case PositionFilter.all:
         return 'All';
-      case PositionFilter.bowler:
-        return 'Bowler';
       case PositionFilter.batsman:
         return 'Batsman';
+      case PositionFilter.bowler:
+        return 'Bowler';
       case PositionFilter.allRounder:
         return 'All Rounder';
       case PositionFilter.wicketKeeper:
@@ -1147,10 +1243,8 @@ class _BoardTab extends ConsumerWidget {
     required int pickInRound,
     required int numTeams,
   }) {
-    // Snake: even rounds reverse the column order
-    final isReversed = round.isEven;
-    final teamIndex = isReversed ? (numTeams - 1 - colIndex) : colIndex;
-    final team = teams[teamIndex];
+    // Column always corresponds to the same team as the header
+    final team = teams[colIndex];
     final pick = pickIndex[(round, team.id)];
 
     if (pick == null) {
@@ -1356,32 +1450,43 @@ class _RosterTab extends ConsumerWidget {
     final sorted = List<DraftPlayer>.from(picked)
       ..sort((a, b) => a.rank.compareTo(b.rank));
 
-    // Separate into pools by role
+    // Separate into pools by role (already sorted by rank)
     final batsmen = sorted.where((p) => p.roleAbbr == 'BAT').toList();
     final bowlers = sorted.where((p) => p.roleAbbr == 'BWL').toList();
-    final allRounders = sorted.where((p) => p.roleAbbr == 'AR').toList();
     final keepers = sorted.where((p) => p.roleAbbr == 'WK').toList();
+    final allRounders = sorted.where((p) => p.roleAbbr == 'AR').toList();
 
-    // Track players assigned to starting roster
     final assigned = <String>{};
 
-    // ── Wicket Keeper slot (one of the 3 batsman slots) ──
-    // Use the highest-ranked WK if available
+    // ── 1. Fill each dedicated slot with its own role first ──
+
+    // Wicket Keeper slot: 1 (WK only) — fill before batsman so WK goes here first
     DraftPlayer? wkStarter;
-    if (keepers.isNotEmpty) {
-      wkStarter = keepers.first;
-      assigned.add(wkStarter.id);
+    for (final p in keepers) {
+      wkStarter = p;
+      assigned.add(p.id);
+      break;
     }
 
-    // ── Batsman slots: 2 remaining after WK ──
+    // Batsman slots: 2 (BAT only, then overflow WK if needed)
     final batStarters = <DraftPlayer>[];
     for (final p in batsmen) {
       if (batStarters.length >= 2) break;
       batStarters.add(p);
       assigned.add(p.id);
     }
+    // If batsman slots still open, fill with unassigned WK
+    if (batStarters.length < 2) {
+      for (final p in keepers) {
+        if (batStarters.length >= 2) break;
+        if (!assigned.contains(p.id)) {
+          batStarters.add(p);
+          assigned.add(p.id);
+        }
+      }
+    }
 
-    // ── Bowler slots: 3 ──
+    // Bowler slots: 3 (BWL only)
     final bwlStarters = <DraftPlayer>[];
     for (final p in bowlers) {
       if (bwlStarters.length >= 3) break;
@@ -1389,14 +1494,16 @@ class _RosterTab extends ConsumerWidget {
       assigned.add(p.id);
     }
 
-    // ── All Rounder slot: 1 ──
+    // All Rounder slot: 1 (AR only)
     DraftPlayer? arStarter;
-    if (allRounders.isNotEmpty) {
-      arStarter = allRounders.first;
-      assigned.add(arStarter.id);
+    for (final p in allRounders) {
+      arStarter = p;
+      assigned.add(p.id);
+      break;
     }
 
-    // ── Flex slot: best remaining unassigned player by rank ──
+    // ── 2. Flex slot: best remaining unassigned player ──
+    // AR overflow goes here before bench
     DraftPlayer? flexStarter;
     for (final p in sorted) {
       if (!assigned.contains(p.id)) {
@@ -1406,13 +1513,14 @@ class _RosterTab extends ConsumerWidget {
       }
     }
 
-    // ── Bench: all remaining unassigned, sorted by rank ──
+    // ── 3. Bench: all remaining unassigned, sorted by rank ──
     final bench = sorted.where((p) => !assigned.contains(p.id)).toList();
 
     // ── Build slots ──
+    const benchSlots = 3;
     final slots = <_RosterSlot>[
-      // Wicket Keeper (shown under Batsman section)
-      _RosterSlot(label: 'Batsman', roleAbbr: 'WK', player: wkStarter),
+      // 1 Wicket Keeper
+      _RosterSlot(label: 'Wicket Keeper', roleAbbr: 'WK', player: wkStarter),
       // 2 Batsmen
       for (int i = 0; i < 2; i++)
         _RosterSlot(
@@ -1431,8 +1539,8 @@ class _RosterTab extends ConsumerWidget {
       _RosterSlot(label: 'All Rounder', roleAbbr: 'AR', player: arStarter),
       // 1 Flex
       _RosterSlot(label: 'Flex', player: flexStarter),
-      // 3 Bench
-      for (int i = 0; i < 3; i++)
+      // Bench (always show all slots, even if empty)
+      for (int i = 0; i < benchSlots; i++)
         _RosterSlot(
           label: 'Bench',
           player: i < bench.length ? bench[i] : null,

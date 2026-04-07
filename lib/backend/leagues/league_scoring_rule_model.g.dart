@@ -43,6 +43,8 @@ _Tournament _$TournamentFromJson(Map<String, dynamic> json) => _Tournament(
   id: json['id'] as String,
   name: json['name'] as String,
   abbreviation: json['abbreviation'] as String?,
+  maxTeams: (json['max_teams'] as num).toInt(),
+  weeks: (json['weeks'] as num).toInt(),
   seasons: (json['seasons'] as List<dynamic>?)
       ?.map((e) => Season.fromJson(e as Map<String, dynamic>))
       .toList(),
@@ -53,6 +55,8 @@ Map<String, dynamic> _$TournamentToJson(_Tournament instance) =>
       'id': instance.id,
       'name': instance.name,
       'abbreviation': instance.abbreviation,
+      'max_teams': instance.maxTeams,
+      'weeks': instance.weeks,
       'seasons': instance.seasons,
     };
 

@@ -31,6 +31,9 @@ sealed class FantasyTeam with _$FantasyTeam {
     @JsonKey(name: "team_icon")
     String? teamIcon,
 
+    @JsonKey(name: "abbreviation")
+    String? teamAbbreviation,
+
     @JsonKey(name: "created_at")
     String? createdAt,
   }) = _FantasyTeam;

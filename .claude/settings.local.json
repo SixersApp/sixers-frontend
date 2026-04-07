@@ -8,7 +8,19 @@
       "Bash(flutter run)",
       "Bash(flutter emulators:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(dart analyze:*)"
+      "Bash(dart analyze:*)",
+      "Bash(find \"C:\\\\Users\\\\achag\\\\PersonalRepos\\\\sixers-stuff\\\\sixers-frontend\" -name \"*tournament*\" -type f 2>/dev/null | head -20)",
+      "Bash(grep -r \"latestGame\\\\|latest_game\" \"C:\\\\Users\\\\achag\\\\PersonalRepos\\\\sixers-stuff\\\\sixers-frontend\\\\lib\" --include=\"*.dart\" 2>/dev/null | head -20)",
+      "Bash(grep -r \"round\\\\|schedule\\\\|matchup\" \"C:\\\\Users\\\\achag\\\\PersonalRepos\\\\sixers-stuff\\\\sixers-frontend\\\\lib\\\\backend\" --include=\"*.dart\" 2>/dev/null | grep -v \".freezed\\\\|.g.dart\" | head -30)",
+      "Bash(find \"C:\\\\Users\\\\achag\\\\PersonalRepos\\\\sixers-stuff\\\\sixers-frontend\\\\lib\" -type f -name \"*.dart\" | xargs grep -l \"const.*=.*[0-9]\\\\|final.*int.*=\" 2>/dev/null | head -20)",
+      "Bash(grep -r \"import.*Tournament\\\\|import.*League\" \"C:\\\\Users\\\\achag\\\\PersonalRepos\\\\sixers-stuff\\\\sixers-frontend\\\\lib\" --include=\"*.dart\" 2>/dev/null | grep -v \".freezed\\\\|.g.dart\" | head -30)",
+      "Bash(grep -r \"maxTeams\\\\|total.*game\\\\|total.*match\\\\|schedule\" \"C:\\\\Users\\\\achag\\\\PersonalRepos\\\\sixers-stuff\\\\sixers-frontend\\\\lib\" --include=\"*.dart\" 2>/dev/null | grep -v \".freezed\\\\|.g.dart\" | head -30)",
+      "Bash(find \"C:\\\\Users\\\\achag\\\\PersonalRepos\\\\sixers-stuff\\\\sixers-frontend\" -type f -name \"*.dart\" -o -name \"*.json\" -o -name \"*.yaml\" 2>/dev/null | grep -E \"\\(config|constant|environment|settings\\)\" | head -20)",
+      "Bash(find /c/Users/achag/PersonalRepos/sixers-stuff/sixers-frontend -maxdepth 2 -type f \\\\\\(-name .env* -o -name *.json -o -name *.config.* \\\\\\))",
+      "Bash(flutter pub:*)",
+      "Bash(curl -s -L \"https://docs.aws.amazon.com/appsync/latest/eventapi/event-api-websocket-protocol.html\")",
+      "Bash(grep -r \"import.*match_provider\\\\|from.*match_provider\" /c/Users/achag/PersonalRepos/sixers-stuff/sixers-frontend/lib --include=*.dart)",
+      "Bash(dart run:*)"
     ]
   }
 }

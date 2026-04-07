@@ -1,3 +1,5 @@
+import 'package:sixers/utils/logger.dart';
+
 class DraftPlayer {
   final String id;
   final String playerName;
@@ -23,9 +25,15 @@ class DraftPlayer {
     this.teamName,
   });
 
-  factory DraftPlayer.fromJson(Map<String, dynamic> json) => DraftPlayer(
+  factory DraftPlayer.fromJson(Map<String, dynamic> json) {
+    final name = json['player_name'] as String;
+    final role = json['role'] as String? ?? 'Unknown';
+    if (name.toLowerCase().contains('rohit')) {
+      logDebug("DraftPlayer '$name': role='$role'");
+    }
+    return DraftPlayer(
         id: json['id'] as String,
-        playerName: json['player_name'] as String,
+        playerName: name,
         fullName: json['full_name'] as String?,
         image: json['image'] as String?,
         role: json['role'] as String? ?? 'Unknown',
@@ -37,10 +45,11 @@ class DraftPlayer {
             : null,
         teamName: json['team_name'] as String?,
       );
+  }
 
   String get roleAbbr {
     final r = role.toLowerCase();
-    if (r.contains('allrounder') || r.contains('all-rounder')) return 'AR';
+    if (r.contains('allrounder') || r.contains('all-rounder') || r.contains('all rounder')) return 'AR';
     if (r.contains('batter') || r == 'batsman') return 'BAT';
     if (r.contains('bowler')) return 'BWL';
     if (r.contains('wicket') || r.contains('keeper')) return 'WK';

@@ -70,6 +70,7 @@ sealed class League with _$League {
     @JsonKey(name: "join_code") required String joinCode,
     @JsonKey(name: "season_id") required String seasonId,
     @JsonKey(name: "latest_game") @Default(0) int latestGame,
+    @JsonKey(name: "total_games") @Default(0) int weeks,
     @JsonKey(name: "teams") required List<FantasyTeam> teams,
     @JsonKey(name: "tournament_abbr") required String? tournamentAbbr,
     @JsonKey(name: "season_year") required int seasonYear,

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/leagues/league_service.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/views/create_league/league_preview_screen.dart';

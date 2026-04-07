@@ -19,11 +19,6 @@ class DraftPlayerService {
       },
     );
 
-    if (res.statusCode == 200 && res.data is List && (res.data as List).isNotEmpty) {
-      logInfo('Draft player sample keys: ${(res.data as List).first.keys}');
-      logInfo('Draft player sample: ${(res.data as List).first}');
-    }
-
     if (res.statusCode != 200 || res.data is! List) {
       logError('fetchDraftPlayers failed: ${res.statusCode}');
       throw Exception('Failed to fetch draft players');

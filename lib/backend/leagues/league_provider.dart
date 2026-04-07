@@ -3,7 +3,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sixers/utils/logger.dart';
 import '../auth/auth_provider.dart';
-import '../fantasy_team/fantasy_team_model.dart';
 import 'league_model.dart';
 import 'league_service.dart';
 

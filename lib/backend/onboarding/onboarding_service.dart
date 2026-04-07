@@ -8,9 +8,10 @@ class OnboardingService {
 
   Future<ProfileModel?> fetchProfile(String userId) async {
     try {
-      final res = await _dio.get("/users/profile");
+      final res = await _dio.get("/account/profile");
       return ProfileModel.fromJson(res.data["profile"]);
     } on DioException catch (e) {
+      if (e.response?.statusCode == 404) return null;
       throw handleDioException(e);
     } catch (_) {
       throw "Something unexpected occurred. Please try again later";
@@ -20,7 +21,7 @@ class OnboardingService {
   Future<void> updateProfileData({required ProfileModel profileData}) async {
     try {
       await _dio.patch(
-        '/users/profile',
+        '/account/profile',
         data: profileData.toJson(),
       );
     } on DioException catch (e) {

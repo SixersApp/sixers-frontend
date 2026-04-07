@@ -38,7 +38,6 @@ class _CustomizeScoringScreenState
     final passedRules =
         widget.leagueData['scoringRules'] as List<LeagueScoringRule>?;
     if (passedRules != null && passedRules.isNotEmpty) {
-      logInfo('Using ${passedRules.length} passed scoring rules');
       if (mounted) {
         setState(() {
           _scoringRules = passedRules;
@@ -50,14 +49,7 @@ class _CustomizeScoringScreenState
     }
 
     try {
-      logInfo('Loading default scoring rules...');
       final rules = await _leagueService.getDefaultScoringRules();
-      logInfo('Loaded ${rules.length} scoring rules');
-      if (rules.isNotEmpty) {
-        logInfo(
-          'Categories: ${rules.map((r) => r.category).toSet().join(', ')}',
-        );
-      }
       if (mounted) {
         setState(() {
           _scoringRules = rules;
@@ -79,9 +71,6 @@ class _CustomizeScoringScreenState
         // For band rules, create controllers for left bound, right bound, and points
         final baseKey = _getRuleKey(rule);
         final (left, right, isOpenEnded) = _parseBand(rule.band);
-        logInfo(
-          'Band rule: ${rule.stat}, band="${rule.band}", parsed: left="$left", right="$right", isOpenEnded=$isOpenEnded, flatPoints=${rule.flatPoints}',
-        );
         _controllers['${baseKey}_left'] = TextEditingController(text: left);
         if (!isOpenEnded) {
           _controllers['${baseKey}_right'] = TextEditingController(text: right);
