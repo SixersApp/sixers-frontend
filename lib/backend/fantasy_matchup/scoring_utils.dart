@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:sixers/backend/fantasy_matchup/matchup_model.dart';
 import 'package:sixers/backend/leagues/league_scoring_rule_model.dart';
 import 'package:sixers/backend/live_match/active_match_model.dart';
-import 'package:sixers/utils/logger.dart';
 
 /// Parsed band with optional bounds and inclusive/exclusive endpoints.
 class _Band {
@@ -176,6 +175,12 @@ double calculatePlayerPoints(
   final multiplierRules = <LeagueScoringRule>[];
 
   for (final rule in rules) {
+    // Multiplier rules (e.g. captaincy) apply regardless of category
+    if (rule.mode == RuleMode.multiplier) {
+      multiplierRules.add(rule);
+      continue;
+    }
+
     if (!categories.contains(rule.category.toLowerCase())) continue;
 
     final stat = rule.stat.toLowerCase();
@@ -189,7 +194,7 @@ double calculatePlayerPoints(
       case RuleMode.band:
         points = _computeBand(perf, rule, stat);
       case RuleMode.multiplier:
-        multiplierRules.add(rule);
+        break; // already handled above
       case RuleMode.threshold:
         points = _computeFlat(perf, rule, stat);
     }
@@ -215,6 +220,248 @@ double calculatePlayerPoints(
   }
 
   return total;
+}
+
+/// A single line item in a fantasy score breakdown.
+class ScoreBreakdownItem {
+  final String label;
+  final String statDisplay;
+  final String ptsPerDisplay;
+  final double points;
+
+  const ScoreBreakdownItem({
+    required this.label,
+    required this.statDisplay,
+    required this.ptsPerDisplay,
+    required this.points,
+  });
+}
+
+/// Detailed breakdown result including subtotal, multipliers, and total.
+class ScoreBreakdown {
+  final List<ScoreBreakdownItem> items;
+  final double subtotal;
+  final List<ScoreBreakdownItem> multipliers;
+  final double total;
+
+  const ScoreBreakdown({
+    required this.items,
+    required this.subtotal,
+    required this.multipliers,
+    required this.total,
+  });
+}
+
+/// Return a per-stat readable name for display.
+String _statDisplayName(String stat) {
+  switch (stat) {
+    case 'points per run':
+      return 'Runs';
+    case 'bonus per 4':
+      return "4's scored";
+    case 'bonus per 6':
+      return "6's scored";
+    case 'strike rate':
+      return 'Strike Rate';
+    case 'economy':
+      return 'Economy';
+    case 'bonus per century':
+      return 'Century Bonus';
+    case 'bonus per half-century':
+      return 'Half Century Bonus';
+    case 'points per wicket':
+      return 'Wickets';
+    case '3-wicket bonus':
+      return '3-Wicket Bonus';
+    case '5-wicket bonus':
+      return '5-Wicket Bonus';
+    case 'points per catch taken':
+      return 'Catch Taken';
+    case '3-catches bonus':
+      return '3-Catches Bonus';
+    case 'run out':
+      return 'Run Out';
+    case 'dropped catch':
+      return 'Dropped Catch';
+    case 'captaincy multiplier':
+      return 'Captain Multiplier';
+    case 'vice captaincy multiplier':
+      return 'Vice Captain Multiplier';
+    default:
+      return stat[0].toUpperCase() + stat.substring(1);
+  }
+}
+
+/// Format a band string like "[140,)" → ">140", "(,6]" → "<6", "[100,150)" → "100-150".
+String _formatBand(String? band) {
+  if (band == null || band.isEmpty) return '';
+  final parsed = _parseBand(band);
+  if (parsed == null) return band;
+
+  if (parsed.lo != null && parsed.hi == null) {
+    final loStr = parsed.lo! == parsed.lo!.roundToDouble()
+        ? parsed.lo!.toInt().toString()
+        : parsed.lo!.toString();
+    return '>$loStr';
+  }
+  if (parsed.lo == null && parsed.hi != null) {
+    final hiStr = parsed.hi! == parsed.hi!.roundToDouble()
+        ? parsed.hi!.toInt().toString()
+        : parsed.hi!.toString();
+    return '<$hiStr';
+  }
+  if (parsed.lo != null && parsed.hi != null) {
+    final loStr = parsed.lo! == parsed.lo!.roundToDouble()
+        ? parsed.lo!.toInt().toString()
+        : parsed.lo!.toString();
+    final hiStr = parsed.hi! == parsed.hi!.roundToDouble()
+        ? parsed.hi!.toInt().toString()
+        : parsed.hi!.toString();
+    return '$loStr-$hiStr';
+  }
+  return band;
+}
+
+/// Get the stat value to display for a given rule.
+String _statValue(PlayerPerformance perf, LeagueScoringRule rule, String stat) {
+  switch (stat) {
+    case 'points per run':
+      return '${perf.runsScored ?? 0}';
+    case 'bonus per 4':
+      return '${perf.fours ?? 0}';
+    case 'bonus per 6':
+      return '${perf.sixes ?? 0}';
+    case 'strike rate':
+      final bf = perf.ballsFaced ?? 0;
+      if (bf == 0) return '0';
+      return _formatBand(rule.band);
+    case 'economy':
+      final bb = perf.ballsBowled ?? 0;
+      if (bb == 0) return '0';
+      return _formatBand(rule.band);
+    case 'bonus per century':
+      return (perf.runsScored ?? 0) >= 100 ? '1' : '0';
+    case 'bonus per half-century':
+      return (perf.runsScored ?? 0) >= 50 ? '1' : '0';
+    case 'points per wicket':
+      return '${perf.wicketsTaken ?? 0}';
+    case '3-wicket bonus':
+      return '${(perf.wicketsTaken ?? 0) ~/ 3}';
+    case '5-wicket bonus':
+      return '${(perf.wicketsTaken ?? 0) ~/ 5}';
+    case 'points per catch taken':
+      return '${perf.catches ?? 0}';
+    case '3-catches bonus':
+      return '${(perf.catches ?? 0) ~/ 3}';
+    case 'run out':
+      return '${perf.runOuts ?? 0}';
+    case 'dropped catch':
+      return '${perf.catchesDropped ?? 0}';
+    case 'captaincy multiplier':
+      return 'C';
+    case 'vice captaincy multiplier':
+      return 'VC';
+    default:
+      return '';
+  }
+}
+
+/// Get the "Pts. Per" display for a rule.
+String _ptsPerDisplay(LeagueScoringRule rule) {
+  switch (rule.mode) {
+    case RuleMode.per_unit:
+      return '${rule.perUnitPoints?.toInt() ?? 0}';
+    case RuleMode.flat:
+    case RuleMode.threshold:
+    case RuleMode.band:
+      return '${rule.flatPoints?.toInt() ?? 0}';
+    case RuleMode.multiplier:
+      return '${rule.multiplier ?? 1}x';
+  }
+}
+
+/// Calculate a detailed score breakdown for a single performance.
+ScoreBreakdown calculateScoreBreakdown(
+  PlayerPerformance perf,
+  List<LeagueScoringRule> rules,
+  Set<String> categories, {
+  String? playerId,
+  String? captainId,
+  String? viceCaptainId,
+}) {
+  final items = <ScoreBreakdownItem>[];
+  final multiplierItems = <ScoreBreakdownItem>[];
+  double subtotal = 0;
+
+  final multiplierRules = <LeagueScoringRule>[];
+
+  for (final rule in rules) {
+    // Multiplier rules (e.g. captaincy) apply regardless of category
+    if (rule.mode == RuleMode.multiplier) {
+      multiplierRules.add(rule);
+      continue;
+    }
+
+    if (!categories.contains(rule.category.toLowerCase())) continue;
+
+    final stat = rule.stat.toLowerCase();
+    double points = 0;
+
+    switch (rule.mode) {
+      case RuleMode.per_unit:
+        points = _computePerUnit(perf, rule, stat);
+      case RuleMode.flat:
+        points = _computeFlat(perf, rule, stat);
+      case RuleMode.band:
+        points = _computeBand(perf, rule, stat);
+      case RuleMode.multiplier:
+        break; // already handled above
+      case RuleMode.threshold:
+        points = _computeFlat(perf, rule, stat);
+    }
+
+    if (points != 0) {
+      items.add(ScoreBreakdownItem(
+        label: _statDisplayName(stat),
+        statDisplay: _statValue(perf, rule, stat),
+        ptsPerDisplay: _ptsPerDisplay(rule),
+        points: points,
+      ));
+    }
+    subtotal += points;
+  }
+
+  double total = subtotal;
+
+  for (final rule in multiplierRules) {
+    final stat = rule.stat.toLowerCase();
+    final bool applies;
+    switch (stat) {
+      case 'captaincy multiplier':
+        applies = playerId != null && playerId == captainId;
+      case 'vice captaincy multiplier':
+        applies = playerId != null && playerId == viceCaptainId;
+      default:
+        applies = false;
+    }
+    if (applies) {
+      final multiplierPts = subtotal * ((rule.multiplier ?? 1) - 1);
+      multiplierItems.add(ScoreBreakdownItem(
+        label: _statDisplayName(stat),
+        statDisplay: stat == 'captaincy multiplier' ? 'C' : 'VC',
+        ptsPerDisplay: '${rule.multiplier ?? 1}x',
+        points: multiplierPts,
+      ));
+      total = subtotal * (rule.multiplier ?? 1);
+    }
+  }
+
+  return ScoreBreakdown(
+    items: items,
+    subtotal: subtotal,
+    multipliers: multiplierItems,
+    total: total,
+  );
 }
 
 // ─── Projection ─────────────────────────────────────────────────────────────
@@ -300,10 +547,7 @@ double calculateTeamScore(
             ? perfByPerfId[player.performanceId!]
             : null) ??
         perfByPlayerId[player.playerId];
-    if (perf == null) {
-      logInfo('TeamScore: ${player.name} no perf found (perfId=${player.performanceId}, playerId=${player.playerId})');
-      continue;
-    }
+    if (perf == null) continue;
 
     final categories = _applicableCategories(player.slot, player.role);
     final playerPoints = calculatePlayerPoints(
@@ -314,10 +558,8 @@ double calculateTeamScore(
       captainId: captainId,
       viceCaptainId: viceCaptainId,
     );
-    logInfo('TeamScore: ${player.name} slot=${player.slot} categories=$categories pts=$playerPoints (runs=${perf.runsScored}, wickets=${perf.wicketsTaken})');
     total += playerPoints;
   }
-  logInfo('TeamScore: TOTAL=$total');
   return total;
 }
 

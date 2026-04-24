@@ -1445,6 +1445,11 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
         fantasyTeamColor: teamMeta?.teamColor != null
             ? stringToColor(teamMeta.teamColor)
             : null,
+        scoringRules: widget.league.scoringRules,
+        captainId: isCaptain ? player.playerId : null,
+        viceCaptainId: isViceCaptain ? player.playerId : null,
+        initialTab: 1,
+        leagueId: widget.league.id,
       ),
       child: Container(
         padding: EdgeInsets.only(
