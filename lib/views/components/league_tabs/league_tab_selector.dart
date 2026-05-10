@@ -24,7 +24,7 @@ class LeagueTabSelector extends StatelessWidget {
         tabs: const [
           Tab(text: 'Team'),
           Tab(text: 'Matchups'),
-          Tab(text: 'Transactions'),
+          Tab(text: 'Trades'),
         ],
       ),
     );

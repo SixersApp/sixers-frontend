@@ -14,6 +14,17 @@ class FantasyTeamInstanceService {
     return FantasyTeamInstance.fromJson(res.data);
   }
 
+  Future<FantasyTeamInstance?> getRosterForTeam({required String fantasy_team_id}) async {
+    try {
+      final res = await ApiClient.dio.get("/fantasy-team-instance/$fantasy_team_id/roster");
+      if (res.statusCode != 200 || res.data == null) return null;
+      return FantasyTeamInstance.fromJson(res.data as Map<String, dynamic>);
+    } catch (e) {
+      logError('Get roster for team error: $e');
+      return null;
+    }
+  }
+
   Future<List<FantasyTeamInstance>> getAllInstances({required String fantasy_team_id}) async {
     try {
       final res = await ApiClient.dio.get("/fantasy-team-instance/$fantasy_team_id/all");
