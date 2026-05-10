@@ -10,7 +10,8 @@ sealed class TradePlayer with _$TradePlayer {
     required String name,
   }) = _TradePlayer;
 
-  factory TradePlayer.fromJson(Map<String, dynamic> json) => _$TradePlayerFromJson(json);
+  factory TradePlayer.fromJson(Map<String, dynamic> json) =>
+      _$TradePlayerFromJson(json);
 }
 
 @freezed

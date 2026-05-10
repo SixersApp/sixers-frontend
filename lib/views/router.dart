@@ -206,6 +206,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           return LeagueSettingsScreen(leagueId: leagueId);
         },
       ),
+      GoRoute(
+        path: "/leagues/:id/trades/propose",
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return ProposeTradeScreen(league: extra['league'] as League);
+        },
+      ),
       GoRoute(path: JoinLeagueScreen.route, builder: (context, state) => const JoinLeagueScreen()),
       GoRoute(
         path: LeaguePreviewScreen.route,

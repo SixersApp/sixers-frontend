@@ -4,14 +4,17 @@ import 'package:go_router/go_router.dart';
 import 'package:sixers/backend/fantasy_team/fantasy_team_model.dart';
 import 'package:sixers/backend/fantasy_team_instance/fantasy_team_instance_model.dart';
 import 'package:sixers/backend/fantasy_team_instance/fantasy_team_instance_provider.dart';
+import 'package:sixers/backend/fantasy_team_instance/fantasy_team_instance_service.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/trades/trade_provider.dart';
-import 'package:sixers/backend/fantasy_team_instance/fantasy_team_instance_service.dart';
 import 'package:sixers/theme/colors.dart';
+
+final _opponentRosterProvider = FutureProvider.autoDispose.family<FantasyTeamInstance?, String>(
+  (ref, teamId) => FantasyTeamInstanceService().getRosterForTeam(fantasy_team_id: teamId),
+);
 
 class ProposeTradeScreen extends ConsumerStatefulWidget {
   const ProposeTradeScreen({super.key, required this.league});
-
   final League league;
 
   @override
@@ -19,24 +22,10 @@ class ProposeTradeScreen extends ConsumerStatefulWidget {
 }
 
 class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
-  FantasyTeam? _selectedOpponent;
-  FantasyTeamInstance? _opponentInstance;
-  bool _loadingOpponent = false;
-
+  String? _selectedOpponentTeamId;
   final Set<String> _offeredPlayerIds = {};
   final Set<String> _requestedPlayerIds = {};
-
-  List<FantasyTeam> get _opponents => widget.league.teams
-      .where((t) => t.id != widget.league.userTeamId)
-      .toList();
-
-  FantasyTeamInstance? get _myCurrentInstance {
-    final instances = ref.read(fantasyTeamInstancesProvider).value ?? [];
-    if (instances.isEmpty) return null;
-    return instances.reduce((a, b) => a.match_num > b.match_num ? a : b);
-  }
-
-  FantasyTeamInstance? get _opponentCurrentInstance => _opponentInstance;
+  bool _isSubmitting = false;
 
   List<RosterPlayerData> _rosterPlayers(RosterPlayers? players) {
     if (players == null) return [];
@@ -46,44 +35,37 @@ class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
       players.bowl1, players.bowl2, players.bowl3,
       players.all1, players.flex1,
       players.bench1, players.bench2, players.bench3,
+      players.bench4, players.bench5, players.bench6,
+      players.bench7, players.bench8,
     ].whereType<RosterPlayerData>().toList();
   }
 
-  Future<void> _selectOpponent(FantasyTeam team) async {
-    setState(() {
-      _selectedOpponent = team;
-      _opponentInstance = null;
-      _requestedPlayerIds.clear();
-      _loadingOpponent = true;
-    });
-
-    final service = FantasyTeamInstanceService();
-    final instance = await service.getRosterForTeam(fantasy_team_id: team.id);
-    setState(() {
-      _opponentInstance = instance;
-      _loadingOpponent = false;
-    });
+  FantasyTeamInstance? get _myCurrentInstance {
+    final instances = ref.watch(fantasyTeamInstancesProvider).value ?? [];
+    if (instances.isEmpty) return null;
+    return instances.reduce((a, b) => a.match_num > b.match_num ? a : b);
   }
 
-  Future<void> _submit() async {
-    if (_offeredPlayerIds.isEmpty || _requestedPlayerIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Select at least one player to offer and one to request'),
-      ));
-      return;
-    }
+  List<FantasyTeam> get _opponentTeams =>
+      widget.league.teams.where((t) => t.id != widget.league.userTeamId).toList();
 
+  Future<void> _submit() async {
+    if (_selectedOpponentTeamId == null ||
+        _offeredPlayerIds.isEmpty ||
+        _requestedPlayerIds.isEmpty) return;
+
+    setState(() => _isSubmitting = true);
     final result = await ref.read(tradesProvider.notifier).propose(
       leagueId: widget.league.id,
       proposerTeamId: widget.league.userTeamId,
-      recipientTeamId: _selectedOpponent!.id,
+      recipientTeamId: _selectedOpponentTeamId!,
       offeredPlayerIds: _offeredPlayerIds.toList(),
       requestedPlayerIds: _requestedPlayerIds.toList(),
     );
-
     if (!mounted) return;
+    setState(() => _isSubmitting = false);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(result['message'] ?? (result['ok'] == true ? 'Trade proposed!' : 'Failed')),
+      content: Text(result['message'] ?? (result['ok'] == true ? 'Trade proposed!' : 'Failed to propose trade')),
       backgroundColor: result['ok'] == true ? Colors.green.shade800 : Colors.red.shade800,
     ));
     if (result['ok'] == true) context.pop();
@@ -91,162 +73,128 @@ class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final myInstance = _myCurrentInstance;
-    final myPlayers = _rosterPlayers(myInstance?.players);
-    final opponentPlayers = _rosterPlayers(_opponentCurrentInstance?.players);
+    final myPlayers = _rosterPlayers(_myCurrentInstance?.players);
+    final opponentRosterAsync = _selectedOpponentTeamId != null
+        ? ref.watch(_opponentRosterProvider(_selectedOpponentTeamId!))
+        : null;
+    final opponentPlayers = opponentRosterAsync?.value != null
+        ? _rosterPlayers(opponentRosterAsync!.value!.players)
+        : <RosterPlayerData>[];
 
-    final canSubmit = _selectedOpponent != null &&
+    final canSubmit = _selectedOpponentTeamId != null &&
         _offeredPlayerIds.isNotEmpty &&
-        _requestedPlayerIds.isNotEmpty;
+        _requestedPlayerIds.isNotEmpty &&
+        !_isSubmitting;
 
     return Scaffold(
       backgroundColor: AppColors.black100,
       appBar: AppBar(
         backgroundColor: AppColors.black100,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, size: 20),
+          icon: const Icon(Icons.arrow_back_ios, size: 20, color: Colors.white),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
-          'PROPOSE TRADE',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
-        ),
+        title: const Text('Propose Trade', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
       ),
-      body: Column(
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
         children: [
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-              children: [
-                // Opponent selector
-                _SectionHeader(title: 'Select opponent'),
-                const SizedBox(height: 10),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: _opponents.map((team) {
-                      final selected = _selectedOpponent?.id == team.id;
-                      return GestureDetector(
-                        onTap: () => _selectOpponent(team),
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: selected ? AppColors.black400 : AppColors.black200,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: selected ? AppColors.black600 : Colors.transparent,
-                            ),
-                          ),
-                          child: Text(
-                            team.teamName,
-                            style: TextStyle(
-                              color: selected ? Colors.white : AppColors.black600,
-                              fontSize: 13,
-                              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                const SizedBox(height: 28),
-
-                // Your players to offer
-                _SectionHeader(title: 'Your offer'),
-                const SizedBox(height: 4),
-                Text(
-                  'Tap to select players you\'re giving away',
-                  style: TextStyle(color: AppColors.black500, fontSize: 12),
-                ),
-                const SizedBox(height: 10),
-                if (myPlayers.isEmpty)
-                  Text('No roster loaded', style: TextStyle(color: AppColors.black500, fontSize: 13))
-                else
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: myPlayers.map((p) => _PlayerChip(
-                      name: p.fullName,
-                      role: p.role,
-                      selected: _offeredPlayerIds.contains(p.id),
-                      onTap: () => setState(() {
-                        _offeredPlayerIds.contains(p.id)
-                            ? _offeredPlayerIds.remove(p.id)
-                            : _offeredPlayerIds.add(p.id);
-                      }),
-                    )).toList(),
-                  ),
-                const SizedBox(height: 28),
-
-                // Opponent's players to request
-                _SectionHeader(title: 'You request'),
-                const SizedBox(height: 4),
-                Text(
-                  'Tap to select players you want from them',
-                  style: TextStyle(color: AppColors.black500, fontSize: 12),
-                ),
-                const SizedBox(height: 10),
-                if (_selectedOpponent == null)
-                  Text('Select an opponent first', style: TextStyle(color: AppColors.black500, fontSize: 13))
-                else if (_loadingOpponent)
-                  const Center(child: CircularProgressIndicator())
-                else if (opponentPlayers.isEmpty)
-                  Text('No roster data available', style: TextStyle(color: AppColors.black500, fontSize: 13))
-                else
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: opponentPlayers.map((p) => _PlayerChip(
-                      name: p.fullName,
-                      role: p.role,
-                      selected: _requestedPlayerIds.contains(p.id),
-                      onTap: () => setState(() {
-                        _requestedPlayerIds.contains(p.id)
-                            ? _requestedPlayerIds.remove(p.id)
-                            : _requestedPlayerIds.add(p.id);
-                      }),
-                    )).toList(),
-                  ),
-              ],
+          _SectionLabel(title: 'Select Opponent'),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              color: AppColors.black200,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedOpponentTeamId,
+                hint: Text('Choose a team', style: TextStyle(color: AppColors.black500)),
+                dropdownColor: AppColors.black200,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+                isExpanded: true,
+                onChanged: (v) => setState(() {
+                  _selectedOpponentTeamId = v;
+                  _requestedPlayerIds.clear();
+                }),
+                items: _opponentTeams.map((t) => DropdownMenuItem(
+                  value: t.id,
+                  child: Text(t.teamName),
+                )).toList(),
+              ),
             ),
           ),
 
-          // Bottom submit bar
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-            decoration: BoxDecoration(
-              color: AppColors.black200,
-              border: Border(top: BorderSide(color: AppColors.black300)),
+          const SizedBox(height: 24),
+
+          _SectionLabel(title: 'Players You Offer'),
+          const SizedBox(height: 8),
+          if (myPlayers.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text('No roster loaded', style: TextStyle(color: AppColors.black500, fontSize: 13)),
+            )
+          else
+            ...myPlayers.map((p) => _CheckablePlayerRow(
+              player: p,
+              selected: _offeredPlayerIds.contains(p.id),
+              onToggle: () => setState(() {
+                if (_offeredPlayerIds.contains(p.id)) {
+                  _offeredPlayerIds.remove(p.id);
+                } else {
+                  _offeredPlayerIds.add(p.id);
+                }
+              }),
+            )),
+
+          const SizedBox(height: 24),
+
+          _SectionLabel(title: 'Players You Request'),
+          const SizedBox(height: 8),
+          if (_selectedOpponentTeamId == null)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text('Select an opponent first', style: TextStyle(color: AppColors.black500, fontSize: 13)),
+            )
+          else if (opponentRosterAsync == null || opponentRosterAsync.isLoading)
+            const Center(child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: CircularProgressIndicator(),
+            ))
+          else if (opponentPlayers.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text('Opponent has no players on their roster', style: TextStyle(color: AppColors.black500, fontSize: 13)),
+            )
+          else
+            ...opponentPlayers.map((p) => _CheckablePlayerRow(
+              player: p,
+              selected: _requestedPlayerIds.contains(p.id),
+              onToggle: () => setState(() {
+                if (_requestedPlayerIds.contains(p.id)) {
+                  _requestedPlayerIds.remove(p.id);
+                } else {
+                  _requestedPlayerIds.add(p.id);
+                }
+              }),
+            )),
+
+          const SizedBox(height: 32),
+
+          ElevatedButton(
+            onPressed: canSubmit ? _submit : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: canSubmit ? AppColors.black300 : AppColors.black200,
+              foregroundColor: canSubmit ? Colors.white : AppColors.black500,
+              disabledBackgroundColor: AppColors.black200,
+              disabledForegroundColor: AppColors.black500,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_offeredPlayerIds.isNotEmpty || _requestedPlayerIds.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Text(
-                      'Offering ${_offeredPlayerIds.length} · Requesting ${_requestedPlayerIds.length}',
-                      style: TextStyle(color: AppColors.black600, fontSize: 13),
-                    ),
-                  ),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: canSubmit ? _submit : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: canSubmit ? Colors.white : AppColors.black300,
-                      foregroundColor: AppColors.black100,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-                    ),
-                    child: const Text('Propose Trade'),
-                  ),
-                ),
-              ],
-            ),
+            child: _isSubmitting
+                ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : const Text('Send Trade Proposal', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -254,64 +202,53 @@ class _ProposeTradeScreenState extends ConsumerState<ProposeTradeScreen> {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel({required this.title});
   final String title;
 
   @override
   Widget build(BuildContext context) {
     return Text(
       title.toUpperCase(),
-      style: TextStyle(
-        color: AppColors.black600,
-        fontSize: 11,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 1.2,
-      ),
+      style: TextStyle(color: AppColors.black600, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.2),
     );
   }
 }
 
-class _PlayerChip extends StatelessWidget {
-  const _PlayerChip({
-    required this.name,
-    required this.role,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String name;
-  final String role;
+class _CheckablePlayerRow extends StatelessWidget {
+  const _CheckablePlayerRow({required this.player, required this.selected, required this.onToggle});
+  final RosterPlayerData player;
   final bool selected;
-  final VoidCallback onTap;
+  final VoidCallback onToggle;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: onToggle,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? Colors.white.withOpacity(0.12) : AppColors.black200,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: selected ? Colors.white.withOpacity(0.5) : AppColors.black300,
-          ),
+          color: selected ? AppColors.black300 : AppColors.black200,
+          borderRadius: BorderRadius.circular(10),
+          border: selected ? Border.all(color: AppColors.black600, width: 1) : null,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Text(
-              name,
-              style: TextStyle(
-                color: selected ? Colors.white : AppColors.black700,
-                fontSize: 13,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-              ),
+            Icon(
+              selected ? Icons.check_circle : Icons.radio_button_unchecked,
+              size: 18,
+              color: selected ? Colors.white : AppColors.black500,
             ),
-            Text(
-              role,
-              style: TextStyle(color: AppColors.black500, fontSize: 11),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(player.fullName, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500)),
+                  Text(player.role, style: TextStyle(color: AppColors.black500, fontSize: 11)),
+                ],
+              ),
             ),
           ],
         ),

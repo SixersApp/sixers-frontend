@@ -157,8 +157,8 @@ class _ActiveLeagueScreenState extends ConsumerState<ActiveLeagueScreen> with Ti
 
           const SizedBox(height: 15),
 
-          // Game selector (hidden on matchups tab — shown inline there)
-          if (_currentTabIndex != 1) ...[
+          // Game selector (hidden on matchups tab and trades tab)
+          if (_currentTabIndex != 1 && _currentTabIndex != 2) ...[
             Container(
               width: double.infinity,
               decoration: BoxDecoration(color: AppColors.black200),

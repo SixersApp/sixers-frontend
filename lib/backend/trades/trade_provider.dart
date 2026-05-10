@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sixers/backend/fantasy_team_instance/fantasy_team_instance_provider.dart';
-import 'package:sixers/backend/trades/trade_model.dart';
-import 'package:sixers/backend/trades/trade_service.dart';
+import 'trade_model.dart';
+import 'trade_service.dart';
 
-final tradesProvider = AsyncNotifierProvider<TradesNotifier, List<Trade>>(TradesNotifier.new);
+final tradesProvider =
+    AsyncNotifierProvider<TradesNotifier, List<Trade>>(TradesNotifier.new);
 
 class TradesNotifier extends AsyncNotifier<List<Trade>> {
   late final TradeService _service;

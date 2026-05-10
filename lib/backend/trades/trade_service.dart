@@ -1,12 +1,20 @@
 import 'package:dio/dio.dart';
-import 'package:sixers/backend/auth/dio_client.dart';
-import 'package:sixers/backend/trades/trade_model.dart';
+import 'package:sixers/utils/logger.dart';
+import '../auth/dio_client.dart';
+import 'trade_model.dart';
 
 class TradeService {
   Future<List<Trade>> listTrades(String teamId) async {
-    final res = await ApiClient.dio.get('/trades/list/$teamId');
-    final data = res.data as List<dynamic>;
-    return data.map((e) => Trade.fromJson(e as Map<String, dynamic>)).toList();
+    try {
+      final res = await ApiClient.dio.get('/trades/list/$teamId');
+      if (res.statusCode != 200 || res.data is! List) return [];
+      return (res.data as List)
+          .map((e) => Trade.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      logError('List trades error: $e');
+      return [];
+    }
   }
 
   Future<Map<String, dynamic>> proposeTrade({
@@ -24,27 +32,51 @@ class TradeService {
         'offeredPlayerIds': offeredPlayerIds,
         'requestedPlayerIds': requestedPlayerIds,
       });
-      return {'ok': true, ...res.data as Map<String, dynamic>};
+      if (res.statusCode == 201 && res.data is Map<String, dynamic>) {
+        return {'ok': true, ...res.data as Map<String, dynamic>};
+      }
+      return {'ok': false, 'message': 'Failed to propose trade'};
     } on DioException catch (e) {
-      return {'ok': false, 'message': e.response?.data?['message'] ?? 'Failed to propose trade'};
+      final msg = e.response?.data is Map
+          ? (e.response!.data['message'] ?? 'Failed to propose trade')
+          : 'Failed to propose trade';
+      return {'ok': false, 'message': msg};
+    } catch (e) {
+      return {'ok': false, 'message': 'Error: $e'};
     }
   }
 
   Future<Map<String, dynamic>> acceptTrade(String tradeId) async {
     try {
       final res = await ApiClient.dio.post('/trades/$tradeId/accept');
-      return {'ok': true, ...res.data as Map<String, dynamic>};
+      if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
+        return {'ok': true, ...res.data as Map<String, dynamic>};
+      }
+      return {'ok': false, 'message': 'Failed to accept trade'};
     } on DioException catch (e) {
-      return {'ok': false, 'message': e.response?.data?['message'] ?? 'Failed to accept trade'};
+      final msg = e.response?.data is Map
+          ? (e.response!.data['message'] ?? 'Failed to accept trade')
+          : 'Failed to accept trade';
+      return {'ok': false, 'message': msg};
+    } catch (e) {
+      return {'ok': false, 'message': 'Error: $e'};
     }
   }
 
   Future<Map<String, dynamic>> declineTrade(String tradeId) async {
     try {
       final res = await ApiClient.dio.patch('/trades/$tradeId/decline');
-      return {'ok': true, ...res.data as Map<String, dynamic>};
+      if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
+        return {'ok': true, ...res.data as Map<String, dynamic>};
+      }
+      return {'ok': false, 'message': 'Failed'};
     } on DioException catch (e) {
-      return {'ok': false, 'message': e.response?.data?['message'] ?? 'Failed to decline trade'};
+      final msg = e.response?.data is Map
+          ? (e.response!.data['message'] ?? 'Failed')
+          : 'Failed';
+      return {'ok': false, 'message': msg};
+    } catch (e) {
+      return {'ok': false, 'message': 'Error: $e'};
     }
   }
 }
