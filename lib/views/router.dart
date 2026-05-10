@@ -23,6 +23,7 @@ import 'package:sixers/views/error_screen.dart';
 import 'package:sixers/views/fantasy_matchup/fantasy_matchup_screen.dart';
 import 'package:sixers/views/home/home_screen.dart';
 import 'package:sixers/views/league/league_screen.dart';
+import 'package:sixers/views/league/trades/propose_trade_screen.dart';
 import 'package:sixers/views/onboarding/basic_info_screen.dart';
 import 'package:sixers/views/onboarding/experience_screen.dart';
 import 'package:sixers/views/settings/settings_screen.dart';
@@ -189,6 +190,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           final tab = int.tryParse(state.uri.queryParameters['tab'] ?? '') ?? 0;
           final game = int.tryParse(state.uri.queryParameters['game'] ?? '');
           return LeagueLoader(leagueId: leagueId, initialTab: tab, initialGame: game);
+        },
+      ),
+      GoRoute(
+        path: '/leagues/:id/trades/propose',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return ProposeTradeScreen(league: extra['league'] as League);
         },
       ),
       GoRoute(
