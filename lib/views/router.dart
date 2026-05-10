@@ -193,6 +193,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/leagues/:id/trades/propose',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return ProposeTradeScreen(league: extra['league'] as League);
+        },
+      ),
+      GoRoute(
         path: "/league/:id/settings",
         builder: (context, state) {
           final leagueId = state.pathParameters["id"]!;
