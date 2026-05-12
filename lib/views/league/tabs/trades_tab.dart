@@ -38,8 +38,6 @@ class _TradesTabState extends ConsumerState<TradesTab> {
       players.bowl1, players.bowl2, players.bowl3,
       players.all1, players.flex1,
       players.bench1, players.bench2, players.bench3,
-      players.bench4, players.bench5, players.bench6,
-      players.bench7, players.bench8,
     ].whereType<RosterPlayerData>().toList();
   }
 

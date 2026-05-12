@@ -32,11 +32,6 @@ sealed class RosterPlayers with _$RosterPlayers {
     RosterPlayerData? bench1,
     RosterPlayerData? bench2,
     RosterPlayerData? bench3,
-    RosterPlayerData? bench4,
-    RosterPlayerData? bench5,
-    RosterPlayerData? bench6,
-    RosterPlayerData? bench7,
-    RosterPlayerData? bench8,
   }) = _RosterPlayers;
 
   factory RosterPlayers.fromJson(Map<String, dynamic> json) => _$RosterPlayersFromJson(json);
