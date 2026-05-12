@@ -63,21 +63,6 @@ _RosterPlayers _$RosterPlayersFromJson(Map<String, dynamic> json) =>
       bench3: json['bench3'] == null
           ? null
           : RosterPlayerData.fromJson(json['bench3'] as Map<String, dynamic>),
-      bench4: json['bench4'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['bench4'] as Map<String, dynamic>),
-      bench5: json['bench5'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['bench5'] as Map<String, dynamic>),
-      bench6: json['bench6'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['bench6'] as Map<String, dynamic>),
-      bench7: json['bench7'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['bench7'] as Map<String, dynamic>),
-      bench8: json['bench8'] == null
-          ? null
-          : RosterPlayerData.fromJson(json['bench8'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$RosterPlayersToJson(_RosterPlayers instance) =>
@@ -93,11 +78,6 @@ Map<String, dynamic> _$RosterPlayersToJson(_RosterPlayers instance) =>
       'bench1': instance.bench1,
       'bench2': instance.bench2,
       'bench3': instance.bench3,
-      'bench4': instance.bench4,
-      'bench5': instance.bench5,
-      'bench6': instance.bench6,
-      'bench7': instance.bench7,
-      'bench8': instance.bench8,
     };
 
 _FantasyTeamInstance _$FantasyTeamInstanceFromJson(Map<String, dynamic> json) =>
