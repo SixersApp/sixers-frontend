@@ -65,11 +65,6 @@ class RosterTab extends ConsumerWidget {
       convertPlayer(rosterPlayers.bench1),
       convertPlayer(rosterPlayers.bench2),
       convertPlayer(rosterPlayers.bench3),
-      convertPlayer(rosterPlayers.bench4),
-      convertPlayer(rosterPlayers.bench5),
-      convertPlayer(rosterPlayers.bench6),
-      convertPlayer(rosterPlayers.bench7),
-      convertPlayer(rosterPlayers.bench8),
     ];
 
     // Filter out nulls
@@ -479,11 +474,6 @@ class RosterTab extends ConsumerWidget {
         slotInfo.add((slot: 'bench1', player: players.bench1?.id != null ? playerMap[players.bench1!.id] : null));
         slotInfo.add((slot: 'bench2', player: players.bench2?.id != null ? playerMap[players.bench2!.id] : null));
         slotInfo.add((slot: 'bench3', player: players.bench3?.id != null ? playerMap[players.bench3!.id] : null));
-        slotInfo.add((slot: 'bench4', player: players.bench4?.id != null ? playerMap[players.bench4!.id] : null));
-        slotInfo.add((slot: 'bench5', player: players.bench5?.id != null ? playerMap[players.bench5!.id] : null));
-        slotInfo.add((slot: 'bench6', player: players.bench6?.id != null ? playerMap[players.bench6!.id] : null));
-        slotInfo.add((slot: 'bench7', player: players.bench7?.id != null ? playerMap[players.bench7!.id] : null));
-        slotInfo.add((slot: 'bench8', player: players.bench8?.id != null ? playerMap[players.bench8!.id] : null));
         break;
     }
 
@@ -537,11 +527,6 @@ class RosterTab extends ConsumerWidget {
           players.bench1?.id,
           players.bench2?.id,
           players.bench3?.id,
-          players.bench4?.id,
-          players.bench5?.id,
-          players.bench6?.id,
-          players.bench7?.id,
-          players.bench8?.id,
         ];
       default:
         return [];
@@ -821,16 +806,6 @@ class RosterTab extends ConsumerWidget {
         return players.bench2?.id;
       case 'bench3':
         return players.bench3?.id;
-      case 'bench4':
-        return players.bench4?.id;
-      case 'bench5':
-        return players.bench5?.id;
-      case 'bench6':
-        return players.bench6?.id;
-      case 'bench7':
-        return players.bench7?.id;
-      case 'bench8':
-        return players.bench8?.id;
       default:
         return null;
     }
@@ -846,7 +821,7 @@ class RosterTab extends ConsumerWidget {
     final isBenchSlot = currentSlot.startsWith('bench');
 
     if (!isBenchSlot) {
-      eligibleSlots.addAll(['bench1', 'bench2', 'bench3', 'bench4', 'bench5', 'bench6', 'bench7', 'bench8']);
+      eligibleSlots.addAll(['bench1', 'bench2', 'bench3']);
     }
 
     final isAllRounder = role.contains('allrounder') || role.contains('all-rounder') || role.contains('all rounder');
@@ -893,7 +868,7 @@ class RosterTab extends ConsumerWidget {
   }
 
   String? _getNextAvailableBenchSlot(FantasyTeamInstance fti) {
-    final benchSlots = ['bench1', 'bench2', 'bench3', 'bench4', 'bench5', 'bench6', 'bench7', 'bench8'];
+    final benchSlots = ['bench1', 'bench2', 'bench3'];
     for (final slot in benchSlots) {
       final playerId = _getPlayerIdForSlot(fti, slot);
       if (playerId == null) {
@@ -919,11 +894,6 @@ class RosterTab extends ConsumerWidget {
       'bench1': players.bench1?.id,
       'bench2': players.bench2?.id,
       'bench3': players.bench3?.id,
-      'bench4': players.bench4?.id,
-      'bench5': players.bench5?.id,
-      'bench6': players.bench6?.id,
-      'bench7': players.bench7?.id,
-      'bench8': players.bench8?.id,
     };
 
     for (final entry in allSlots.entries) {
