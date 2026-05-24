@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WaiverPlayer {
 
- String get id; String get name; String get role; String get image;@JsonKey(fromJson: _ppgFromJson) double get ppg;@JsonKey(name: 'match_status') String get matchStatus;
+ String get id; String get name; String get role; String get image; double get ppg;@JsonKey(name: 'match_status') String get matchStatus;
 /// Create a copy of WaiverPlayer
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $WaiverPlayerCopyWith<$Res>  {
   factory $WaiverPlayerCopyWith(WaiverPlayer value, $Res Function(WaiverPlayer) _then) = _$WaiverPlayerCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String role, String image,@JsonKey(fromJson: _ppgFromJson) double ppg,@JsonKey(name: 'match_status') String matchStatus
+ String id, String name, String role, String image, double ppg,@JsonKey(name: 'match_status') String matchStatus
 });
 
 
@@ -155,7 +155,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String role,  String image, @JsonKey(fromJson: _ppgFromJson)  double ppg, @JsonKey(name: 'match_status')  String matchStatus)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String role,  String image,  double ppg, @JsonKey(name: 'match_status')  String matchStatus)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WaiverPlayer() when $default != null:
 return $default(_that.id,_that.name,_that.role,_that.image,_that.ppg,_that.matchStatus);case _:
@@ -176,7 +176,7 @@ return $default(_that.id,_that.name,_that.role,_that.image,_that.ppg,_that.match
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String role,  String image, @JsonKey(fromJson: _ppgFromJson)  double ppg, @JsonKey(name: 'match_status')  String matchStatus)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String role,  String image,  double ppg, @JsonKey(name: 'match_status')  String matchStatus)  $default,) {final _that = this;
 switch (_that) {
 case _WaiverPlayer():
 return $default(_that.id,_that.name,_that.role,_that.image,_that.ppg,_that.matchStatus);}
@@ -193,7 +193,7 @@ return $default(_that.id,_that.name,_that.role,_that.image,_that.ppg,_that.match
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String role,  String image, @JsonKey(fromJson: _ppgFromJson)  double ppg, @JsonKey(name: 'match_status')  String matchStatus)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String role,  String image,  double ppg, @JsonKey(name: 'match_status')  String matchStatus)?  $default,) {final _that = this;
 switch (_that) {
 case _WaiverPlayer() when $default != null:
 return $default(_that.id,_that.name,_that.role,_that.image,_that.ppg,_that.matchStatus);case _:
@@ -208,14 +208,14 @@ return $default(_that.id,_that.name,_that.role,_that.image,_that.ppg,_that.match
 @JsonSerializable()
 
 class _WaiverPlayer implements WaiverPlayer {
-  const _WaiverPlayer({required this.id, this.name = '', this.role = '', this.image = '', @JsonKey(fromJson: _ppgFromJson) this.ppg = 0.0, @JsonKey(name: 'match_status') this.matchStatus = 'NS'});
+  const _WaiverPlayer({required this.id, this.name = '', this.role = '', this.image = '', this.ppg = 0.0, @JsonKey(name: 'match_status') this.matchStatus = 'NS'});
   factory _WaiverPlayer.fromJson(Map<String, dynamic> json) => _$WaiverPlayerFromJson(json);
 
 @override final  String id;
 @override@JsonKey() final  String name;
 @override@JsonKey() final  String role;
 @override@JsonKey() final  String image;
-@override@JsonKey(fromJson: _ppgFromJson) final  double ppg;
+@override@JsonKey() final  double ppg;
 @override@JsonKey(name: 'match_status') final  String matchStatus;
 
 /// Create a copy of WaiverPlayer
@@ -251,7 +251,7 @@ abstract mixin class _$WaiverPlayerCopyWith<$Res> implements $WaiverPlayerCopyWi
   factory _$WaiverPlayerCopyWith(_WaiverPlayer value, $Res Function(_WaiverPlayer) _then) = __$WaiverPlayerCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String role, String image,@JsonKey(fromJson: _ppgFromJson) double ppg,@JsonKey(name: 'match_status') String matchStatus
+ String id, String name, String role, String image, double ppg,@JsonKey(name: 'match_status') String matchStatus
 });
 
 

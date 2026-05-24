@@ -3,13 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'waiver_model.freezed.dart';
 part 'waiver_model.g.dart';
 
-double _ppgFromJson(dynamic value) {
-  if (value == null) return 0.0;
-  if (value is num) return value.toDouble();
-  if (value is String) return double.tryParse(value) ?? 0.0;
-  return 0.0;
-}
-
 @freezed
 sealed class WaiverPlayer with _$WaiverPlayer {
   const factory WaiverPlayer({
@@ -17,7 +10,7 @@ sealed class WaiverPlayer with _$WaiverPlayer {
     @Default('') String name,
     @Default('') String role,
     @Default('') String image,
-    @JsonKey(fromJson: _ppgFromJson) @Default(0.0) double ppg,
+    @Default(0.0) double ppg,
     @JsonKey(name: 'match_status') @Default('NS') String matchStatus,
   }) = _WaiverPlayer;
 

@@ -183,6 +183,8 @@ class _TradesTabState extends ConsumerState<TradesTab> {
               // ─── Waiver Wire ──────────────────────────────────────────────
               Divider(color: AppColors.black300, height: 1),
               const SizedBox(height: 24),
+              _SectionLabel(title: 'Waiver Wire'),
+              const SizedBox(height: 16),
 
               // Your players — drop section
               _SectionLabel(title: 'Your Players'),
@@ -199,9 +201,7 @@ class _TradesTabState extends ConsumerState<TradesTab> {
                   )),
                 )),
 
-              const SizedBox(height: 24),
-              _SectionLabel(title: 'Waiver Wire'),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               // ── Search + filter ───────────────────────────────────────────
               TextField(
