@@ -12,7 +12,7 @@ _WaiverPlayer _$WaiverPlayerFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String? ?? '',
       role: json['role'] as String? ?? '',
       image: json['image'] as String? ?? '',
-      ppg: (json['ppg'] as num?)?.toDouble() ?? 0.0,
+      ppg: json['ppg'] == null ? 0.0 : _ppgFromJson(json['ppg']),
       matchStatus: json['match_status'] as String? ?? 'NS',
     );
 
