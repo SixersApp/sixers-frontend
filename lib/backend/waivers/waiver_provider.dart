@@ -10,7 +10,9 @@ class WaiverNotifier extends AsyncNotifier<WaiverPage> {
   late final WaiverService _service;
   String? _leagueId;
   int _page = 1;
-  static const int pageSize = 5;
+  String _search = '';
+  String _role = '';
+  static const int pageSize = 10;
 
   @override
   Future<WaiverPage> build() async {
@@ -23,8 +25,24 @@ class WaiverNotifier extends AsyncNotifier<WaiverPage> {
     _page = page;
     state = const AsyncLoading();
     state = await AsyncValue.guard(
-      () => _service.listWaivers(leagueId: leagueId, page: page, limit: pageSize),
+      () => _service.listWaivers(
+        leagueId: leagueId,
+        page: page,
+        limit: pageSize,
+        search: _search,
+        role: _role,
+      ),
     );
+  }
+
+  Future<void> setSearch(String search) async {
+    _search = search;
+    if (_leagueId != null) await loadPage(_leagueId!, 1);
+  }
+
+  Future<void> setRole(String role) async {
+    _role = role;
+    if (_leagueId != null) await loadPage(_leagueId!, 1);
   }
 
   Future<void> nextPage() async {

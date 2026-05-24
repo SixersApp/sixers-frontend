@@ -11,6 +11,8 @@ _WaiverPlayer _$WaiverPlayerFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       name: json['name'] as String? ?? '',
       role: json['role'] as String? ?? '',
+      image: json['image'] as String? ?? '',
+      ppg: (json['ppg'] as num?)?.toDouble() ?? 0.0,
       matchStatus: json['match_status'] as String? ?? 'NS',
     );
 
@@ -19,5 +21,7 @@ Map<String, dynamic> _$WaiverPlayerToJson(_WaiverPlayer instance) =>
       'id': instance.id,
       'name': instance.name,
       'role': instance.role,
+      'image': instance.image,
+      'ppg': instance.ppg,
       'match_status': instance.matchStatus,
     };

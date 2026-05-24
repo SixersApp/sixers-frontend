@@ -7,12 +7,19 @@ class WaiverService {
   Future<WaiverPage> listWaivers({
     required String leagueId,
     int page = 1,
-    int limit = 5,
+    int limit = 10,
+    String search = '',
+    String role = '',
   }) async {
     try {
       final res = await ApiClient.dio.get(
         '/waivers/$leagueId',
-        queryParameters: {'page': page, 'limit': limit},
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          if (search.isNotEmpty) 'search': search,
+          if (role.isNotEmpty) 'role': role,
+        },
       );
       if (res.statusCode != 200 || res.data == null) return WaiverPage.empty();
       final data = res.data as Map<String, dynamic>;

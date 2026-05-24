@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,6 +22,37 @@ class TradesTab extends ConsumerStatefulWidget {
 }
 
 class _TradesTabState extends ConsumerState<TradesTab> {
+  final _searchController = TextEditingController();
+  Timer? _searchDebounce;
+  String _selectedRole = '';
+
+  static const _roleFilters = [
+    ('All', ''),
+    ('BAT', 'batsman'),
+    ('BOWL', 'bowler'),
+    ('WK', 'wicket'),
+    ('AR', 'all-rounder'),
+  ];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchDebounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 400), () {
+      ref.read(waiverProvider.notifier).setSearch(value.trim());
+    });
+  }
+
+  void _onRoleSelected(String role) {
+    setState(() => _selectedRole = role);
+    ref.read(waiverProvider.notifier).setRole(role);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -169,6 +202,67 @@ class _TradesTabState extends ConsumerState<TradesTab> {
                 )),
 
               const SizedBox(height: 20),
+
+              // ── Search + filter ───────────────────────────────────────────
+              TextField(
+                controller: _searchController,
+                onChanged: _onSearchChanged,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'Search players...',
+                  hintStyle: TextStyle(color: AppColors.black500, fontSize: 14),
+                  prefixIcon: Icon(Icons.search, color: AppColors.black500, size: 20),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? GestureDetector(
+                          onTap: () {
+                            _searchController.clear();
+                            _onSearchChanged('');
+                          },
+                          child: Icon(Icons.close, color: AppColors.black500, size: 18),
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: AppColors.black200,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: _roleFilters.map((filter) {
+                    final (label, value) = filter;
+                    final selected = _selectedRole == value;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: GestureDetector(
+                        onTap: () => _onRoleSelected(value),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: selected ? AppColors.black600 : AppColors.black200,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            label,
+                            style: TextStyle(
+                              color: selected ? AppColors.black100 : AppColors.black600,
+                              fontSize: 12,
+                              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 16),
 
               // Available players — paginated
               waiverAsync.when(
@@ -446,6 +540,12 @@ class _RosterDropRow extends StatelessWidget {
   final RosterPlayerData player;
   final VoidCallback onDrop;
 
+  String _initials(String name) {
+    final parts = name.trim().split(' ');
+    if (parts.length >= 2) return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
+    return name.isNotEmpty ? name[0].toUpperCase() : '?';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -457,6 +557,15 @@ class _RosterDropRow extends StatelessWidget {
       ),
       child: Row(
         children: [
+          CircleAvatar(
+            radius: 16,
+            backgroundColor: AppColors.black400,
+            backgroundImage: player.image.isNotEmpty ? NetworkImage(player.image) : null,
+            child: player.image.isEmpty
+                ? Text(_initials(player.fullName), style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600))
+                : null,
+          ),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,13 +578,16 @@ class _RosterDropRow extends StatelessWidget {
           GestureDetector(
             onTap: onDrop,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              width: 32,
+              height: 32,
               decoration: BoxDecoration(
                 color: Colors.red.shade900.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(color: Colors.red.shade800.withOpacity(0.4)),
               ),
-              child: Text('Drop', style: TextStyle(color: Colors.red.shade400, fontSize: 12, fontWeight: FontWeight.w600)),
+              child: Center(
+                child: Text('−', style: TextStyle(color: Colors.red.shade400, fontSize: 20, fontWeight: FontWeight.w600)),
+              ),
             ),
           ),
         ],
@@ -488,6 +600,12 @@ class _WaiverPlayerRow extends StatelessWidget {
   const _WaiverPlayerRow({required this.player, required this.onAdd});
   final WaiverPlayer player;
   final VoidCallback onAdd;
+
+  String _initials(String name) {
+    final parts = name.trim().split(' ');
+    if (parts.length >= 2) return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
+    return name.isNotEmpty ? name[0].toUpperCase() : '?';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -502,15 +620,32 @@ class _WaiverPlayerRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 6,
-            height: 6,
-            margin: const EdgeInsets.only(right: 10),
-            decoration: BoxDecoration(
-              color: ineligible ? Colors.red.shade600 : Colors.green.shade500,
-              shape: BoxShape.circle,
-            ),
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: AppColors.black400,
+                backgroundImage: player.image.isNotEmpty ? NetworkImage(player.image) : null,
+                child: player.image.isEmpty
+                    ? Text(_initials(player.name), style: TextStyle(color: ineligible ? AppColors.black500 : Colors.white, fontSize: 11, fontWeight: FontWeight.w600))
+                    : null,
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: ineligible ? Colors.red.shade600 : Colors.green.shade500,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.black200, width: 1.5),
+                  ),
+                ),
+              ),
+            ],
           ),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -520,17 +655,38 @@ class _WaiverPlayerRow extends StatelessWidget {
               ],
             ),
           ),
+          // PPG column
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                player.ppg > 0 ? player.ppg.toStringAsFixed(0) : '-',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: ineligible ? AppColors.black500 : Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              Text(
+                'PPG',
+                style: TextStyle(color: AppColors.black500, fontSize: 10),
+              ),
+            ],
+          ),
+          const SizedBox(width: 12),
           if (!ineligible)
             GestureDetector(
               onTap: onAdd,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
                   color: Colors.green.shade900.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(6),
                   border: Border.all(color: Colors.green.shade700.withOpacity(0.5)),
                 ),
-                child: Text('Add', style: TextStyle(color: Colors.green.shade400, fontSize: 12, fontWeight: FontWeight.w600)),
+                child: Center(
+                  child: Text('+', style: TextStyle(color: Colors.green.shade400, fontSize: 18, fontWeight: FontWeight.w600)),
+                ),
               ),
             )
           else
