@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WaiverPlayer {
 
- String get id; String get name; String get role;@JsonKey(name: 'match_status') String get matchStatus;
+ String get id; String get name; String get role; String get image; double get ppg;@JsonKey(name: 'match_status') String get matchStatus;
 /// Create a copy of WaiverPlayer
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $WaiverPlayerCopyWith<WaiverPlayer> get copyWith => _$WaiverPlayerCopyWithImpl<W
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WaiverPlayer&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.role, role) || other.role == role)&&(identical(other.matchStatus, matchStatus) || other.matchStatus == matchStatus));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WaiverPlayer&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.role, role) || other.role == role)&&(identical(other.image, image) || other.image == image)&&(identical(other.ppg, ppg) || other.ppg == ppg)&&(identical(other.matchStatus, matchStatus) || other.matchStatus == matchStatus));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,role,matchStatus);
+int get hashCode => Object.hash(runtimeType,id,name,role,image,ppg,matchStatus);
 
 @override
 String toString() {
-  return 'WaiverPlayer(id: $id, name: $name, role: $role, matchStatus: $matchStatus)';
+  return 'WaiverPlayer(id: $id, name: $name, role: $role, image: $image, ppg: $ppg, matchStatus: $matchStatus)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $WaiverPlayerCopyWith<$Res>  {
   factory $WaiverPlayerCopyWith(WaiverPlayer value, $Res Function(WaiverPlayer) _then) = _$WaiverPlayerCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String role,@JsonKey(name: 'match_status') String matchStatus
+ String id, String name, String role, String image, double ppg,@JsonKey(name: 'match_status') String matchStatus
 });
 
 
@@ -65,12 +65,14 @@ class _$WaiverPlayerCopyWithImpl<$Res>
 
 /// Create a copy of WaiverPlayer
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? role = null,Object? matchStatus = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? role = null,Object? image = null,Object? ppg = null,Object? matchStatus = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
-as String,matchStatus: null == matchStatus ? _self.matchStatus : matchStatus // ignore: cast_nullable_to_non_nullable
+as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String,ppg: null == ppg ? _self.ppg : ppg // ignore: cast_nullable_to_non_nullable
+as double,matchStatus: null == matchStatus ? _self.matchStatus : matchStatus // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -153,10 +155,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String role, @JsonKey(name: 'match_status')  String matchStatus)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String role,  String image,  double ppg, @JsonKey(name: 'match_status')  String matchStatus)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WaiverPlayer() when $default != null:
-return $default(_that.id,_that.name,_that.role,_that.matchStatus);case _:
+return $default(_that.id,_that.name,_that.role,_that.image,_that.ppg,_that.matchStatus);case _:
   return orElse();
 
 }
@@ -174,10 +176,10 @@ return $default(_that.id,_that.name,_that.role,_that.matchStatus);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String role, @JsonKey(name: 'match_status')  String matchStatus)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String role,  String image,  double ppg, @JsonKey(name: 'match_status')  String matchStatus)  $default,) {final _that = this;
 switch (_that) {
 case _WaiverPlayer():
-return $default(_that.id,_that.name,_that.role,_that.matchStatus);}
+return $default(_that.id,_that.name,_that.role,_that.image,_that.ppg,_that.matchStatus);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -191,10 +193,10 @@ return $default(_that.id,_that.name,_that.role,_that.matchStatus);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String role, @JsonKey(name: 'match_status')  String matchStatus)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String role,  String image,  double ppg, @JsonKey(name: 'match_status')  String matchStatus)?  $default,) {final _that = this;
 switch (_that) {
 case _WaiverPlayer() when $default != null:
-return $default(_that.id,_that.name,_that.role,_that.matchStatus);case _:
+return $default(_that.id,_that.name,_that.role,_that.image,_that.ppg,_that.matchStatus);case _:
   return null;
 
 }
@@ -206,12 +208,14 @@ return $default(_that.id,_that.name,_that.role,_that.matchStatus);case _:
 @JsonSerializable()
 
 class _WaiverPlayer implements WaiverPlayer {
-  const _WaiverPlayer({required this.id, this.name = '', this.role = '', @JsonKey(name: 'match_status') this.matchStatus = 'NS'});
+  const _WaiverPlayer({required this.id, this.name = '', this.role = '', this.image = '', this.ppg = 0.0, @JsonKey(name: 'match_status') this.matchStatus = 'NS'});
   factory _WaiverPlayer.fromJson(Map<String, dynamic> json) => _$WaiverPlayerFromJson(json);
 
 @override final  String id;
 @override@JsonKey() final  String name;
 @override@JsonKey() final  String role;
+@override@JsonKey() final  String image;
+@override@JsonKey() final  double ppg;
 @override@JsonKey(name: 'match_status') final  String matchStatus;
 
 /// Create a copy of WaiverPlayer
@@ -227,16 +231,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WaiverPlayer&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.role, role) || other.role == role)&&(identical(other.matchStatus, matchStatus) || other.matchStatus == matchStatus));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WaiverPlayer&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.role, role) || other.role == role)&&(identical(other.image, image) || other.image == image)&&(identical(other.ppg, ppg) || other.ppg == ppg)&&(identical(other.matchStatus, matchStatus) || other.matchStatus == matchStatus));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,role,matchStatus);
+int get hashCode => Object.hash(runtimeType,id,name,role,image,ppg,matchStatus);
 
 @override
 String toString() {
-  return 'WaiverPlayer(id: $id, name: $name, role: $role, matchStatus: $matchStatus)';
+  return 'WaiverPlayer(id: $id, name: $name, role: $role, image: $image, ppg: $ppg, matchStatus: $matchStatus)';
 }
 
 
@@ -247,7 +251,7 @@ abstract mixin class _$WaiverPlayerCopyWith<$Res> implements $WaiverPlayerCopyWi
   factory _$WaiverPlayerCopyWith(_WaiverPlayer value, $Res Function(_WaiverPlayer) _then) = __$WaiverPlayerCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String role,@JsonKey(name: 'match_status') String matchStatus
+ String id, String name, String role, String image, double ppg,@JsonKey(name: 'match_status') String matchStatus
 });
 
 
@@ -264,12 +268,14 @@ class __$WaiverPlayerCopyWithImpl<$Res>
 
 /// Create a copy of WaiverPlayer
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? role = null,Object? matchStatus = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? role = null,Object? image = null,Object? ppg = null,Object? matchStatus = null,}) {
   return _then(_WaiverPlayer(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
-as String,matchStatus: null == matchStatus ? _self.matchStatus : matchStatus // ignore: cast_nullable_to_non_nullable
+as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String,ppg: null == ppg ? _self.ppg : ppg // ignore: cast_nullable_to_non_nullable
+as double,matchStatus: null == matchStatus ? _self.matchStatus : matchStatus // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

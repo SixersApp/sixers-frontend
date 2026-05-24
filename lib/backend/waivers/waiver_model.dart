@@ -9,6 +9,8 @@ sealed class WaiverPlayer with _$WaiverPlayer {
     required String id,
     @Default('') String name,
     @Default('') String role,
+    @Default('') String image,
+    @Default(0.0) double ppg,
     @JsonKey(name: 'match_status') @Default('NS') String matchStatus,
   }) = _WaiverPlayer;
 
