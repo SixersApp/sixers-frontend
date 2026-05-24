@@ -548,7 +548,9 @@ class _RosterDropRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: () => showPlayerStatsSheet(context, playerId: player.id, playerName: player.fullName),
+      child: Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
@@ -592,6 +594,7 @@ class _RosterDropRow extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 }
@@ -611,7 +614,9 @@ class _WaiverPlayerRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final ineligible = player.matchStatus == 'IN_PROGRESS' || player.matchStatus == 'FINISHED';
 
-    return Container(
+    return GestureDetector(
+      onTap: () => showPlayerStatsSheet(context, playerId: player.id, playerName: player.name),
+      child: Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
@@ -692,6 +697,7 @@ class _WaiverPlayerRow extends StatelessWidget {
           else
             Text('Played', style: TextStyle(color: AppColors.black500, fontSize: 11)),
         ],
+      ),
       ),
     );
   }
