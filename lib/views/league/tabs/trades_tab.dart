@@ -9,6 +9,7 @@ import 'package:sixers/backend/trades/trade_provider.dart';
 import 'package:sixers/backend/waivers/waiver_model.dart';
 import 'package:sixers/backend/waivers/waiver_provider.dart';
 import 'package:sixers/theme/colors.dart';
+import 'package:sixers/views/league/components/player_stats_bottom_sheet.dart';
 
 class TradesTab extends ConsumerStatefulWidget {
   const TradesTab({super.key, required this.league});
@@ -349,15 +350,68 @@ class _PlayerRow extends StatelessWidget {
       children: [
         SizedBox(
           width: 80,
-          child: Text(label, style: TextStyle(color: AppColors.black600, fontSize: 12)),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(label, style: TextStyle(color: AppColors.black600, fontSize: 12)),
+          ),
         ),
         Expanded(
-          child: Text(
-            players.map((p) => p.name).join(', '),
-            style: const TextStyle(color: Colors.white, fontSize: 13),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: players.map((p) => _TradedPlayerChip(player: p)).toList(),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _TradedPlayerChip extends StatelessWidget {
+  const _TradedPlayerChip({required this.player});
+  final TradePlayer player;
+
+  String _initials(String name) {
+    final parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
+    }
+    return name.isNotEmpty ? name[0].toUpperCase() : '?';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => showPlayerStatsSheet(
+        context,
+        playerId: player.id,
+        playerName: player.name,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 14,
+              backgroundColor: AppColors.black400,
+              backgroundImage: player.image.isNotEmpty ? NetworkImage(player.image) : null,
+              child: player.image.isEmpty
+                  ? Text(
+                      _initials(player.name),
+                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                player.name,
+                style: const TextStyle(color: Colors.white, fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

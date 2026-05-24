@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TradePlayer {
 
- String get id; String get name;
+ String get id; String get name; String get image;
 /// Create a copy of TradePlayer
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $TradePlayerCopyWith<TradePlayer> get copyWith => _$TradePlayerCopyWithImpl<Trad
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TradePlayer&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TradePlayer&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name);
+int get hashCode => Object.hash(runtimeType,id,name,image);
 
 @override
 String toString() {
-  return 'TradePlayer(id: $id, name: $name)';
+  return 'TradePlayer(id: $id, name: $name, image: $image)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $TradePlayerCopyWith<$Res>  {
   factory $TradePlayerCopyWith(TradePlayer value, $Res Function(TradePlayer) _then) = _$TradePlayerCopyWithImpl;
 @useResult
 $Res call({
- String id, String name
+ String id, String name, String image
 });
 
 
@@ -65,10 +65,11 @@ class _$TradePlayerCopyWithImpl<$Res>
 
 /// Create a copy of TradePlayer
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? image = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -151,10 +152,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String image)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TradePlayer() when $default != null:
-return $default(_that.id,_that.name);case _:
+return $default(_that.id,_that.name,_that.image);case _:
   return orElse();
 
 }
@@ -172,10 +173,10 @@ return $default(_that.id,_that.name);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String image)  $default,) {final _that = this;
 switch (_that) {
 case _TradePlayer():
-return $default(_that.id,_that.name);}
+return $default(_that.id,_that.name,_that.image);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -189,10 +190,10 @@ return $default(_that.id,_that.name);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String image)?  $default,) {final _that = this;
 switch (_that) {
 case _TradePlayer() when $default != null:
-return $default(_that.id,_that.name);case _:
+return $default(_that.id,_that.name,_that.image);case _:
   return null;
 
 }
@@ -204,11 +205,12 @@ return $default(_that.id,_that.name);case _:
 @JsonSerializable()
 
 class _TradePlayer implements TradePlayer {
-  const _TradePlayer({required this.id, required this.name});
+  const _TradePlayer({required this.id, required this.name, this.image = ''});
   factory _TradePlayer.fromJson(Map<String, dynamic> json) => _$TradePlayerFromJson(json);
 
 @override final  String id;
 @override final  String name;
+@override@JsonKey() final  String image;
 
 /// Create a copy of TradePlayer
 /// with the given fields replaced by the non-null parameter values.
@@ -223,16 +225,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TradePlayer&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TradePlayer&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.image, image) || other.image == image));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name);
+int get hashCode => Object.hash(runtimeType,id,name,image);
 
 @override
 String toString() {
-  return 'TradePlayer(id: $id, name: $name)';
+  return 'TradePlayer(id: $id, name: $name, image: $image)';
 }
 
 
@@ -243,7 +245,7 @@ abstract mixin class _$TradePlayerCopyWith<$Res> implements $TradePlayerCopyWith
   factory _$TradePlayerCopyWith(_TradePlayer value, $Res Function(_TradePlayer) _then) = __$TradePlayerCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name
+ String id, String name, String image
 });
 
 
@@ -260,10 +262,11 @@ class __$TradePlayerCopyWithImpl<$Res>
 
 /// Create a copy of TradePlayer
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? image = null,}) {
   return _then(_TradePlayer(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
