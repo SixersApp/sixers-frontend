@@ -8,6 +8,7 @@ import 'package:sixers/backend/fantasy_team_instance/fantasy_team_instance_servi
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/trades/trade_provider.dart';
 import 'package:sixers/theme/colors.dart';
+import 'package:sixers/views/league/components/player_stats_bottom_sheet.dart';
 
 final _opponentRosterProvider = FutureProvider.autoDispose.family<FantasyTeamInstance?, String>(
   (ref, teamId) => FantasyTeamInstanceService().getRosterForTeam(fantasy_team_id: teamId),
@@ -219,6 +220,14 @@ class _CheckablePlayerRow extends StatelessWidget {
   final bool selected;
   final VoidCallback onToggle;
 
+  String _initials(String name) {
+    final parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
+    }
+    return name.isNotEmpty ? name[0].toUpperCase() : '?';
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -237,6 +246,26 @@ class _CheckablePlayerRow extends StatelessWidget {
               selected ? Icons.check_circle : Icons.radio_button_unchecked,
               size: 18,
               color: selected ? Colors.white : AppColors.black500,
+            ),
+            const SizedBox(width: 10),
+            // Avatar — tapping opens player profile without toggling selection
+            GestureDetector(
+              onTap: () => showPlayerStatsSheet(
+                context,
+                playerId: player.id,
+                playerName: player.fullName,
+              ),
+              child: CircleAvatar(
+                radius: 16,
+                backgroundColor: AppColors.black400,
+                backgroundImage: player.image.isNotEmpty ? NetworkImage(player.image) : null,
+                child: player.image.isEmpty
+                    ? Text(
+                        _initials(player.fullName),
+                        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                      )
+                    : null,
+              ),
             ),
             const SizedBox(width: 10),
             Expanded(

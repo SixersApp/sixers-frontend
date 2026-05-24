@@ -6,11 +6,18 @@ part of 'trade_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_TradePlayer _$TradePlayerFromJson(Map<String, dynamic> json) =>
-    _TradePlayer(id: json['id'] as String, name: json['name'] as String);
+_TradePlayer _$TradePlayerFromJson(Map<String, dynamic> json) => _TradePlayer(
+  id: json['id'] as String,
+  name: json['name'] as String,
+  image: json['image'] as String? ?? '',
+);
 
 Map<String, dynamic> _$TradePlayerToJson(_TradePlayer instance) =>
-    <String, dynamic>{'id': instance.id, 'name': instance.name};
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'image': instance.image,
+    };
 
 _Trade _$TradeFromJson(Map<String, dynamic> json) => _Trade(
   id: json['id'] as String,

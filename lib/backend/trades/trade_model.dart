@@ -8,6 +8,7 @@ sealed class TradePlayer with _$TradePlayer {
   const factory TradePlayer({
     required String id,
     required String name,
+    @Default('') String image,
   }) = _TradePlayer;
 
   factory TradePlayer.fromJson(Map<String, dynamic> json) =>
