@@ -17,6 +17,21 @@ class LeagueService {
         .toList();
   }
 
+  /// Returns a single league with leaderboard-enriched team objects
+  /// (wins / losses / matches_completed / avg_points_per_game / match_scores).
+  Future<League?> getLeague(String leagueId) async {
+    try {
+      final res = await _dio.get("/leagues/$leagueId");
+
+      if (res.statusCode != 200 || res.data is! Map) return null;
+
+      return League.fromJson(res.data as Map<String, dynamic>);
+    } catch (e, st) {
+      logError('getLeague error: $e', st);
+      return null;
+    }
+  }
+
   Future<League> createLeague({
     required String name,
     required String tournamentId,

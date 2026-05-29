@@ -3,13 +3,39 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sixers/backend/fantasy_team_instance/fantasy_team_instance_provider.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
+import 'package:sixers/backend/leagues/league_provider.dart';
 import 'package:sixers/theme/colors.dart';
 import 'package:sixers/utils/string_to_avatar.dart';
 import 'package:sixers/views/components/league_dropdown/league_dropdown_v2.dart';
 import 'package:sixers/views/components/league_tabs/league_tab_selector.dart';
+import 'package:sixers/views/league/components/leaderboard_sheet.dart';
 import 'package:sixers/views/league/tabs/matchups_tab.dart';
 import 'package:sixers/views/league/tabs/roster_tab.dart';
 import 'package:sixers/views/league/tabs/transactions_tab.dart';
+
+/// Returns [base] with each team's leaderboard record (wins / losses /
+/// matchesCompleted / avgPointsPerGame / matchScores) populated from the
+/// matching team in [detail], looked up by team id. League-level fields and
+/// any team field not in the record set are taken from [base]. If [detail] is
+/// null (still loading or request failed) [base] is returned unchanged.
+League _mergeStandings(League base, League? detail) {
+  if (detail == null || detail.teams.isEmpty) return base;
+
+  final byId = {for (final t in detail.teams) t.id: t};
+  final mergedTeams = base.teams.map((team) {
+    final stats = byId[team.id];
+    if (stats == null) return team;
+    return team.copyWith(
+      wins: stats.wins,
+      losses: stats.losses,
+      matchesCompleted: stats.matchesCompleted,
+      avgPointsPerGame: stats.avgPointsPerGame,
+      matchScores: stats.matchScores,
+    );
+  }).toList();
+
+  return base.copyWith(teams: mergedTeams);
+}
 
 class ActiveLeagueScreen extends ConsumerStatefulWidget {
   const ActiveLeagueScreen({super.key, required this.league, this.initialTab = 0, this.initialGame});
@@ -74,6 +100,18 @@ class _ActiveLeagueScreenState extends ConsumerState<ActiveLeagueScreen> with Ti
 
   @override
   Widget build(BuildContext context) {
+    // Watch the singular endpoint for leaderboard-enriched team data and merge
+    // the per-team record fields into widget.league's teams (which come from
+    // the list endpoint and carry the full league-level shape). Merging — rather
+    // than swapping the whole league — keeps league-level fields the detail
+    // endpoint omits (tournament_abbr, season_year, latest_game, …) intact.
+    final detailAsync = ref.watch(leagueDetailProvider(widget.league.id));
+    final league = _mergeStandings(widget.league, detailAsync.value);
+    final teams = league.teams;
+    // Guard the selected index against shrinking team lists
+    final safeTeamIndex =
+        _selectedTeamIndex < teams.length ? _selectedTeamIndex : 0;
+
     return Scaffold(
       backgroundColor: AppColors.black100,
       appBar: AppBar(
@@ -88,16 +126,16 @@ class _ActiveLeagueScreenState extends ConsumerState<ActiveLeagueScreen> with Ti
                 width: 35,
                 height: 35,
                 decoration: BoxDecoration(
-                  color: widget.league.teams.isNotEmpty
-                      ? stringToColor(widget.league.teams[_selectedTeamIndex].teamColor)
+                  color: teams.isNotEmpty
+                      ? stringToColor(teams[safeTeamIndex].teamColor)
                       : AppColors.yellow300,
                   borderRadius: BorderRadius.circular(5),
                 ),
-                child: widget.league.teams.isNotEmpty
+                child: teams.isNotEmpty
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(5),
                         child: Image.asset(
-                          stringToAvatar(widget.league.teams[_selectedTeamIndex].teamIcon),
+                          stringToAvatar(teams[safeTeamIndex].teamIcon),
                           width: 35,
                           height: 35,
                           fit: BoxFit.cover,
@@ -114,11 +152,11 @@ class _ActiveLeagueScreenState extends ConsumerState<ActiveLeagueScreen> with Ti
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.league.name.toUpperCase(),
+                        league.name.toUpperCase(),
                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),
                       ),
                       Text(
-                        widget.league.teams.isNotEmpty ? widget.league.teams[_selectedTeamIndex].teamName : "Kittu's Kool Kids",
+                        teams.isNotEmpty ? teams[safeTeamIndex].teamName : "Kittu's Kool Kids",
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.black600),
                       ),
                     ],
@@ -133,14 +171,8 @@ class _ActiveLeagueScreenState extends ConsumerState<ActiveLeagueScreen> with Ti
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: GestureDetector(
-              onTap: () => showLeagueDropDown(context),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.grid_view, size: 24, color: AppColors.black800),
-                  Icon(Icons.arrow_drop_down, size: 24, color: AppColors.black800),
-                ],
-              ),
+              onTap: () => showLeaderboardSheet(context, league: league),
+              child: Icon(Icons.grid_view, size: 24, color: AppColors.black800),
             ),
           ),
         ],
@@ -183,10 +215,10 @@ class _ActiveLeagueScreenState extends ConsumerState<ActiveLeagueScreen> with Ti
                   ),
                   IconButton(
                     icon: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onPressed: _selectedGameNum < widget.league.weeks
+                    onPressed: _selectedGameNum < league.weeks
                         ? () => _onGameChanged(_selectedGameNum + 1)
                         : null,
-                    color: _selectedGameNum < widget.league.weeks
+                    color: _selectedGameNum < league.weeks
                         ? Colors.white
                         : Colors.grey.shade600,
                   ),
@@ -202,8 +234,8 @@ class _ActiveLeagueScreenState extends ConsumerState<ActiveLeagueScreen> with Ti
               controller: _tabController,
               children: [
                 RosterTab(
-                  league: widget.league,
-                  selectedTeamIndex: _selectedTeamIndex,
+                  league: league,
+                  selectedTeamIndex: safeTeamIndex,
                   selectedGameNum: _selectedGameNum,
                   onTeamSelected: (index) {
                     setState(() {
@@ -213,11 +245,11 @@ class _ActiveLeagueScreenState extends ConsumerState<ActiveLeagueScreen> with Ti
                   onGameChanged: _onGameChanged,
                 ),
                 MatchupsTab(
-                  league: widget.league,
+                  league: league,
                   selectedGameNum: _selectedGameNum,
                   onGameChanged: _onGameChanged,
                 ),
-                TransactionsTab(league: widget.league),
+                TransactionsTab(league: league),
               ],
             ),
           ),
