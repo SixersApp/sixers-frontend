@@ -11,7 +11,7 @@ import 'package:sixers/views/components/league_tabs/league_tab_selector.dart';
 import 'package:sixers/views/league/components/leaderboard_sheet.dart';
 import 'package:sixers/views/league/tabs/matchups_tab.dart';
 import 'package:sixers/views/league/tabs/roster_tab.dart';
-import 'package:sixers/views/league/tabs/transactions_tab.dart';
+import 'package:sixers/views/league/tabs/trades_tab.dart';
 
 /// Returns [base] with each team's leaderboard record (wins / losses /
 /// matchesCompleted / avgPointsPerGame / matchScores) populated from the
@@ -189,8 +189,8 @@ class _ActiveLeagueScreenState extends ConsumerState<ActiveLeagueScreen> with Ti
 
           const SizedBox(height: 15),
 
-          // Game selector (hidden on matchups tab — shown inline there)
-          if (_currentTabIndex != 1) ...[
+          // Game selector (hidden on matchups tab and trades tab)
+          if (_currentTabIndex != 1 && _currentTabIndex != 2) ...[
             Container(
               width: double.infinity,
               decoration: BoxDecoration(color: AppColors.black200),
@@ -249,7 +249,7 @@ class _ActiveLeagueScreenState extends ConsumerState<ActiveLeagueScreen> with Ti
                   selectedGameNum: _selectedGameNum,
                   onGameChanged: _onGameChanged,
                 ),
-                TransactionsTab(league: league),
+                TradesTab(league: widget.league),
               ],
             ),
           ),
