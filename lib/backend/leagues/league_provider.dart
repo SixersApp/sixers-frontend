@@ -98,3 +98,15 @@ class Leagues extends _$Leagues {
     }
   }
 }
+
+/// Fetches a single league via GET /leagues/:leagueId. Unlike [leaguesProvider],
+/// the team objects in the response include leaderboard fields
+/// (wins / losses / matches_completed / avg_points_per_game / match_scores).
+@riverpod
+Future<League?> leagueDetail(Ref ref, String leagueId) async {
+  // Reuse auth gating from the list provider
+  final auth = await ref.watch(authProviderProvider.future);
+  if (auth == null) return null;
+
+  return LeagueService().getLeague(leagueId);
+}

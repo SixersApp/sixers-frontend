@@ -139,6 +139,7 @@ class HomeScreen extends ConsumerWidget {
                                   // Flatten matchups, keeping only the user's matchups
                                   final flatMatchups = <({String leagueId, Matchup matchup})>[];
                                   for (final group in leagueGroups) {
+                                    if (leagues.isEmpty) continue;
                                     final league = leagues.firstWhere(
                                       (l) => l.id == group.leagueId,
                                       orElse: () => leagues.first,

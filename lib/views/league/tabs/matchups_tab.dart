@@ -5,6 +5,7 @@ import 'package:sixers/backend/fantasy_matchup/matchup_provider.dart' show weekM
 import 'package:sixers/backend/fantasy_matchup/scoring_utils.dart';
 import 'package:sixers/backend/leagues/league_model.dart';
 import 'package:sixers/backend/leagues/league_scoring_rule_model.dart';
+import 'package:sixers/backend/leagues/standings.dart';
 import 'package:sixers/backend/fantasy_matchup/matchup_model.dart';
 import 'package:sixers/backend/live_match/active_match_model.dart';
 import 'package:sixers/backend/live_match/live_match_provider.dart';
@@ -490,12 +491,11 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
     final isUpcoming = weekStatus == 'upcoming';
     final isActive = weekStatus == 'active';
     final isCompleted = weekStatus == 'completed';
-    final team1Index = team1Meta != null
-        ? widget.league.teams.indexOf(team1Meta) + 1
-        : 0;
-    final team2Index = team2Meta != null
-        ? widget.league.teams.indexOf(team2Meta) + 1
-        : 0;
+    // Real league standings rank (wins desc, losses asc, avg ppg desc).
+    // Falls back to 0 (chip hidden) if rank can't be resolved.
+    final ranks = rankByTeamId(widget.league.teams);
+    final team1Index = team1Meta != null ? (ranks[matchup.team1.fantasyTeamId] ?? 0) : 0;
+    final team2Index = team2Meta != null ? (ranks[matchup.team2.fantasyTeamId] ?? 0) : 0;
 
     return Column(
       children: [
@@ -534,22 +534,23 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
                                 size: 28,
                               ),
                       ),
-                      Positioned(
-                        bottom: 1,
-                        left: 1,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.black100,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          child: Text(
-                            '#$team1Index',
-                            style: Theme.of(context).textTheme.titleSmall
-                                ?.copyWith(color: AppColors.black800),
+                      if (team1Index > 0)
+                        Positioned(
+                          bottom: 1,
+                          left: 1,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.black100,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                            child: Text(
+                              '#$team1Index',
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(color: AppColors.black800),
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                   Expanded(
@@ -646,22 +647,23 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
                                 size: 28,
                               ),
                       ),
-                      Positioned(
-                        bottom: 1,
-                        right: 1,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.black100,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          child: Text(
-                            '#$team2Index',
-                            style: Theme.of(context).textTheme.titleSmall
-                                ?.copyWith(color: AppColors.black800),
+                      if (team2Index > 0)
+                        Positioned(
+                          bottom: 1,
+                          right: 1,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.black100,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                            child: Text(
+                              '#$team2Index',
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(color: AppColors.black800),
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ],
@@ -1445,6 +1447,11 @@ class _MatchupsTabState extends ConsumerState<MatchupsTab> {
         fantasyTeamColor: teamMeta?.teamColor != null
             ? stringToColor(teamMeta.teamColor)
             : null,
+        scoringRules: widget.league.scoringRules,
+        captainId: isCaptain ? player.playerId : null,
+        viceCaptainId: isViceCaptain ? player.playerId : null,
+        initialTab: 1,
+        leagueId: widget.league.id,
       ),
       child: Container(
         padding: EdgeInsets.only(
